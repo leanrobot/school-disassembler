@@ -1,0 +1,16 @@
+=== Commit Strategy ===
+Initially, clone the repository.
+
+- Pull from the repository: 'git pull remote origin'
+- create a new branch and checkout: 'git checkout -b <branch_name>
+- develop your branch... commit often:
+    'git status' # View a list of which files have been modified, from the previous HEAD
+    'git diff'   # View a diff of all files between HEAD & changes
+                 # Navigate with 'j,k' quit with 'q'
+    'git add -A' # add all changes to the commit
+    'git commit' # make commit
+- Once done working on feature, merge back into master branch
+    'git checkout master' # checkout the master branch
+    'git pull remote origin' # pull the latest changes
+    'git merge <branch_name>' # merge your branch into master, resolve any conflicts
+    'git push remote origin' # update the remote repository
