@@ -1,0 +1,60 @@
+00001B58 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.14.01
+Created On: 5/8/2014 2:07:52 PM
+
+00001B58                             1      ORG 7000
+00001B58                             2  
+00001B58                             3  * -----------------
+00001B58                             4  * Title: Test Program
+00001B58                             5  * Author: Tom
+00001B58                             6  * -----------------
+00001B58                             7  
+00001B58                             8  START:
+00001B58                             9  
+00001B58                            10  * REQUIRED EA MODES
+00001B58                            11  * Dn, An, (An), #DATA, (An)+, -(An), (xxx).W, (xxx.L)
+00001B58                            12  
+00001B58                            13  
+00001B58                            14  **********************
+00001B58                            15  * Add Commands
+00001B58                            16  
+00001B58                            17  
+00001B58                            18  **********************
+00001B58                            19  * Move Commands
+00001B58                            20  
+00001B58                            21      
+00001B58  1400                      22      MOVE.B D0,D2
+00001B5A  1415                      23      MOVE.B (A5),D2
+00001B5C  141D                      24      MOVE.B (A5)+,D2
+00001B5E  1425                      25      MOVE.B -(A5),D2
+00001B60  11C2 5000                 26      MOVE.B D2,$5000
+00001B64  11D0 5000                 27      MOVE.B (A0),$5000
+00001B68                            28  
+00001B68  3400                      29      MOVE.W D0,D2
+00001B6A  3408                      30      MOVE.W A0,D2
+00001B6C  3415                      31      MOVE.W (A5),D2
+00001B6E  3409                      32      MOVE.W A1,D2
+00001B70  341D                      33      MOVE.W (A5)+,D2
+00001B72  3425                      34      MOVE.W -(A5),D2
+00001B74  31C2 5000                 35      MOVE.W D2,$5000
+00001B78  31D0 5000                 36      MOVE.W (A0),$5000
+00001B7C                            37  
+00001B7C  2400                      38      MOVE.L D0,D2
+00001B7E  2408                      39      MOVE.L A0,D2
+00001B80  2415                      40      MOVE.L (A5),D2
+00001B82  2409                      41      MOVE.L A1,D2
+00001B84  241D                      42      MOVE.L (A5)+,D2
+00001B86  2425                      43      MOVE.L -(A5),D2
+00001B88  21C2 5000                 44      MOVE.L D2,$5000
+00001B8C  21D0 5000                 45      MOVE.L (A0),$5000
+00001B90                            46  
+00001B90                            47      END START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+START               1B58
