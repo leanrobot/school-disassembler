@@ -102,6 +102,23 @@ START:                  ; first instruction of program
     *CMPI.L    #12345678, #123 *ERROR, destination cannot be direct data  
     *CMPI.L    #12345678987,D1   *ERROR, data size does not match operation
     
+    *Test code for BCLR
+    BCLR.L    D1, D0
+    *BCLR    D1, A1    *ERROR, destination cannot be address register
+    BCLR    D1, (A1)
+    BCLR    D1, (A1)+
+    BCLR    D1, -(A1)
+    BCLR    D1, $4000
+    BCLR    D1, $8000
+    
+    BCLR    #12345678, D1
+    *BCLR    #1234, A1    *ERROR, destination cannot be address register
+    BCLR    #1234, (A1)
+    BCLR    #1234, (A1)+
+    BCLR    #1234, -(A1)
+    BCLR    #1234, $4000
+    BCLR    #1234, $8000 
+    
     SIMHALT             ; halt simulator
 
 * Put variables and constants here

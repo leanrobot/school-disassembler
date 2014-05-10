@@ -1,6 +1,6 @@
 00007000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.14.01
-Created On: 5/9/2014 1:17:19 AM
+Created On: 5/9/2014 10:58:40 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :
@@ -106,11 +106,24 @@ Created On: 5/9/2014 1:17:19 AM
 000070E4                           102      *CMPI.L    #12345678, #123 *ERROR, destination cannot be direct data  
 000070E4                           103      *CMPI.L    #12345678987,D1   *ERROR, data size does not match operation
 000070E4                           104      
-000070E4  FFFF FFFF                105      SIMHALT             ; halt simulator
-000070E8                           106  
-000070E8                           107  * Put variables and constants here
-000070E8                           108  
-000070E8                           109      END    START        ; last line of source
+000070E4                           105      *Test code for BCLR
+000070E4  0380                     106      BCLR.L    D1, D0
+000070E6                           107      *BCLR    D1, A1    *ERROR, destination cannot be address register
+000070E6  0391                     108      BCLR    D1, (A1)
+000070E8  0399                     109      BCLR    D1, (A1)+
+000070EA  03A1                     110      BCLR    D1, -(A1)
+000070EC  03B8 4000                111      BCLR    D1, $4000
+000070F0  03B9 00008000            112      BCLR    D1, $8000
+000070F6                           113      
+000070F6  0881 004E                114      BCLR    #12345678, D1
+000070FA                           115      *BCLR    #1234, A1    *ERROR, destination cannot be address register
+000070FA  0891 000C                116      BCLR    #12, (A1)
+000070FE                           117      
+000070FE  FFFF FFFF                118      SIMHALT             ; halt simulator
+00007102                           119  
+00007102                           120  * Put variables and constants here
+00007102                           121  
+00007102                           122      END    START        ; last line of source
 
 No errors detected
 No warnings generated
