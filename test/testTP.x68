@@ -54,15 +54,15 @@ START:
 	MOVEA.W (A1),A2
 	MOVEA.W (A1)+,A2
 	MOVEA.W -(A1),A2
-	MOVEA.W $07FFF,A2 	; Word addr
-	MOVEA.W $FFFF8000,A2 ; Word addr TODO NOT SURE
+	MOVEA.W $07FFF,A2 		* Word addr
+	MOVEA.W $FFFF8000,A2 	* Word addr TODO NOT SURE
 
 	MOVEA.L D0,A2
 	MOVEA.L A1,A2
 	MOVEA.L (A1),A2
 	MOVEA.L (A1)+,A2
 	MOVEA.L -(A1),A2
-	MOVEA.L $8005,A2	; Long Word addr
+	MOVEA.L $8005,A2		* Long Word addr
 
 	* Incorrect Tests
 
@@ -71,14 +71,17 @@ START:
 
 	* Correct Tests
 	LEA (A1),A2
-	LEA $07FFF,A2 ; Word addr
-	LEA $8000,A2 ; Word addr
-	LEA $00008000,A2; Long word addr
+	LEA $07FFF,A2    	* Word addr
+	LEA $8000,A2 		* Word addr
+	LEA $00008000,A2 	* Long word addr
 
 	* Incorrect Tests
 
 ****************************
 * OR Tests
+
+	*** <EA> --> Dn ***
+
 	OR.B D0,D1
 	OR.B (A1),D1
 	OR.B (A1)+,D1
@@ -103,11 +106,57 @@ START:
 	OR.L $100,D1
 	OR.L $1234A,D1
 
-	* TODO Half done, need to add DN -> <EA> 
+	*** Dn --> <EA> ***
+
+	OR.B D1,(A1)
+	OR.B D1,(A1)+
+	OR.B D1,-(A1)
+	OR.B D1,$07FF * Word addr
+	OR.B D1,$8000 * Long word addr
+
+	OR.W D1,(A1)
+	OR.W D1,(A1)+
+	OR.W D1,-(A1)
+	OR.W D1,$07FF * Word addr
+	OR.W D1,$8000 * Long word addr
+
+	OR.L D1,(A1)
+	OR.L D1,(A1)+
+	OR.L D1,-(A1)
+	OR.L D1,$07FF * Word addr
+	OR.L D1,$8000 * Long word addr
+
+
+******************************
+* ORI Tests
+
+	* Correct tests
+	ORI.B #$0000,D1
+	ORI.B #$0000,(A1)
+	ORI.B #$0000,(A1)+
+	ORI.B #$0000,-(A1)
+	ORI.B #$0000, $07FF * Word addr
+	ORI.B #$0000, $8000 * Word addr
+
+	ORI.W #$0000,D1
+	ORI.W #$0000,(A1)
+	ORI.W #$0000,(A1)+
+	ORI.W #$0000,-(A1)
+	ORI.W #$0000, $07FF * Word addr
+	ORI.W #$0000, $8000 * Word addr
+
+	ORI.L #$0000,D1
+	ORI.L #$0000,(A1)
+	ORI.L #$0000,(A1)+
+	ORI.L #$0000,-(A1)
+	ORI.L #$0000, $07FF * Word addr
+	ORI.L #$0000, $8000 * Word addr
+
+	* Incorrect Tests
 
 ****************************
 * Bcc tests
-
+BRANCH NOP
 	BCC BRANCH
 	BCS BRANCH
 	BEQ BRANCH
@@ -122,6 +171,18 @@ START:
 	BPL BRANCH
 	BVC BRANCH
 	BVS BRANCH
+
+	* Incorrect Tests
+
+******************************
+* MOVEM Tests
+
+	MOVEM D0-D7, $4500
+	MOVEM $4500, D0-D7
+
+	* Incorrect Tests
+
+******************************
 
 
 	END START
