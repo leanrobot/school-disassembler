@@ -1,0 +1,135 @@
+00007000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.14.01
+Created On: 5/9/2014 10:58:40 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      :
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00007000                             7      ORG    $7000
+00007000                             8  START:                  ; first instruction of program
+00007000                             9  
+00007000                            10  * Put program code here
+00007000                            11  
+00007000                            12      * Test code for EOR
+00007000  B101                      13      EOR.B    D0, D1
+00007002                            14      *EOR.B    D0, A1    *ERROR, does not take An
+00007002  B111                      15      EOR.B    D0,(A1)
+00007004  B119                      16      EOR.B    D0,(A1)+
+00007006  B121                      17      EOR.B    D0,-(A1)
+00007008  B139 00008000             18      EOR.B    D0,$8000
+0000700E  B138 4000                 19      EOR.B    D0,$4000
+00007012                            20      *EOR.B    D0,#1234   *ERROR, does not take direct data
+00007012                            21      *EOR.B    A1,D1    *ERROR, first param must be Dn 
+00007012                            22     
+00007012  B141                      23      EOR.W    D0, D1
+00007014                            24      *EOR.W    D0, A1    *ERROR, does not take An
+00007014  B151                      25      EOR.W    D0,(A1)
+00007016  B159                      26      EOR.W    D0,(A1)+
+00007018  B161                      27      EOR.W    D0,-(A1)
+0000701A  B179 00008000             28      EOR.W    D0,$8000
+00007020  B178 4000                 29      EOR.W    D0,$4000
+00007024                            30      *EOR.W    D0,#1234    *ERROR, does not take direct data
+00007024                            31      *EOR.W    A1,D1    *ERROR, first param must be Dn 
+00007024                            32      
+00007024  B181                      33      EOR.L    D0, D1
+00007026                            34      *EOR.L    D0, A1    *ERROR, does not take An
+00007026  B191                      35      EOR.L    D0,(A1)
+00007028  B199                      36      EOR.L    D0,(A1)+
+0000702A  B1A1                      37      EOR.L    D0,-(A1)
+0000702C  B1B9 00008000             38      EOR.L    D0,$8000
+00007032  B1B8 4000                 39      EOR.L    D0,$4000
+00007036                            40      *EOR.L    D0,#1234 *ERROR, does not take direct data
+00007036                            41      *EOR.L    A1,D1    *ERROR, first param must be Dn 
+00007036                            42      
+00007036                            43      *Test code for CMP
+00007036  B200                      44      CMP.B    D0, D1
+00007038                            45      *CMP.B    A1, D1  *ERROR, can be only be used with W and L
+00007038  B211                      46      CMP.B    (A1),D1
+0000703A  B219                      47      CMP.B    (A1)+,D1
+0000703C  B221                      48      CMP.B    -(A1),D1
+0000703E  B239 00008000             49      CMP.B    $8000,D1
+00007044  B238 4000                 50      CMP.B    $4000,D1
+00007048  B23C 007B                 51      CMP.B    #123,D1   
+0000704C                            52      *CMP.B    D0,A1   *ERROR, destination must be Dn
+0000704C                            53      
+0000704C  B240                      54      CMP.W    D0, D1
+0000704E  B249                      55      CMP.W    A1, D1  
+00007050  B251                      56      CMP.W    (A1),D1
+00007052  B259                      57      CMP.W    (A1)+,D1
+00007054  B261                      58      CMP.W    -(A1),D1
+00007056  B279 00008000             59      CMP.W    $8000,D1
+0000705C  B278 4000                 60      CMP.W    $4000,D1
+00007060  B27C 04D2                 61      CMP.W    #1234,D1   
+00007064                            62      *CMP.W    D0,A1   *ERROR, destination must be Dn
+00007064                            63      
+00007064  B280                      64      CMP.L    D0, D1
+00007066  B289                      65      CMP.L    A1, D1  
+00007068  B291                      66      CMP.L    (A1),D1
+0000706A  B299                      67      CMP.L    (A1)+,D1
+0000706C  B2A1                      68      CMP.L    -(A1),D1
+0000706E  B2B9 00008000             69      CMP.L    $8000,D1
+00007074  B2B8 4000                 70      CMP.L    $4000,D1
+00007078  B2BC 00BC4B20             71      CMP.L    #12340000,D1   
+0000707E                            72      *CMP.L    D0,A1   *ERROR, destination must be Dn
+0000707E                            73      
+0000707E                            74      *Test code for CMPI
+0000707E  0C01 000C                 75      CMPI.B    #12, D1
+00007082                            76      *CMPI.B    #12, A1 *ERROR, destination cannot be An
+00007082  0C11 000C                 77      CMPI.B    #12, (A1)
+00007086  0C19 000C                 78      CMPI.B    #12, (A1)+
+0000708A  0C21 000C                 79      CMPI.B    #12, -(A1)
+0000708E  0C39 000C 00008000        80      CMPI.B    #12, $8000
+00007096  0C38 000C 4000            81      CMPI.B    #12, $4000
+0000709C                            82      *CMPI.B    #12, #123 *ERROR, destination cannot be direct data  
+0000709C                            83      *CMPI.B    #1234,D1   *ERROR, data size does not match operation
+0000709C                            84      
+0000709C  0C41 04D2                 85      CMPI.W    #1234, D1
+000070A0                            86      *CMPI.W    #1234, A1 *ERROR, destination cannot be An
+000070A0  0C51 04D2                 87      CMPI.W    #1234, (A1)
+000070A4  0C59 04D2                 88      CMPI.W    #1234, (A1)+
+000070A8  0C61 04D2                 89      CMPI.W    #1234, -(A1)
+000070AC  0C79 04D2 00008000        90      CMPI.W    #1234, $8000
+000070B4  0C78 04D2 4000            91      CMPI.W    #1234, $4000
+000070BA                            92      *CMPI.W    #12, #123 *ERROR, destination cannot be direct data  
+000070BA                            93      *CMPI.W    #12345678,D1   *ERROR, data size does not match operation
+000070BA                            94      
+000070BA  0C81 00BC614E             95      CMPI.L    #12345678, D1
+000070C0                            96      *CMPI.L    #12345678, A1 *ERROR, destination cannot be An
+000070C0  0C91 00BC614E             97      CMPI.L    #12345678, (A1)
+000070C6  0C99 00BC614E             98      CMPI.L    #12345678, (A1)+
+000070CC  0CA1 00BC614E             99      CMPI.L    #12345678, -(A1)
+000070D2  0CB9 00BC614E 00008000   100      CMPI.L    #12345678, $8000
+000070DC  0CB8 00BC614E 4000       101      CMPI.L    #12345678, $4000
+000070E4                           102      *CMPI.L    #12345678, #123 *ERROR, destination cannot be direct data  
+000070E4                           103      *CMPI.L    #12345678987,D1   *ERROR, data size does not match operation
+000070E4                           104      
+000070E4                           105      *Test code for BCLR
+000070E4  0380                     106      BCLR.L    D1, D0
+000070E6                           107      *BCLR    D1, A1    *ERROR, destination cannot be address register
+000070E6  0391                     108      BCLR    D1, (A1)
+000070E8  0399                     109      BCLR    D1, (A1)+
+000070EA  03A1                     110      BCLR    D1, -(A1)
+000070EC  03B8 4000                111      BCLR    D1, $4000
+000070F0  03B9 00008000            112      BCLR    D1, $8000
+000070F6                           113      
+000070F6  0881 004E                114      BCLR    #12345678, D1
+000070FA                           115      *BCLR    #1234, A1    *ERROR, destination cannot be address register
+000070FA  0891 000C                116      BCLR    #12, (A1)
+000070FE                           117      
+000070FE  FFFF FFFF                118      SIMHALT             ; halt simulator
+00007102                           119  
+00007102                           120  * Put variables and constants here
+00007102                           121  
+00007102                           122      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+START               7000
