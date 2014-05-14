@@ -13,4 +13,4 @@ Initially, clone the repository.
     'git checkout master' # checkout the master branch
     'git pull remote origin' # pull the latest changes
     'git merge <branch_name>' # merge your branch into master, resolve any conflicts
-    'git push remote origin' # update the remote repository
+    'git push origin master' # update the remote repository
