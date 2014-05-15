@@ -7,42 +7,61 @@
 CR      EQU     $0D
 LF      EQU     $0A
 
-    ORG    $7000
-START:                  ; first instruction of program
+stack EQU $7000    *sp initial
+
+
+    ORG    $4000
+START:      
+    LEA stack, SP                ; first instruction of program
+
 
 * Put program code here
     LEA     IO_OPEN, A1        *Print welcome message
     MOVE.B  #14, D0
     TRAP    #15
 
+DISPLAY_AND_PROMPT_FOR_INPUT:
+    *Clears D2 and D3 for new input/checking address validity
+    CLR.L    D2
+    CLR.L    D3
+
     LEA    IO_STARTMSSG, A1       *Print request for address
     MOVE.B  #14, D0
     TRAP    #15
-    
+    MOVE.L  #$00000000, A1  *Clears A1 so that IO_STARTMSSG is not overwritten
     MOVE.B  #2,D0           *Take in address from user and put in (A1)
     TRAP #15
     
-    JSR     IO_CONVERT_ASCII_ADDR
-    MOVE.L  D3,(IO_STARTADDR)
+    JSR     IO_CONVERT_ASCII_ADDR    *Convert user ASCII input to hex address
+    BRA     IO_CHECK_EVEN_START_ADDRESS   *Check start address is an even #
+IO_STORE_START:
+    MOVE.L  D3,IO_STARTADDR          *Store converted address in variable
     
     CLR.L   D3              * RESET D3 to work with ending address
     
     LEA    IO_ENDMSSG, A1       *Print request for address
     MOVE.B  #14, D0
     TRAP    #15
-    
+    MOVE.L  #$00000000, A1   *Clears A1 so that IO_ENDMSSG is not overwritten
     MOVE.B  #2,D0           *Take in address from user and put in (A1)
     TRAP #15
     
-    JSR     IO_CONVERT_ASCII_ADDR
-    MOVE.L  D3,(IO_ENDADDR)
+    JSR     IO_CONVERT_ASCII_ADDR     *Convert user ASCII input to hex address
+    BRA     IO_CHECK_EVEN_END_ADDRESS *Check end address is an even #
+IO_STORE_END:
+    MOVE.L  D3,IO_ENDADDR             *Store converted address in variable
+    
+    * Verify starting address < ending address
+    BRA     IO_CHECK_ENDING_ADDR
+IO_INPUT_SUCCESSFUL:
+    
     
     *******************************************************************
     * Begin Looping portion of code.
-    MOVE.L (IO_STARTADDR),(IO_CURR_ADDR)
+    MOVE.L (IO_STARTADDR),(IO_CURR_ADDR)    *Move starting address to current address variable
 MAIN_LOOP: 
-    JSR IO_HEX2ASCII
-    JSR OP_DETERMINE_OP_CODE
+    JSR IO_HEX2ASCII                        *Loop through address converting Hex to ascii
+    JSR OP_DETERMINE_OP_CODE                *Determine what the opcode is
     JSR IO_MOVE_OP_CODE_TO_BUFFER  
     
 
@@ -55,31 +74,78 @@ MAIN_LOOP:
 
 IO_CONVERT_ASCII_ADDR:
     MOVE.B  D1,D2           *Move length of address from D1 to D2    
+
+*puts final converted address into D3
 IO_LOOP: 
      MOVE.B    (A1)+, D1
-     JSR IO_AS2HEX
+     JSR IO_AS2HEX          *Go to conversion loop for each digit
      ROL.L #4, D3
      ADD.B D1, D3
      SUB.B #1, D2
      BNE IO_LOOP
-     
      RTS
+
+
+*Checks that the start address is an even number
+IO_CHECK_EVEN_START_ADDRESS:
+     MOVE.L   D3, D4
+     ANDI.B   #$1, D4
+     CMPI.B    #$1, D4
+     BEQ      IO_ADDRESS_ODD_PRINT_ERROR_MSSG
+     BRA      IO_STORE_START
+
+*Checks that the ending address is an even number
+IO_CHECK_EVEN_END_ADDRESS:
+     MOVE.L   D3, D4
+     ANDI.B   #$1, D4
+     CMPI.B    #$1, D4
+     BEQ      IO_ADDRESS_ODD_PRINT_ERROR_MSSG
+     BRA      IO_STORE_END
+     
+*Prints odd address error message and returns main
+IO_ADDRESS_ODD_PRINT_ERROR_MSSG:
+     LEA   IO_ODD_ERROR_MSSG, A1
+     MOVE.B   #14, D0
+     TRAP     #15
+     BRA   DISPLAY_AND_PROMPT_FOR_INPUT
+     
+*Checks to see that address is after starting address
+IO_CHECK_ENDING_ADDR:
+     CLR.L    D2
+     CLR.L    D3
+     MOVE.L   IO_STARTADDR, D2
+     MOVE.L   IO_ENDADDR, D3
+     CMP.L    D2, D3      *Compare start and end address
+     BLE    IO_ENDADDR_AFTER_STARTADDR
+     BRA    IO_INPUT_SUCCESSFUL    *Go back to main
+     
+*Displays message indicating ending address is smaller
+*than starting address. Jumps to main to have user re-enter
+IO_ENDADDR_AFTER_STARTADDR:
+
+     CLR.L    IO_STARTADDR
+     CLR.L    IO_ENDADDR
+     LEA IO_END_BEFORE_START_MSG, A1    
+     
+     MOVE.B  #14, D0
+     TRAP    #15
+     BRA    DISPLAY_AND_PROMPT_FOR_INPUT
 
 *Convert ASCII to Hex
 IO_AS2HEX:   
          CMP.B    #'A', D1    *Compare D1 
          BMI    IO_DIGIHEX     * BLT branches if D1 for digit
          BGE    IO_NUMHEX      *BGT branches if D1 for A-F
-         RTS
+IO_AS2HEX_COMPLETE         RTS
          
          
 IO_DIGIHEX:  
          SUB.B    #$30, D1   *Subtract 30 from D1 to convert from ASCII digit to Hex digit
-         RTS                *Return to IO
+         BRA  IO_AS2HEX_COMPLETE              *Return to IO
             
 IO_NUMHEX:   
          SUB.B    #$37, D1   *Subtract 37 from D1 to convert from ASCII A-F to Hex
-         RTS
+         BRA IO_AS2HEX_COMPLETE
          
 IO_HEX2ASCII:
          * D1 = loop counter
@@ -98,12 +164,15 @@ IO_HEX2ASCII_LOOP:
          BLE      IO_DIGIHEX2ASCII    
          BGT      IO_LETTERHEX2ASCII 
          
-         * Write to line buffer
-         MOVE.B D3,(LINE_BUF)+
+         * Write to address register
+         MOVE.B D3,(A1)+        *Can't increment line buffer, so this is an address register now
          
          * Reloop
          SUBI #1,D1
          BNE IO_HEX2ASCII_LOOP
+         
+         MOVE.L A1, IO_LINE_BUF *Move converted address into line buffer
+         MOVE.L A1, D4      *Move converted address into D4 for op_code determination
          
          RTS
          
@@ -117,6 +186,7 @@ IO_LETTERHEX2ASCII:
     
 IO_MOVE_OP_CODE_TO_BUFFER:
             * TODO
+         RTS
          
  
 *IO CONSTANTS
@@ -131,6 +201,8 @@ IO_OPEN     DC.B    ' ____ ____ ____ ', CR, LF
 
 IO_STARTMSSG    DC.B    'Enter a starting address: ',0
 IO_ENDMSSG      DC.B    'Enter a ending address: ',0
+IO_END_BEFORE_START_MSG    DC.B 'The ending address you entered is after the start address', CR, LF, 0
+IO_ODD_ERROR_MSSG DC.B  'Illegal address. Please re-enter even addresses', CR, LF, 0
 IO_TAB          DC.B    9  
 
 **IO VARIABLES
@@ -141,6 +213,7 @@ IO_CURR_ADDR    DS.L    1
 
 *===============================================================================================* OP CODE
 
+*Address where opcode is to decode is in D4
 OP_DETERMINE_OP_CODE:
     MOVE.B #1,(OP_CODE_UNKNWN)
     LEA OP_CODE,A1
@@ -169,6 +242,7 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
 
 
 *~Font name~Courier New~
