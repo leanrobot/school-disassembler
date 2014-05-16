@@ -165,6 +165,7 @@ IO_HEX2ASCII_LOOP:
          BGT      IO_LETTERHEX2ASCII 
          
          * Write to address register
+ADD_TO_BUFFER:         
          MOVE.B D3,(A1)+        *Can't increment line buffer, so this is an address register now
          
          * Reloop
@@ -178,11 +179,11 @@ IO_HEX2ASCII_LOOP:
          
 IO_DIGIHEX2ASCII:
          ADD.B     #$30, D3
-         RTS
+         BRA ADD_TO_BUFFER
 
 IO_LETTERHEX2ASCII:
          ADD.B    #$37, D3
-         RTS
+         BRA ADD_TO_BUFFER
     
 IO_MOVE_OP_CODE_TO_BUFFER:
             * TODO
