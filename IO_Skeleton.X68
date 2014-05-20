@@ -60,12 +60,14 @@ IO_INPUT_SUCCESSFUL:
     * Begin Looping portion of code.
     MOVE.L (IO_STARTADDR),(IO_CURR_ADDR)    *Move starting address to current address variable
 MAIN_LOOP: 
+    LEA IO_LINE_BUF, A0                   * pointer to line buffer
+    MOVE.L (IO_CURR_ADDR), D2               * Parameter setup for IO_HEX2ASCII
     JSR IO_HEX2ASCII                        *Loop through address converting Hex to ascii
+    JSR IO_INSERT_TAB
     JSR OP_DETERMINE_OP_CODE                *Determine what the opcode is
     JSR IO_MOVE_OP_CODE_TO_BUFFER  
     *If current address does not equal ending address, go back to MAIN_LOOP
 
-     
 
     SIMHALT ;*********** END OF MAIN ********************
 
@@ -148,114 +150,57 @@ IO_NUMHEX:
          SUB.B    #$37, D1   *Subtract 37 from D1 to convert from ASCII A-F to Hex
          BRA IO_AS2HEX_COMPLETE
          
+
+
+* D2 contains hex value to convert
+* A0 Contains the line buffer
 IO_HEX2ASCII:
-         * D1 = loop counter
-         * D2 = Original address
-         * D3 = working address for loop
-         
-         MOVE.L   (IO_CURR_ADDR),D2    * Get the current instruction address
-         MOVEQ    #8, D1               * Setup a loop from 8 --> 0.
-         CLR.L    (A3)
-         CLR.L    D4
-         CLR.L    D5
-         MOVE.L   D2, (A3)               * Move address to D2 to D3 to work with
-IO_HEX2ASCII_GET_DIGIT:
-         MOVE.B   (A3)+, D5         *Move one byte to D5 to work with
-         MOVE.B    D5, D6           *Copy byte to rotate, to get first digit of byte
-         ROR.B      #4, D5
-         ANDI.B  #$0F, D5
-         JSR IO_HEX2ASCII_LOOP         * Go to conversion loop for each digit
-         ROL.L    #8, D4
-         ADD.B    D5, D4
-         SUB.B    #1, D1               * Decrement loop counter
-         *Do it again, to get second digit of byte
-         MOVE.B   D6, D5               *Move copy back into D5 to get second digit
-         ANDI.B   #$05, D5
-         JSR IO_HEX2ASCII_LOOP
-         ROL.L    #8, D4
-         ADD.B    D5, D4
-         SUB.B    #1, D1              *Decrement loop counter
-         BEQ    IO_ADD_TO_BUFFER      *Add address to buffer
-         CMP.B    #4, D1              *If not 0, see if <= or >4
-         BLE    IO_HEX2ASCII_SECOND_HALF     *Move to function to hold second half
-         BGT    IO_HEX2ASCII_GET_DIGIT       *If still greater than 4, keep going
-IO_HEX2ASCII_GET_DIGIT_DONE:
-         *Concatenate the two registers
-         *Move d4 into another address register
-         RTS
-         
-         
-IO_HEX2ASCII_SECOND_HALF:
-         MOVE.L    D4, A2    *Move first half of address to A2 to save
-         CLR.L     D4        *Clear D4 for second half
-IO_HEX2ASCII_SECOND_HALF_LOOP:
-         MOVE.B   (A3)+, D5         *Move one byte to D5 to work with
-         MOVE.B    D5, D6           *Copy byte to rotate, to get first digit of byte
-         ROR.B     #4, D5
-         ANDI.B   #$0F, D5
-         JSR IO_HEX2ASCII_LOOP         * Go to conversion loop for each digit
-         ROL.L    #8, D4
-         ADD.B    D5, D4
-         SUB.B    #1, D1               * Decrement loop counter
-         *Do it again, to get second digit of byte
-         MOVE.B   D6, D5               *Move copy back into D5 to get second digit
-         ANDI.B   #$05, D5
-         JSR IO_HEX2ASCII_LOOP
-         ROL.L    #8, D4
-         ADD.B    D5, D4
-         SUB.B    #1, D1              *Decrement loop counter
-         BEQ    IO_ADD_TO_BUFFER      *Add address to buffer
-         BEQ   IO_HEX2ASCII_GET_DIGIT_DONE
-         BNE   IO_HEX2ASCII_SECOND_HALF_LOOP
-         
+    MOVEM.L D0-D7/A1-A7, -(A7)
+    CLR.L D1
+    CLR.L D3
+    MOVE.B #8, d1 * counter for loop
+LOOP  ROL.L #4, D2          * rotate the value once.
+      MOVE.L D2, D3         * copy
+      AND.L #$0000000F, D3
+      CMP.B #$09,D3        * if F <= d3, letter.
+      BGT Letter
+      BLE Digit             * else, digit.
+Letter  ADD #$37,D3         * add $37
+        BRA EndIf
+Digit   ADD #$30,D3         * add $30
+EndIf   MOVE.B D3,(A0)+
 
-IO_HEX2ASCII_LOOP:
-         *MOVE.L   D2,D3
-         *LSR      D1,D3
-         *AND.L    #$0000000F, D3
-         
-         *Convert to ASCII
-         CMP.B    #9, D5
-         BLE      IO_DIGIHEX2ASCII    
-         BGT      IO_LETTERHEX2ASCII 
-IO_HEX2ASCII_LOOP_COMPLETE:
-         RTS
-         * Write to address register
-IO_ADD_TO_BUFFER:         
-         *MOVE.B D3,(A1)+        *Can't increment line buffer, so this is an address register now
-         
-         * Reloop
-         *SUBI #1,D1
-         *BNE IO_HEX2ASCII_LOOP
-         
-         MOVE.L D4, IO_LINE_BUF *Move converted address into line buffer
-         
-         CLR.L   (A1)
-         
-         MOVE.L    IO_LINE_BUF, A1
-         MOVE.L    IO_TAB, A2
-         
-IO_INSERT_FIRST_TAB:         
-         MOVE.B    (A2)+, (A1)+
-         BNE       IO_INSERT_FIRST_TAB
-         MOVE.L    A1, IO_LINE_BUF
-         
-         LEA    IO_LINE_BUF, A3
-         MOVE.B    #14, D0
-         TRAP      #15
-         
-         *Add Tab to Line buffer
-         *MOVE.L A1, D4      *Move converted address into D4 for op_code determination
-         
-         BRA IO_HEX2ASCII_GET_DIGIT_DONE
-         
-IO_DIGIHEX2ASCII:
-         ADD.B     #$30, D5
-         BRA IO_HEX2ASCII_LOOP_COMPLETE
+        SUB.B #1,D1         * decrement loop counter
+        BNE LOOP          * repeat loop?
 
-IO_LETTERHEX2ASCII:
-         ADD.B    #$37, D5
-         BRA IO_HEX2ASCII_LOOP_COMPLETE
+    MOVEM.L (A7)+, D0-D7/A1-A7
+    RTS
+
+* A0 is the current place in line buffer
+IO_INSERT_TAB:
+    MOVE.B #$20,(A0)+
+    MOVE.B #$20,(A0)+
+    MOVE.B #$20,(A0)+
+    MOVE.B #$20,(A0)+
+    RTS
+
+
+
+         
+*IO_INSERT_FIRST_TAB:         
+*         MOVE.B    (A2)+, (A1)+
+*         BNE       IO_INSERT_FIRST_TAB
+*         MOVE.L    A1, IO_LINE_BUF
+*         
+*         LEA    IO_LINE_BUF, A3
+*         MOVE.B    #14, D0
+*         TRAP      #15
+*         
+*         *Add Tab to Line buffer
+*         *MOVE.L A1, D4      *Move converted address into D4 for op_code determination
+*         
+*         BRA IO_HEX2ASCII_GET_DIGIT_DONE
+         
     
 IO_MOVE_OP_CODE_TO_BUFFER:
             * TODO
@@ -315,6 +260,7 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
 
 
 

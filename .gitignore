@@ -1,2 +1,4 @@
 .DS_Store
 */.DS_Store
+*.S68
+*.L68
