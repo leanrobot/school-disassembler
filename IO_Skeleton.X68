@@ -36,6 +36,7 @@ DISPLAY_AND_PROMPT_FOR_INPUT:
     BRA     IO_CHECK_EVEN_START_ADDRESS   *Check start address is an even #
 IO_STORE_START:
     MOVE.L  D3,IO_STARTADDR          *Store converted address in variable
+    MOVEA.L D3, A6                   * Move the starting address to a6, current soemthign
     
     CLR.L   D3              * RESET D3 to work with ending address
     
@@ -58,18 +59,34 @@ IO_INPUT_SUCCESSFUL:
     
     *******************************************************************
     * Begin Looping portion of code.
-    MOVE.L (IO_STARTADDR),(IO_CURR_ADDR)    *Move starting address to current address variable
-MAIN_LOOP: 
+    ****MOVEA.L (IO_STARTADDR),A6    *Move starting address to current address variable
+MAIN_LOOP:
+IO_READING:
+    MOVE.L      (IO_ENDADDR),D0
+    CMP.L       A6,D0
+    BLT         PROMPT_TO_RESTART
+    BGE         READ_IN_AND_PROCESS
+
+PROMPT_TO_RESTART:
+    RTS * TODO
+    SIMHALT ;*********** END OF MAIN ********************
+
+READ_IN_AND_PROCESS:
     LEA IO_LINE_BUF, A0                   * pointer to line buffer
-    MOVE.L (IO_CURR_ADDR), D2               * Parameter setup for IO_HEX2ASCII
-    JSR IO_HEX2ASCII                        *Loop through address converting Hex to ascii
+    MOVE.L A6, D2               * Parameter setup for IO_HEX2ASCII
+    JSR IO_HEX2ASCII             *Loop through address converting Hex to ascii
     JSR IO_INSERT_TAB
     JSR OP_DETERMINE_OP_CODE                *Determine what the opcode is
-    JSR IO_MOVE_OP_CODE_TO_BUFFER  
-    *If current address does not equal ending address, go back to MAIN_LOOP
 
+    MOVE.B #$0, (A0)+ * Terminate the line buffer
 
-    SIMHALT ;*********** END OF MAIN ********************
+    LEA     IO_LINE_BUF, A1
+    MOVE.B #13, D0
+    TRAP #15
+
+    MOVE.W (A6)+,D4
+
+    BRA IO_READING
 
 * Put variables and constants here
 *==================================================================* IO
@@ -201,10 +218,6 @@ IO_INSERT_TAB:
 *         
 *         BRA IO_HEX2ASCII_GET_DIGIT_DONE
          
-    
-IO_MOVE_OP_CODE_TO_BUFFER:
-            * TODO
-         RTS
          
  
 *IO CONSTANTS
@@ -232,15 +245,14 @@ IO_CURR_ADDR    DS.L    1
 *===============================================================================================* OP CODE
 
 *Address where opcode is to decode is in D4
+* A0 is line buffer
 OP_DETERMINE_OP_CODE:
     MOVE.B #1,(OP_CODE_UNKNWN)
-    LEA OP_CODE,A1
     * Hardcode 'D','A','T','A'
-    MOVE.B #'D', (A1)+
-    MOVE.B #'A', (A1)+
-    MOVE.B #'T', (A1)+
-    MOVE.B #'A', (A1)+
-    MOVE.B #0,   (A1)+
+    MOVE.B #'D', (A0)+
+    MOVE.B #'A', (A0)+
+    MOVE.B #'T', (A0)+
+    MOVE.B #'A', (A0)+
     RTS
 
 *===============================================================================================* EA
