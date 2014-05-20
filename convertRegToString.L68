@@ -1,0 +1,38 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.14.01
+Created On: 5/20/2014 2:16:15 PM
+
+00001000                             1      ORG $1000
+00001000                             2  START:
+00001000  123C 0008                  3      MOVE.B #8, d1 * counter for loop
+00001004  3279 00001036              4      MOVEA LINE,A1 * load string buffer
+0000100A  243C 001F70C2              5      MOVE.L #$001F70C2, D2
+00001010  E99A                       6  LOOP  ROL.L #4, D2          * rotate the value once.
+00001012  2602                       7        MOVE.L D2, D3         * copy
+00001014  C6BC 0000000F              8        AND.L #$0000000F, D3
+0000101A  B63C 0009                  9        CMP.B #$09,D3        * if F <= d3, letter.
+0000101E  6E00 0006                 10        BGT Letter
+00001022  6F00 000A                 11        BLE Digit             * else, digit.
+00001026  0643 0037                 12  Letter  ADD #$37,D3         * add $37
+0000102A  6000 0006                 13          BRA EndIf
+0000102E  0643 0030                 14  Digit   ADD #$30,D3         * add $30
+00001032  5301                      15  EndIf   SUB.B #1,D1         * decrement loop counter
+00001034  66DA                      16          BNE LOOP          * repeat loop?
+00001036                            17          
+00001036                            18  LINE    DS.B 80
+00001086                            19  
+00001086                            20      END START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+DIGIT               102E
+ENDIF               1032
+LETTER              1026
+LINE                1036
+LOOP                1010
+START               1000
