@@ -7,13 +7,14 @@
 CR      EQU     $0D
 LF      EQU     $0A
 
-stack EQU $A000    *sp initial
+stack   EQU     $A000    *sp initial
+shift   EQU     12
 
 
     ORG    $4000
 START:      
     LEA stack, SP                ; first instruction of program
-
+    LEA OP_jmp_table,A5
 
 * Put program code here
     LEA     IO_OPEN, A1        *Print welcome message
@@ -72,7 +73,7 @@ PROMPT_TO_RESTART:
     MOVE.B    #14, D0
     TRAP      #15
 
-    CLR.L     D1
+    CLR.L     D1  
 
     MOVE.B    #5, D0
     TRAP      #15
@@ -259,7 +260,7 @@ IO_LINE_BUF     DS.B    80
 IO_CURR_ADDR    DS.L    1
   
 
-*===============================================================================================* OP CODE
+*===================================================================* OP CODE
 
 *Address where opcode is to decode is in D4
 * A0 is line buffer
@@ -271,6 +272,222 @@ OP_DETERMINE_OP_CODE:
     MOVE.B #'T', (A0)+
     MOVE.B #'A', (A0)+
     RTS
+
+OP_DECODER:
+    * ready data for comparisons by shifting digits 15 through 12 to
+    * digits 0 through 3. 
+    
+    MOVE.B      #shift,D1
+    MOVE.W      D4,D0
+    LSR.W       D1,D0
+    
+    * jump table implementation
+    MULU        #6,D0
+    JSR         0(A5,D0) 
+    RTS                  *jumps back to READ_IN_AND_PROCESS
+    
+*ORI.B, ORI.W, ORI.L, BCLR.B, BCLS.L, CMPI.B, CMPI.W, CMPI.I
+OP_Code0000:
+
+*MOVE.B
+OP_Code0001:
+
+*MOVE.L, MOVEA.L
+OP_Code0010:
+
+*MOVE.W, MOVEA.W
+OP_Code0011:
+
+*NOP, JSR, RTS, NEG.B, NEG.W, NEG.L, LEA.L, MOVEM.W*, MOVEM.L*
+OP_Code0100:
+    * is it NOP?
+    MOVE.W      D4,D1
+    MOVE.W      #$4E71, D2
+    CMP.W       D2, D1
+    BEQ         OP_NOP
+    * is  it JSR?
+    MOVE.W      D4,D1
+    MOVE.W      #$4E80,D2
+    ANDI.W      #$FFC0,D1
+    CMP.W       D2,D1
+    BEQ         OP_JSR
+    * is it RTS?
+    MOVE.W      D4,D1
+    MOVE.W      #$4775,D2
+    CMP.W       D2, D1
+    BEQ         OP_RTS
+    * is it NEG?
+    MOVE.W      D4,D1    
+    MOVE.W      #$4400,D2
+    ANDI.W      #$FF00,D1
+    CMP.W       D2, D1
+    BEQ         OP_NEG   
+    * is it LEA.L?
+    MOVE.W      D4,D1
+    MOVE.W      #$41C0,D2
+    ANDI.W      #$F1C0,D1
+    CMP.W       D2,D1
+    BEQ         OP_LEA
+    * is it MOVEM?
+    MOVE.W      D4,D1
+    MOVE.W      #$4880,D2
+    ANDI.W      #$FB80,D1
+    CMP.W       D2,D1
+    BEQ         OP_MOVEM
+    * invalid op_code was given
+    BNE         OP_NOT_FOUND_ERROR
+
+    OP_NOP:
+        *TODO write NOP to some buffer to display
+        BRA         OP_Done_Decoding      
+
+    OP_JSR:
+        *TODO write JSR to some buffer to display    
+        *TODO effective Address Processing
+        BRA         OP_Done_Decoding
+    
+    OP_RTS:
+        *TODO write RTS to some buffer to display
+        BRA         OP_Done_Decoding
+    
+    OP_NEG:
+        *find out length
+        MOVE.W     D4,D1
+        ANDI.W     #$00C0,D1
+        * .B? 
+        MOVE.W     #$0000,D2
+        CMP.W      D2,D1
+        BEQ        OP_NEG_B
+        * .W?
+        MOVE.W     #$0040,D2
+        CMP.W      D2,D1
+        BEQ        OP_NEG_W
+        * .L?
+        MOVE.W     #$0080,D2
+        CMP.W      D2,D1
+        BEQ        OP_NEG_L
+        BNE        OP_NOT_FOUND_ERROR
+         
+        OP_NEG_B:
+            *TODO write NEG.B to some buffer to display    
+            *TODO effective Address Processing
+            BRA         OP_Done_Decoding
+ 
+        OP_NEG_W:
+            *TODO write NEG.W to some buffer to display    
+            *TODO effective Address Processing
+            BRA         OP_Done_Decoding
+ 
+        OP_NEG_L:
+            *TODO write NEG.L to some buffer to display    
+            *TODO effective Address Processing
+            BRA         OP_Done_Decoding
+    
+    OP_LEA:
+        *TODO write LEA to some buffer to display    
+        *TODO effective Address Processing
+        BRA         OP_Done_Decoding
+    
+    OP_MOVEM:
+        MOVE.W      D4,D1
+        MOVE.W      #$0400,D2
+        ANDI.W      #$0400,D1
+        CMP.W       D1,D2
+        BEQ         OP_MOVEM_MEM2REG
+        BNE         OP_MOVEM_REG2MEM
+        
+        OP_MOVEM_MEM2REG:
+            MOVE.W      D4,D1
+            MOVE.W      #$0040,D2
+            ANDI.W      #$0040,D1
+            CMP.W       D1,D2
+            BEQ         OP_MOVEM_MEM2REG_L
+            BNE         OP_MOVEM_MEM2REG_W
+            
+            OP_MOVEM_MEM2REG_L:
+                *TODO print and EA
+                BRA         OP_Done_Decoding
+            OP_MOVEM_MEM2REG_W:
+                *TODO print and EA
+                BRA         OP_Done_Decoding
+        
+        OP_MOVEM_REG2MEM:
+            MOVE.W      D4,D1
+            MOVE.W      #$0040,D2
+            ANDI.W      #$0040,D1
+            CMP.W       D1,D2 
+            BEQ         OP_MOVEM_REG2MEM_L
+            BNE         OP_MOVEM_REG2MEM_W     
+            
+            OP_MOVEM_REG2MEM_L:
+                *TODO print and EA
+                BRA         OP_Done_Decoding
+            OP_MOVEM_REG2MEM_W:
+                *TODO print and EA
+                BRA         OP_Done_Decoding
+        
+*SUBQ.B, SUBQ.W, SUBQ.L
+OP_Code0101:
+
+*BCS, BGE, BLT, BVC, BRA
+OP_Code0110:
+
+****NOT USED!!!
+OP_Code0111:
+
+*DIVS.W, OR.B*, OR.W*, OR.L*
+OP_Code1000:
+
+*SUB.B*, SUB.W*, SUB.L*
+OP_Code1001:
+
+****NOT USED!!!
+OP_Code1010:
+
+*EOR.B, EOR.W, EOR.L, CMP.B, CMP.W, CMP.L
+OP_Code1011:
+
+*MULS.W
+OP_Code1100:
+
+*ADD.B*, ADD.W*, ADD.L*, ADDA.W, ADDA.L
+OP_Code1101:
+
+*LSd.B*, LSd.W*, LSd.L*, ASd.B*, ASd.W*, ASd.L*, ROd.B*, ROD.W*, ROd.L*
+OP_Code1110:
+
+****NOT USED!!!
+OP_Code1111:
+
+
+OP_Done_Decoding:
+      RTS
+
+OP_NOT_FOUND_ERROR:
+    *Display error message
+    RTS    
+
+*===============================================================================================* OP CODE CONSTANTS
+*OP CODE CONSTANTS
+
+OP_jmp_table   
+    JMP         OP_Code0000
+    JMP         OP_Code0001
+    JMP         OP_Code0010
+    JMP         OP_Code0011
+    JMP         OP_Code0100
+    JMP         OP_Code0101
+    JMP         OP_Code0110
+    JMP         OP_Code0111
+    JMP         OP_Code1000
+    JMP         OP_Code1001
+    JMP         OP_Code1010
+    JMP         OP_Code1011
+    JMP         OP_Code1100
+    JMP         OP_Code1101
+    JMP         OP_Code1111
+    
+NOP    DC.B    'NOP'
 
 *===============================================================================================* EA
 
@@ -289,6 +506,7 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
 
 
 
