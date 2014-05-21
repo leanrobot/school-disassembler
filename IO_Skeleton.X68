@@ -68,7 +68,23 @@ IO_READING:
     BGE         READ_IN_AND_PROCESS
 
 PROMPT_TO_RESTART:
-    RTS * TODO
+    LEA    IO_RESTART_PROMPT, A1
+    MOVE.B    #14, D0
+    TRAP      #15
+
+    CLR.L     D1
+
+    MOVE.B    #5, D0
+    TRAP      #15
+
+    *Y/y = 59 OR 79
+    *N/n = 4E or 6E
+    CMP.B     #$59, D1
+    BEQ    DISPLAY_AND_PROMPT_FOR_INPUT
+    CMP.B     #$79, D1
+    BEQ    DISPLAY_AND_PROMPT_FOR_INPUT
+
+*DO NOT PUT METHODS BETWEEN PROMPT_TO_RESTART
     SIMHALT ;*********** END OF MAIN ********************
 
 READ_IN_AND_PROCESS:
@@ -235,6 +251,7 @@ IO_ENDMSSG      DC.B    'Enter a ending address: ',0
 IO_END_BEFORE_START_MSG    DC.B 'The ending address you entered is after the start address', CR, LF, 0
 IO_ODD_ERROR_MSSG DC.B  'Illegal address. Please re-enter even addresses', CR, LF, 0
 IO_TAB          DC.B    '    ', 0  
+IO_RESTART_PROMPT   DC.B    'Would you like to run again? Enter Y/N: ', CR, LF, 0
 
 **IO VARIABLES
 IO_LINE_BUF     DS.B    80
