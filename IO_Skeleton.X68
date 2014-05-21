@@ -93,6 +93,9 @@ READ_IN_AND_PROCESS:
     MOVE.L A6, D2               * Parameter setup for IO_HEX2ASCII
     JSR IO_HEX2ASCII             *Loop through address converting Hex to ascii
     JSR IO_INSERT_TAB
+    MOVE.B (A6)+,D4    
+    ROL.W       #8,D4
+    MOVE.B (A6)+,D4
     JSR OP_DETERMINE_OP_CODE                *Determine what the opcode is
 
     MOVE.B #$0, (A0)+ * Terminate the line buffer
@@ -101,7 +104,7 @@ READ_IN_AND_PROCESS:
     MOVE.B #13, D0
     TRAP #15
 
-    MOVE.W (A6)+,D4
+   
 
     BRA IO_READING
 
@@ -265,20 +268,24 @@ IO_CURR_ADDR    DS.L    1
 *Address where opcode is to decode is in D4
 * A0 is line buffer
 OP_DETERMINE_OP_CODE:
-    MOVE.B #1,(OP_CODE_UNKNWN)
+    *MOVE.B #1,(OP_CODE_UNKNWN)
     * Hardcode 'D','A','T','A'
-    MOVE.B #'D', (A0)+
-    MOVE.B #'A', (A0)+
-    MOVE.B #'T', (A0)+
-    MOVE.B #'A', (A0)+
-    RTS
+    *MOVE.B #'D', (A0)+
+    *MOVE.B #'A', (A0)+
+    *MOVE.B #'T', (A0)+
+    *MOVE.B #'A', (A0)+
+    *RTS
 
 OP_DECODER:
     * ready data for comparisons by shifting digits 15 through 12 to
     * digits 0 through 3. 
-    
+    CLR.L       D0
+    *MOVE.W      D4,A2
+    *MOVE.B      (A2)+,D4
+    *ROL.W       #8,D4
+    *MOVE.B      (A2),D4
+    MOVE.W      D4,D1
     MOVE.B      #shift,D1
-    MOVE.W      D4,D0
     LSR.W       D1,D0
     
     * jump table implementation
@@ -338,16 +345,22 @@ OP_Code0100:
     BNE         OP_NOT_FOUND_ERROR
 
     OP_NOP:
-        *TODO write NOP to some buffer to display
+        MOVE.B #'N', (A0)+
+        MOVE.B #'O', (A0)+
+        MOVE.B #'P', (A0)+
         BRA         OP_Done_Decoding      
 
     OP_JSR:
-        *TODO write JSR to some buffer to display    
+        MOVE.B #'J', (A0)+
+        MOVE.B #'S', (A0)+
+        MOVE.B #'R', (A0)+   
         *TODO effective Address Processing
         BRA         OP_Done_Decoding
     
     OP_RTS:
-        *TODO write RTS to some buffer to display
+        MOVE.B #'R', (A0)+
+        MOVE.B #'T', (A0)+
+        MOVE.B #'S', (A0)+
         BRA         OP_Done_Decoding
     
     OP_NEG:
@@ -369,22 +382,36 @@ OP_Code0100:
         BNE        OP_NOT_FOUND_ERROR
          
         OP_NEG_B:
-            *TODO write NEG.B to some buffer to display    
+            MOVE.B #'N', (A0)+
+            MOVE.B #'E', (A0)+
+            MOVE.B #'G', (A0)+
+            MOVE.B #'.', (A0)+
+            MOVE.B #'B', (A0)+    
             *TODO effective Address Processing
             BRA         OP_Done_Decoding
  
         OP_NEG_W:
-            *TODO write NEG.W to some buffer to display    
+            MOVE.B #'N', (A0)+
+            MOVE.B #'E', (A0)+
+            MOVE.B #'G', (A0)+
+            MOVE.B #'.', (A0)+
+            MOVE.B #'W', (A0)+    
             *TODO effective Address Processing
             BRA         OP_Done_Decoding
  
         OP_NEG_L:
-            *TODO write NEG.L to some buffer to display    
+            MOVE.B #'N', (A0)+
+            MOVE.B #'E', (A0)+
+            MOVE.B #'G', (A0)+
+            MOVE.B #'.', (A0)+
+            MOVE.B #'L', (A0)+   
             *TODO effective Address Processing
             BRA         OP_Done_Decoding
     
     OP_LEA:
-        *TODO write LEA to some buffer to display    
+        MOVE.B #'L', (A0)+
+        MOVE.B #'E', (A0)+
+        MOVE.B #'A', (A0)+  
         *TODO effective Address Processing
         BRA         OP_Done_Decoding
     
@@ -435,7 +462,6 @@ OP_Code0110:
 ****NOT USED!!!
 OP_Code0111:
     BRA         OP_NOT_FOUND_ERROR
-
 *DIVS.W, OR.B*, OR.W*, OR.L*
 OP_Code1000:
 
@@ -463,10 +489,15 @@ OP_Code1111:
     BRA         OP_NOT_FOUND_ERROR
 
 OP_Done_Decoding:
-      RTS
+    RTS
 
 OP_NOT_FOUND_ERROR:
-    *Display error message
+    MOVE.B #'E', (A0)+
+    MOVE.B #'R', (A0)+
+    MOVE.B #'R', (A0)+
+    MOVE.B #'O', (A0)+
+    MOVE.B #'R', (A0)+
+    MOVE.B #'!', (A0)+    
     RTS    
 
 *===============================================================================================* OP CODE CONSTANTS
@@ -488,8 +519,6 @@ OP_jmp_table
     JMP         OP_Code1100
     JMP         OP_Code1101
     JMP         OP_Code1111
-    
-NOP    DC.B    'NOP'
 
 *===============================================================================================* EA
 
