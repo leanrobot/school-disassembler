@@ -434,6 +434,7 @@ OP_Code0110:
 
 ****NOT USED!!!
 OP_Code0111:
+    BRA         OP_NOT_FOUND_ERROR
 
 *DIVS.W, OR.B*, OR.W*, OR.L*
 OP_Code1000:
@@ -443,6 +444,7 @@ OP_Code1001:
 
 ****NOT USED!!!
 OP_Code1010:
+     BRA         OP_NOT_FOUND_ERROR
 
 *EOR.B, EOR.W, EOR.L, CMP.B, CMP.W, CMP.L
 OP_Code1011:
@@ -458,7 +460,7 @@ OP_Code1110:
 
 ****NOT USED!!!
 OP_Code1111:
-
+    BRA         OP_NOT_FOUND_ERROR
 
 OP_Done_Decoding:
       RTS
@@ -506,6 +508,7 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
 
 
 
