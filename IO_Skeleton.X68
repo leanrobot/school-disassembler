@@ -62,6 +62,7 @@ IO_INPUT_SUCCESSFUL:
     * Begin Looping portion of code.
     ****MOVEA.L (IO_STARTADDR),A6    *Move starting address to current address variable
 MAIN_LOOP:
+    MOVE.B    #25, D6                  *Counter for display looping, starts at 30
 IO_READING:
     MOVE.L      (IO_ENDADDR),D0
     CMP.L       A6,D0
@@ -100,9 +101,15 @@ READ_IN_AND_PROCESS:
 
     MOVE.B #$0, (A0)+ * Terminate the line buffer
 
+    CMP.B   #0, D6                         *Compare counter to 30
+    BEQ     IO_CLEAR_SCREEN
+DISPLAY_LINE_BUFFER:
+    SUB.B    #1, D6                        *Decrement counter
+    
     LEA     IO_LINE_BUF, A1
     MOVE.B #13, D0
     TRAP #15
+
 
    
 
@@ -220,6 +227,18 @@ IO_INSERT_TAB:
     MOVE.B #$20,(A0)+
     MOVE.B #$20,(A0)+
     RTS
+    
+    
+IO_CLEAR_SCREEN:
+        LEA  IO_LOAD_MORE_DATA_TO_SCREEN, A1      *Prompt user to hit tap a key
+        MOVE.B    #13, D0
+        TRAP      #15
+        
+        MOVE.B    #4, D0                          *User presses any key
+        TRAP      #15
+    
+        MOVE.B    #25, D6                          *Restart loop counter
+        BRA       DISPLAY_LINE_BUFFER
 
 *IO CONSTANTS
 IO_OPEN     DC.B    ' ____ ____ ____ ', CR, LF 
@@ -237,10 +256,11 @@ IO_END_BEFORE_START_MSG    DC.B 'The ending address you entered is after the sta
 IO_ODD_ERROR_MSSG DC.B  'Illegal address. Please re-enter even addresses', CR, LF, 0
 IO_TAB          DC.B    '    ', 0  
 IO_RESTART_PROMPT   DC.B    'Would you like to run again? Enter Y/N: ', CR, LF, 0
+IO_LOAD_MORE_DATA_TO_SCREEN    DC.B    'Press any key to load more data...', CR, LF, 0
 
 **IO VARIABLES
 IO_LINE_BUF     DS.B    80
-
+IO_DISPLAY_LOOP_COUNTER    DS.B  1
 IO_CURR_ADDR    DS.L    1
   
 
@@ -651,6 +671,7 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
 
 
 
