@@ -11,8 +11,47 @@ START:                  ; first instruction of program
     NOP
     MOVE.B D0,D1
     MOVE.B #$10,D0
+    MOVE.W D0,D1
+    MOVE.W #$10,D0
+    JSR TEST
+    LEA TESTI, A0
     NOP
     NOP
+    MOVE.L D0,D2
+    MOVEA.L D5,A4
+    NOP
+    JSR TEST
+    NOP
+    LEA TESTI, A0
+    NOP
+    NOP
+    JSR TEST
+    NOP
+    LEA TESTI, A0
+    LEA TESTI, A0
+    LEA TESTI, A0
+    LEA TESTI, A0
+    LEA TESTI, A0
+    NOP
+    NOP
+    NOP
+    JSR TEST
+    NEG D0
+    NEG D1
+    NEG $000
+    NEG $7999
+    NOP
+    NOP
+    NOP
+    LSR.L #4,D0 
+    LSL.B #4,D0
+    NOP
+   NOP
+    NOP
+    MOVE.B D0,D1
+    MOVE.B #$10,D0
+    MOVE.W D0,D1
+    MOVE.W #$10,D0
     JSR TEST
     LEA TESTI, A0
     NOP
@@ -46,7 +85,12 @@ START:                  ; first instruction of program
     NOP
     
 TEST RTS
+
+
 TESTI DC.B 'yoyoma'
+    END    START        ; last line of source
+    
+
     
 * Put program code here
 
@@ -55,6 +99,7 @@ TESTI DC.B 'yoyoma'
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 *~Font name~Courier New~

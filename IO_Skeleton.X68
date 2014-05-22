@@ -519,6 +519,80 @@ OP_Code1101:
 
 *LSd.B*, LSd.W*, LSd.L*, ASd.B*, ASd.W*, ASd.L*, ROd.B*, ROd.W*, ROd.L*
 OP_Code1110:
+    *decide if LSd, ASd, or ROd
+    *first check if LSd
+    MOVE.W      D4,D1
+    MOVE.W      #$0008,D2
+    ANDI.W      #$0018,D1
+    CMP.W       D2,D1
+    BEQ         OP_LSd
+    *Now check if ASd
+    MOVE.W      #$0000,D2
+    CMP.W       D2,D1
+    BEQ         OP_ASd
+    *Finally check if ROd, error if not
+    MOVE.W      #$0018,D2
+    CMP.W       D2,D1
+    BEQ         OP_ROd  
+    BNE         OP_NOT_FOUND_ERROR
+    
+    OP_1110_CheckRightOrLeft:
+        MOVE.W      D4,D1
+        MOVE.W      #$0100,D2
+        ANDI.W      #$0100,D1
+        CMP.W       D2,D1
+        BEQ         OP_Left
+        BNE         OP_Right
+
+        OP_Left:
+            MOVE.B #'L', (A0)+
+            RTS
+        OP_Right:   
+            MOVE.B #'R', (A0)+
+            RTS
+            
+    OP_1110_GetSize:
+        MOVE.W      D4,D1
+        * first check for byte size
+        MOVE.W      #$0000,D2
+        ANDI.W      #$00C0,D1
+        CMP.W       D2,D1
+        BEQ         OP_1110_Byte
+        * then check for word
+        MOVE.W      #$0040,D2    
+        CMP.W       D2,D1
+        BEQ         OP_1110_Word
+        * last check for long or its an error
+        MOVE.W      #$0080,D2    
+        CMP.W       D2,D1
+        BEQ         OP_1110_Long
+        
+        OP_1110_Byte:
+            MOVE.B #'B', (A0)+
+            RTS
+        OP_1110_Word:
+            MOVE.B #'W', (A0)+
+            RTS
+        OP_1110_Long:
+            MOVE.B #'L', (A0)+
+            RTS
+
+    OP_LSd:
+        MOVE.B #'L', (A0)+
+        MOVE.B #'S', (A0)+
+        JSR         OP_1110_CheckRightOrLeft
+        MOVE.B #'.', (A0)+
+        JSR         OP_1110_GetSize
+         *TODO add EA processing
+        BRA         OP_Done_Decoding
+        
+    OP_ASd:
+    *check Right or Left
+    
+    OP_ROd:
+    *check Right or Left
+    
+    
 
 ****NOT USED!!!
 OP_Code1111:
