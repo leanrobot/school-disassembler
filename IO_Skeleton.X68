@@ -280,16 +280,12 @@ OP_DECODER:
     * ready data for comparisons by shifting digits 15 through 12 to
     * digits 0 through 3. 
     CLR.L       D0
-    *MOVE.W      D4,A2
-    *MOVE.B      (A2)+,D4
-    *ROL.W       #8,D4
-    *MOVE.B      (A2),D4
-    MOVE.W      D4,D1
+    MOVE.W      D4,D0
     MOVE.B      #shift,D1
     LSR.W       D1,D0
     
     * jump table implementation
-    MULU        #6,D0
+    MULU        #4,D0
     JSR         0(A5,D0) 
     RTS                  *jumps back to READ_IN_AND_PROCESS
     
@@ -298,9 +294,47 @@ OP_Code0000:
 
 *MOVE.B
 OP_Code0001:
-
+    *only possibility, can we garuntee test data will compile? do we need error checking here?
+    OP_MOVE_W:
+         MOVE.B #'M', (A0)+
+         MOVE.B #'O', (A0)+
+         MOVE.B #'V', (A0)+
+         MOVE.B #'E', (A0)+
+         MOVE.B #'.', (A0)+
+         MOVE.B #'W', (A0)+ 
+         *TODO EA Processing
+         BRA         OP_Done_Decoding 
+    
 *MOVE.L, MOVEA.L
 OP_Code0010:
+    *If equal after bit mask, then MOVEA.L, else, MOVE.L
+    MOVE.W      D4,D1
+    MOVE.W      #$0040,D2
+    ANDI.W      #$01C0,D1
+    CMP.W       D2,D1
+    BEQ         OP_MOVEA_L
+    BNE         OP_MOVE_L
+    
+    OP_MOVEA_L:
+         MOVE.B #'M', (A0)+
+         MOVE.B #'O', (A0)+
+         MOVE.B #'V', (A0)+
+         MOVE.B #'E', (A0)+
+         MOVE.B #'A', (A0)+
+         MOVE.B #'.', (A0)+
+         MOVE.B #'L', (A0)+ 
+         *TODO EA Processing
+         BRA         OP_Done_Decoding     
+         
+    OP_MOVE_L:
+         MOVE.B #'M', (A0)+
+         MOVE.B #'O', (A0)+
+         MOVE.B #'V', (A0)+
+         MOVE.B #'E', (A0)+
+         MOVE.B #'.', (A0)+
+         MOVE.B #'L', (A0)+ 
+         *TODO EA Processing
+         BRA         OP_Done_Decoding      
 
 *MOVE.W, MOVEA.W
 OP_Code0011:
@@ -537,6 +571,7 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
 
 
 
