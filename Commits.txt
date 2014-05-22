@@ -11,6 +11,6 @@ Initially, clone the repository.
     'git commit' # make commit
 - Once done working on feature, merge back into master branch
     'git checkout master' # checkout the master branch
-    'git pull remote origin' # pull the latest changes
+    'git pull origin master' # pull the latest changes
     'git merge <branch_name>' # merge your branch into master, resolve any conflicts
     'git push origin master' # update the remote repository
