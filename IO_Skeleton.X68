@@ -275,7 +275,7 @@ IO_END_BEFORE_START_MSG    DC.B 'The ending address you entered is after the sta
 IO_ODD_ERROR_MSSG DC.B  'Illegal address. Please re-enter even addresses', CR, LF, 0
 IO_TAB          DC.B    '    ', 0  
 IO_RESTART_PROMPT   DC.B    'Would you like to run again? Enter Y/N: ', CR, LF, 0
-IO_LOAD_MORE_DATA_TO_SCREEN    DC.B    'Press any key to load more data...', CR, LF, 0
+IO_LOAD_MORE_DATA_TO_SCREEN    DC.B    'Press enter to load more data...', CR, LF, 0
 
 **IO VARIABLES
 IO_LINE_BUF     DS.B    80
@@ -690,6 +690,7 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
 
 
 
