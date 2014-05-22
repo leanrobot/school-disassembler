@@ -221,25 +221,6 @@ IO_INSERT_TAB:
     MOVE.B #$20,(A0)+
     RTS
 
-
-
-         
-*IO_INSERT_FIRST_TAB:         
-*         MOVE.B    (A2)+, (A1)+
-*         BNE       IO_INSERT_FIRST_TAB
-*         MOVE.L    A1, IO_LINE_BUF
-*         
-*         LEA    IO_LINE_BUF, A3
-*         MOVE.B    #14, D0
-*         TRAP      #15
-*         
-*         *Add Tab to Line buffer
-*         *MOVE.L A1, D4      *Move converted address into D4 for op_code determination
-*         
-*         BRA IO_HEX2ASCII_GET_DIGIT_DONE
-         
-         
- 
 *IO CONSTANTS
 IO_OPEN     DC.B    ' ____ ____ ____ ', CR, LF 
          DC.B    '||6 |||8 |||k ||', CR, LF
@@ -268,13 +249,6 @@ IO_CURR_ADDR    DS.L    1
 *Address where opcode is to decode is in D4
 * A0 is line buffer
 OP_DETERMINE_OP_CODE:
-    *MOVE.B #1,(OP_CODE_UNKNWN)
-    * Hardcode 'D','A','T','A'
-    *MOVE.B #'D', (A0)+
-    *MOVE.B #'A', (A0)+
-    *MOVE.B #'T', (A0)+
-    *MOVE.B #'A', (A0)+
-    *RTS
 
 OP_DECODER:
     * ready data for comparisons by shifting digits 15 through 12 to
@@ -295,13 +269,13 @@ OP_Code0000:
 *MOVE.B
 OP_Code0001:
     *only possibility, can we garuntee test data will compile? do we need error checking here?
-    OP_MOVE_W:
+    OP_MOVE_B:
          MOVE.B #'M', (A0)+
          MOVE.B #'O', (A0)+
          MOVE.B #'V', (A0)+
          MOVE.B #'E', (A0)+
          MOVE.B #'.', (A0)+
-         MOVE.B #'W', (A0)+ 
+         MOVE.B #'B', (A0)+ 
          *TODO EA Processing
          BRA         OP_Done_Decoding 
     
@@ -338,6 +312,34 @@ OP_Code0010:
 
 *MOVE.W, MOVEA.W
 OP_Code0011:
+ *If equal after bit mask, then MOVEA.L, else, MOVE.L
+    MOVE.W      D4,D1
+    MOVE.W      #$0040,D2
+    ANDI.W      #$01C0,D1
+    CMP.W       D2,D1
+    BEQ         OP_MOVEA_W
+    BNE         OP_MOVE_W
+    
+    OP_MOVEA_W:
+         MOVE.B #'M', (A0)+
+         MOVE.B #'O', (A0)+
+         MOVE.B #'V', (A0)+
+         MOVE.B #'E', (A0)+
+         MOVE.B #'A', (A0)+
+         MOVE.B #'.', (A0)+
+         MOVE.B #'W', (A0)+ 
+         *TODO EA Processing
+         BRA         OP_Done_Decoding     
+         
+    OP_MOVE_W:
+         MOVE.B #'M', (A0)+
+         MOVE.B #'O', (A0)+
+         MOVE.B #'V', (A0)+
+         MOVE.B #'E', (A0)+
+         MOVE.B #'.', (A0)+
+         MOVE.B #'W', (A0)+ 
+         *TODO EA Processing
+         BRA         OP_Done_Decoding 
 
 *NOP, JSR, RTS, NEG.B, NEG.W, NEG.L, LEA.L, MOVEM.W*, MOVEM.L*
 OP_Code0100:
