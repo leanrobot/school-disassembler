@@ -275,8 +275,7 @@ OP_Code0001:
          MOVE.B #'V', (A0)+
          MOVE.B #'E', (A0)+
          MOVE.B #'.', (A0)+
-         MOVE.B #'B', (A0)+ 
-         *TODO EA Processing
+         MOVE.B #'B', (A0)+          *TODO EA Processing
          BRA         OP_Done_Decoding 
     
 *MOVE.L, MOVEA.L
@@ -494,6 +493,7 @@ OP_Code0101:
 
 *BCS, BGE, BLT, BVC, BRA
 OP_Code0110:
+    BRA         OP_NOT_FOUND_ERROR
 
 ****NOT USED!!!
 OP_Code0111:
@@ -517,11 +517,14 @@ OP_Code1100:
 *ADD.B*, ADD.W*, ADD.L*, ADDA.W, ADDA.L
 OP_Code1101:
 
-*LSd.B*, LSd.W*, LSd.L*, ASd.B*, ASd.W*, ASd.L*, ROd.B*, ROD.W*, ROd.L*
+*LSd.B*, LSd.W*, LSd.L*, ASd.B*, ASd.W*, ASd.L*, ROd.B*, ROd.W*, ROd.L*
 OP_Code1110:
 
 ****NOT USED!!!
 OP_Code1111:
+    BRA         OP_NOT_FOUND_ERROR
+    
+OP_Jump_ERROR:
     BRA         OP_NOT_FOUND_ERROR
 
 OP_Done_Decoding:
@@ -555,6 +558,7 @@ OP_jmp_table
     JMP         OP_Code1100
     JMP         OP_Code1101
     JMP         OP_Code1111
+    JMP         OP_Jump_ERROR
 
 *===============================================================================================* EA
 
