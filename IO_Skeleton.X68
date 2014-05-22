@@ -22,6 +22,10 @@ START:
     TRAP    #15
 
 DISPLAY_AND_PROMPT_FOR_INPUT:
+    LEA    IO_NEW_LINE, A1
+    MOVE.B    #14, D0
+    TRAP #15
+
     *Clears D2 and D3 for new input/checking address validity
     CLR.L    D2
     CLR.L    D3
@@ -276,6 +280,7 @@ IO_ODD_ERROR_MSSG DC.B  'Illegal address. Please re-enter even addresses', CR, L
 IO_TAB          DC.B    '    ', 0  
 IO_RESTART_PROMPT   DC.B    'Would you like to run again? Enter Y/N: ', CR, LF, 0
 IO_LOAD_MORE_DATA_TO_SCREEN    DC.B    'Press enter to load more data...', CR, LF, 0
+IO_NEW_LINE    DC.B   '', CR, LF, 0
 
 **IO VARIABLES
 IO_LINE_BUF     DS.B    80
