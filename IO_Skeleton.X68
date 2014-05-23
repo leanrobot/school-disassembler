@@ -597,9 +597,7 @@ OP_Code1110:
 ****NOT USED!!!
 OP_Code1111:
     BRA         OP_NOT_FOUND_ERROR
-    
-OP_Jump_ERROR:
-    BRA         OP_NOT_FOUND_ERROR
+
 
 OP_Done_Decoding:
     RTS
@@ -631,8 +629,8 @@ OP_jmp_table
     JMP         OP_Code1011
     JMP         OP_Code1100
     JMP         OP_Code1101
+    JMP         OP_Code1110
     JMP         OP_Code1111
-    JMP         OP_Jump_ERROR
 
 *===============================================================================================* EA
 
@@ -651,6 +649,8 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
+
 
 
 
