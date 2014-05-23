@@ -184,6 +184,16 @@ IO_ENDADDR_AFTER_STARTADDR:
 
 *Convert ASCII to Hex
 IO_AS2HEX:   
+         *Begin error checking, send back to start if incorrect
+         CMP.B    #$30, D1                    *Less than 30 is ASCII chars before 0
+         BLT      IO_INVALID_CHARACTER_ENTERED
+         CMP.B    #'F', D1                    *ASCII characters after F
+         BGT      IO_INVALID_CHARACTER_ENTERED
+         CMP.B    #'A', D1
+         BLT      IO_CHECK_BETWEEN_9_AND_A
+IO_END_CHAR_RANGE_CHECKING:      
+         *End error checking
+        
          CMP.B    #'A', D1    *Compare D1 
          BMI    IO_DIGIHEX     * BLT branches if D1 for digit
          BGE    IO_NUMHEX      *BGT branches if D1 for A-F
@@ -199,6 +209,16 @@ IO_NUMHEX:
          SUB.B    #$37, D1   *Subtract 37 from D1 to convert from ASCII A-F to Hex
          BRA IO_AS2HEX_COMPLETE
          
+IO_CHECK_BETWEEN_9_AND_A:
+         CMP.B    #$3A, D1
+         BLT     IO_END_CHAR_RANGE_CHECKING
+
+IO_INVALID_CHARACTER_ENTERED:
+         LEA    IO_INVALID_CHARACTER_ERROR_MSG, A1
+         MOVE.B    #14, D0
+         TRAP      #15
+         BRA DISPLAY_AND_PROMPT_FOR_INPUT
+
 
 
 * ========== Convert # in data register to line buffer
@@ -281,6 +301,7 @@ IO_TAB          DC.B    '    ', 0
 IO_RESTART_PROMPT   DC.B    'Would you like to run again? Enter Y/N: ', CR, LF, 0
 IO_LOAD_MORE_DATA_TO_SCREEN    DC.B    'Press enter to load more data...', CR, LF, 0
 IO_NEW_LINE    DC.B   '', CR, LF, 0
+IO_INVALID_CHARACTER_ERROR_MSG    DC.B    'Invalid character entered.', CR, LF, 0
 
 **IO VARIABLES
 IO_LINE_BUF     DS.B    80
