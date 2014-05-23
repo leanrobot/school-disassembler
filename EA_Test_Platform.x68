@@ -107,6 +107,7 @@ EA_HandleOperand:
 	MOVEM.L (A7)+, PARAMS
 	RTS
 
+* register # = D7
 EA_DirectData:
 	MOVEM.L PARAMS, -(A7)
 
@@ -119,6 +120,7 @@ EA_DirectData:
 	MOVEM.L (A7)+, PARAMS
 	RTS
 
+* register # = D7
 EA_DirectAddress:
 	MOVEM.L PARAMS, -(A7)
 	MOVE.B #$41, (A0)+ 		* Address (A)
@@ -130,6 +132,7 @@ EA_DirectAddress:
 	MOVEM.L (A7)+, PARAMS
 	RTS
 
+* register # = D7
 EA_IndirectAddress:
 	MOVEM.L PARAMS, -(A7)
 
@@ -140,6 +143,7 @@ EA_IndirectAddress:
 	MOVEM.L (A7)+, PARAMS
 	RTS
 
+* register # = D7
 EA_PostDecAddress:
 	MOVEM.L PARAMS, -(A7)
 
@@ -149,6 +153,7 @@ EA_PostDecAddress:
 	MOVEM.L (A7)+, PARAMS
 	RTS
 
+* register # = D7
 EA_PreDecAddress:
 	MOVEM.L PARAMS, -(A7)
 
@@ -157,80 +162,6 @@ EA_PreDecAddress:
 
 	MOVEM.L (A7)+, PARAMS
 	RTS
-
-*	*** Initial Setup
-*	* D1 is the case
-*	* D4 is the word instruction
-*	* D5 is the instruction length
-*
-*	MOVE.W #$7000, A0
-*
-*	MOVE.B #1, D1
-*	MOVE.L #$00003209, D4   * MOVE.W A1, D1
-*							* source mode = 111, dest = 000
-*
-*	* Print Source =============================================================
-*	MOVE.L #$00000003, D6 * shift
-*	MOVE.L #$00000003, D7 * keep
-*	JSR EA_ShiftAndMask
-*
-*	CMP.B #%000, D2				* mode = direct data register
-*	BEQ EA_Decode_IfModeDirect
-*	CMP.B #%001, D2 			* mode = direct address register
-*	BEQ EA_Decode_IfModeDirect
-*
-*	EA_DecodeSource_IfModeDirect:
-*		*save source mode in d3
-*		MOVE.L D2, D3
-*
-*		* get register.
-*		MOVE.L #$00000000, D6 * shift
-*		MOVE.L #$00000003, D7 * keep
-*		JSR EA_ShiftAndMask
-*
-*		* setup sub call.
-*		MOVE.L D3, D6
-*		MOVE.L D2, D7
-*
-*		* call direct source mode
-*		JSR EA_DirectSourceMode
-*
-*	*Print comma & space.
-*	MOVE.B #$2C, (A0)+
-*	MOVE.B #$20, (A0)+
-*	* Print Destination ========================================================
-*
-*
-*	SIMHALT
-*
-**D4 = word instruction
-**D6 = Source Mode bits
-**D7 = Source Mode register #
-*EA_DirectSourceMode:
-*	* Choose D or A to print
-*	MOVEM.L PARAMS, -(A7)
-*	CMP.W #$0, D6
-*	BEQ EA_DirectSourceMode_IfD
-*	BRA EA_DirectSourceMode_IfA
-*
-*	EA_DirectSourceMode_IfD:
-*		MOVE.B #$44, (A0)+ 		* Data (D)
-*		BRA EA_DirectSourceMode_IfADEnd
-*	EA_DirectSourceMode_IfA:
-*		MOVE.B #$41, (A0)+ 		* Address (A)
-*		BRA EA_DirectSourceMode_IfADEnd
-*	EA_DirectSourceMode_IfADEnd:
-*
-*	*Print the register #
-*	MOVE.L D7, D2
-*	MOVE.L #$00000001, D3
-*	JSR IO_HEX2ASCII
-*
-*
-*	MOVEM.L (A7)+, PARAMS
-*	RTS
-
-
 
 * D4 = shift & mask data (LW)
 * D6 = Shift right amount (LW)
