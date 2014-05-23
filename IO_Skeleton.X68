@@ -652,10 +652,22 @@ OP_Code1110:
         BRA         OP_Done_Decoding
         
     OP_ASd:
-    *check Right or Left
+        MOVE.B #'A', (A0)+
+        MOVE.B #'S', (A0)+
+        JSR         OP_1110_CheckRightOrLeft
+        MOVE.B #'.', (A0)+
+        JSR         OP_1110_GetSize
+         *TODO add EA processing
+        BRA         OP_Done_Decoding
     
     OP_ROd:
-    *check Right or Left
+        MOVE.B #'R', (A0)+
+        MOVE.B #'O', (A0)+
+        JSR         OP_1110_CheckRightOrLeft
+        MOVE.B #'.', (A0)+
+        JSR         OP_1110_GetSize
+         *TODO add EA processing
+        BRA         OP_Done_Decoding
     
     
 
@@ -714,6 +726,7 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
 
 
 
