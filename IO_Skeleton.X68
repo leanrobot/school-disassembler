@@ -22,6 +22,10 @@ START:
     TRAP    #15
 
 DISPLAY_AND_PROMPT_FOR_INPUT:
+    LEA    IO_NEW_LINE, A1
+    MOVE.B    #14, D0
+    TRAP #15
+
     *Clears D2 and D3 for new input/checking address validity
     CLR.L    D2
     CLR.L    D3
@@ -62,6 +66,7 @@ IO_INPUT_SUCCESSFUL:
     * Begin Looping portion of code.
     ****MOVEA.L (IO_STARTADDR),A6    *Move starting address to current address variable
 MAIN_LOOP:
+    MOVE.B    #25, D6                  *Counter for display looping, starts at 30
 IO_READING:
     MOVE.L      (IO_ENDADDR),D0
     CMP.L       A6,D0
@@ -91,6 +96,7 @@ PROMPT_TO_RESTART:
 READ_IN_AND_PROCESS:
     LEA IO_LINE_BUF, A0                   * pointer to line buffer
     MOVE.L A6, D2               * Parameter setup for IO_HEX2ASCII
+    MOVE.L #$8, D3
     JSR IO_HEX2ASCII             *Loop through address converting Hex to ascii
     JSR IO_INSERT_TAB
     MOVE.B (A6)+,D4    
@@ -100,9 +106,15 @@ READ_IN_AND_PROCESS:
 
     MOVE.B #$0, (A0)+ * Terminate the line buffer
 
+    CMP.B   #0, D6                         *Compare counter to 30
+    BEQ     IO_CLEAR_SCREEN
+DISPLAY_LINE_BUFFER:
+    SUB.B    #1, D6                        *Decrement counter
+    
     LEA     IO_LINE_BUF, A1
     MOVE.B #13, D0
     TRAP #15
+
 
    
 
@@ -172,6 +184,16 @@ IO_ENDADDR_AFTER_STARTADDR:
 
 *Convert ASCII to Hex
 IO_AS2HEX:   
+         *Begin error checking, send back to start if incorrect
+         CMP.B    #$30, D1                    *Less than 30 is ASCII chars before 0
+         BLT      IO_INVALID_CHARACTER_ENTERED
+         CMP.B    #'F', D1                    *ASCII characters after F
+         BGT      IO_INVALID_CHARACTER_ENTERED
+         CMP.B    #'A', D1
+         BLT      IO_CHECK_BETWEEN_9_AND_A
+IO_END_CHAR_RANGE_CHECKING:      
+         *End error checking
+        
          CMP.B    #'A', D1    *Compare D1 
          BMI    IO_DIGIHEX     * BLT branches if D1 for digit
          BGE    IO_NUMHEX      *BGT branches if D1 for A-F
@@ -187,28 +209,56 @@ IO_NUMHEX:
          SUB.B    #$37, D1   *Subtract 37 from D1 to convert from ASCII A-F to Hex
          BRA IO_AS2HEX_COMPLETE
          
+IO_CHECK_BETWEEN_9_AND_A:
+         CMP.B    #$3A, D1
+         BLT     IO_END_CHAR_RANGE_CHECKING
+
+IO_INVALID_CHARACTER_ENTERED:
+         LEA    IO_INVALID_CHARACTER_ERROR_MSG, A1
+         MOVE.B    #14, D0
+         TRAP      #15
+         BRA DISPLAY_AND_PROMPT_FOR_INPUT
 
 
+
+* ========== Convert # in data register to line buffer
 * D2 contains hex value to convert
+* D3 contains # of bytes, number length.
 * A0 Contains the line buffer
 IO_HEX2ASCII:
     MOVEM.L D0-D7/A1-A7, -(A7)
     CLR.L D1
-    CLR.L D3
-    MOVE.B #8, d1 * counter for loop
-LOOP  ROL.L #4, D2          * rotate the value once.
-      MOVE.L D2, D3         * copy
-      AND.L #$0000000F, D3
-      CMP.B #$09,D3        * if F <= d3, letter.
-      BGT Letter
-      BLE Digit             * else, digit.
-Letter  ADD #$37,D3         * add $37
-        BRA EndIf
-Digit   ADD #$30,D3         * add $30
-EndIf   MOVE.B D3,(A0)+
+    MOVE.B  #8, D4
+    SUB.B   D3, D4
+    * discard unneeded front bits
+    IO_HEX2ASCII_DiscardLoop:
+        CMP.B   #0, D4
+        BLE     IO_HEX2ASCII_DiscardLoopDone
+        ROL.L   #4, D2
+        SUBQ.B  #1, D4
+        BRA     IO_HEX2ASCII_DiscardLoop
+    IO_HEX2ASCII_DiscardLoopDone:
+    
+    MOVE.B D3, D1           * counter for loop
+
+    IO_HEX2ASCII_ConvertLoop:
+        ROL.L #4, D2          * rotate the value once.
+        MOVE.L D2, D3         * copy
+        AND.L #$0000000F, D3
+        CMP.B #$09,D3        * if F <= d3, letter.
+        BGT IO_HEX2ASCII_IfLetter
+        BLE IO_HEX2ASCII_IfDigit             * else, digit.
+
+            IO_HEX2ASCII_IfLetter:
+                ADD #$37,D3         * add $37
+                BRA IO_HEX2ASCII_EndIf
+            IO_HEX2ASCII_IfDigit:
+                ADD #$30,D3         * add $30
+        IO_HEX2ASCII_EndIf:
+            MOVE.B D3,(A0)+       * write to line buffer
 
         SUB.B #1,D1         * decrement loop counter
-        BNE LOOP          * repeat loop?
+    BNE IO_HEX2ASCII_ConvertLoop    * repeat loop?
 
     MOVEM.L (A7)+, D0-D7/A1-A7
     RTS
@@ -220,6 +270,18 @@ IO_INSERT_TAB:
     MOVE.B #$20,(A0)+
     MOVE.B #$20,(A0)+
     RTS
+    
+    
+IO_CLEAR_SCREEN:
+        LEA  IO_LOAD_MORE_DATA_TO_SCREEN, A1      *Prompt user to hit tap a key
+        MOVE.B    #13, D0
+        TRAP      #15
+        
+        MOVE.B    #4, D0                          *User presses any key
+        TRAP      #15
+    
+        MOVE.B    #25, D6                          *Restart loop counter
+        BRA       DISPLAY_LINE_BUFFER
 
 *IO CONSTANTS
 IO_OPEN     DC.B    ' ____ ____ ____ ', CR, LF 
@@ -237,10 +299,13 @@ IO_END_BEFORE_START_MSG    DC.B 'The ending address you entered is after the sta
 IO_ODD_ERROR_MSSG DC.B  'Illegal address. Please re-enter even addresses', CR, LF, 0
 IO_TAB          DC.B    '    ', 0  
 IO_RESTART_PROMPT   DC.B    'Would you like to run again? Enter Y/N: ', CR, LF, 0
+IO_LOAD_MORE_DATA_TO_SCREEN    DC.B    'Press enter to load more data...', CR, LF, 0
+IO_NEW_LINE    DC.B   '', CR, LF, 0
+IO_INVALID_CHARACTER_ERROR_MSG    DC.B    'Invalid character entered.', CR, LF, 0
 
 **IO VARIABLES
 IO_LINE_BUF     DS.B    80
-
+IO_DISPLAY_LOOP_COUNTER    DS.B  1
 IO_CURR_ADDR    DS.L    1
   
 
