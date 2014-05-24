@@ -6,6 +6,7 @@
 *-----------------------------------------------------------
 CR      EQU     $0D
 LF      EQU     $0A
+PARAMS  REG     D3-D7/A2-A6
 
 stack   EQU     $A000    *sp initial
 shift   EQU     12
@@ -104,6 +105,12 @@ READ_IN_AND_PROCESS:
     MOVE.B (A6)+,D4
     JSR OP_DETERMINE_OP_CODE                *Determine what the opcode is
 
+    JSR IO_INSERT_TAB
+    JSR IO_INSERT_TAB
+
+    * EA_DECODE(d2=opcode case, d3=operation size)
+    JSR EA_DECODE
+
     MOVE.B #$0, (A0)+ * Terminate the line buffer
 
     CMP.B   #0, D6                         *Compare counter to 30
@@ -122,6 +129,14 @@ DISPLAY_LINE_BUFFER:
 
 * Put variables and constants here
 *==================================================================* IO
+
+* ___   __    _  _______  __   __  _______      _______  __   __  _______  _______  __   __  _______ 
+*|   | |  |  | ||       ||  | |  ||       |    |       ||  | |  ||       ||       ||  | |  ||       |
+*|   | |   |_| ||    _  ||  | |  ||_     _|    |   _   ||  | |  ||_     _||    _  ||  | |  ||_     _|
+*|   | |       ||   |_| ||  |_|  |  |   |      |  | |  ||  |_|  |  |   |  |   |_| ||  |_|  |  |   |  
+*|   | |  _    ||    ___||       |  |   |      |  |_|  ||       |  |   |  |    ___||       |  |   |  
+*|   | | | |   ||   |    |       |  |   |      |       ||       |  |   |  |   |    |       |  |   |  
+*|___| |_|  |__||___|    |_______|  |___|      |_______||_______|  |___|  |___|    |_______|  |___|  
 
 IO_CONVERT_ASCII_ADDR:
     MOVE.B  D1,D2           *Move length of address from D1 to D2    
@@ -265,10 +280,7 @@ IO_HEX2ASCII:
 
 * A0 is the current place in line buffer
 IO_INSERT_TAB:
-    MOVE.B #$20,(A0)+
-    MOVE.B #$20,(A0)+
-    MOVE.B #$20,(A0)+
-    MOVE.B #$20,(A0)+
+    MOVE.B #$9,(A0)+
     RTS
     
     
@@ -310,6 +322,13 @@ IO_CURR_ADDR    DS.L    1
   
 
 *===================================================================* OP CODE
+* _______  _______    _______  _______  ______   _______ 
+*|       ||       |  |       ||       ||      | |       |
+*|   _   ||    _  |  |       ||   _   ||  _    ||    ___|
+*|  | |  ||   |_| |  |       ||  | |  || | |   ||   |___ 
+*|  |_|  ||    ___|  |      _||  |_|  || |_|   ||    ___|
+*|       ||   |      |     |_ |       ||       ||   |___ 
+*|_______||___|      |_______||_______||______| |_______|
 
 *Address where opcode is to decode is in D4
 * A0 is line buffer
@@ -357,11 +376,11 @@ OP_Code0000:
         CMP.W       D1,D2
         BEQ         OP_0000_byte
         *Word?
-        MOVE.W      #$0000,D2
+        MOVE.W      #$0040,D2
         CMP.W       D1,D2
         BEQ         OP_0000_word
         *Long?
-        MOVE.W      #$0000,D2
+        MOVE.W      #$0080,D2
         CMP.W       D1,D2
         BEQ         OP_0000_long
         *error
@@ -484,7 +503,9 @@ OP_Code0011:
          MOVE.B #'A', (A0)+
          MOVE.B #'.', (A0)+
          MOVE.B #'W', (A0)+ 
-         *TODO EA Processing
+         *Set EA Case 1, op size word(3)
+         MOVEQ #1, D2
+         MOVEQ #3, D3
          BRA         OP_Done_Decoding     
          
     OP_MOVE_W:
@@ -494,7 +515,9 @@ OP_Code0011:
          MOVE.B #'E', (A0)+
          MOVE.B #'.', (A0)+
          MOVE.B #'W', (A0)+ 
-         *TODO EA Processing
+         *Set EA Case 1, op size word(3)
+         MOVEQ #1, D2
+         MOVEQ #3, D3
          BRA         OP_Done_Decoding 
 
 *NOP, JSR, RTS, NEG.B, NEG.W, NEG.L, LEA.L, MOVEM.W*, MOVEM.L*
@@ -932,7 +955,7 @@ OP_Code1010:
 *EOR.B, EOR.W, EOR.L, CMP.B, CMP.W, CMP.L
 OP_Code1011:
     MOVE.W      D4,D1
-    ANDI.W      #$001C,D1
+    ANDI.W      #$01C0,D1
     *EOR.B?
     MOVE.W      #$0100,D2
     CMP.W       D2,D1
@@ -1258,6 +1281,226 @@ OP_jmp_table
     JMP         OP_Code1111
 
 *===============================================================================================* EA
+* _______  _______  _______    _______  ______   ______   ______   
+*|       ||       ||       |  |   _   ||      | |      | |    _ |  
+*|    ___||    ___||    ___|  |  |_|  ||  _    ||  _    ||   | ||  
+*|   |___ |   |___ |   |___   |       || | |   || | |   ||   |_||_ 
+*|    ___||    ___||    ___|  |       || |_|   || |_|   ||    __  |
+*|   |___ |   |    |   |      |   _   ||       ||       ||   |  | |
+*|_______||___|    |___|      |__| |__||______| |______| |___|  |_|
+
+*    MOVE.W #$7000, A0
+*
+*    * MOVE.W A2, D4 == 380A
+*    * MOVE.W (A3), D5 == 3A13
+*    * MOVE.W -(A1), (A0)+ == 30E1
+*    *
+*    *
+*
+*    MOVE.L #$000030E1, D4   
+*    JSR EA_DECODE
+*    SIMHALT
+
+***************************** Main Method for EA
+* D2 = EA Case Code
+* D3 = Size of Operation
+EA_DECODE:
+    * IF case == 1:
+    CMP.B #1, D2
+    BEQ     EA_DECODE_BranchCase1
+
+    * IF CAse is anything else
+    BRA EA_DECODE_UnsupportedCase
+
+    EA_DECODE_BranchCase1:
+        JSR EA_DECODE_CASE1
+        BRA EA_DECODE_EndIf
+    EA_DECODE_UnsupportedCase:
+        * do soemthing
+        BRA EA_DECODE_EndIf
+
+    EA_DECODE_EndIf:
+    RTS
+
+
+***** Case 1 includes:
+*       MOVE, MOVEA
+EA_DECODE_CASE1:
+    MOVEM.L PARAMS, -(A7)
+    * get source mode ===============
+    MOVE.L #$00000003, D6 * shift
+    MOVE.L #$00000003, D7 * keep
+    JSR EA_ShiftAndMask
+    MOVE.L D2, D5
+
+    * get source register
+    MOVE.L #$00000000, D6 * shift
+    MOVE.L #$00000003, D7 * keep
+    JSR EA_ShiftAndMask
+    
+    MOVE.L D5, D6
+    MOVE.L D2, D7
+
+    * HandleOperand(src=d6, reg=d7)
+    JSR EA_HandleOperand
+
+    *Print comma & space.
+    MOVE.B #$2C, (A0)+
+    MOVE.B #$20, (A0)+
+
+    * Get dest mode =================
+    MOVE.L #$00000006, D6 * shift
+    MOVE.L #$00000003, D7 * keep
+    JSR EA_ShiftAndMask
+    MOVE.L D2, D5
+
+    * get dest register 
+    MOVE.L #$00000009, D6 * shift
+    MOVE.L #$00000003, D7 * keep
+    JSR EA_ShiftAndMask
+
+    MOVE.L D5, D6
+    MOVE.L D2, D7
+    JSR EA_HandleOperand
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* Mode = D6
+* Register = D7
+EA_HandleOperand:
+    MOVEM.L PARAMS, -(A7)
+
+    *if src == 0 --> directData
+    CMP.B #0, D6
+    BEQ EA_HandleOperand_IfDirectData
+
+    *elif src == 1 --> direct address
+    CMP.B #1, D6
+    BEQ EA_HandleOperand_IfDirectAddress
+
+    *elif src == 2 --> indirect address
+    CMP.B #2, D6
+    BEQ EA_HandleOperand_IfIndirectAddr
+
+    *elif src == 3 --> post dec address
+    CMP.B #3, D6
+    BEQ EA_HandleOperand_IfPostDec
+
+    *elif src == 4 --> pre dec address
+    CMP.B #4, D6
+    BEQ EA_HandleOperand_IfPreDec
+
+    BRA EA_HandleOperand_IfElse     * Not any of the supported modes, error.
+
+    EA_HandleOperand_IfDirectData:
+        JSR EA_DirectData
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_IfDirectAddress:
+        JSR EA_DirectAddress
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_IfIndirectAddr:
+        JSR EA_IndirectAddress
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_IfPostDec:
+        JSR EA_PostDecAddress
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_IfPreDec:
+        JSR EA_PreDecAddress
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_IfElse:
+    * TODO ERROR HANDLING HERE -----------
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_IfEnd:
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* register # = D7
+EA_DirectData:
+    MOVEM.L PARAMS, -(A7)
+
+    MOVE.B #$44, (A0)+      * Data (D)
+    *Print the register #
+    MOVE.L D7, D2
+    MOVE.L #$00000001, D3
+    JSR IO_HEX2ASCII
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* register # = D7
+EA_DirectAddress:
+    MOVEM.L PARAMS, -(A7)
+    MOVE.B #$41, (A0)+      * Address (A)
+    *Print the register #
+    MOVE.L D7, D2
+    MOVE.L #$00000001, D3
+    JSR IO_HEX2ASCII
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* register # = D7
+EA_IndirectAddress:
+    MOVEM.L PARAMS, -(A7)
+
+    MOVE.B #$28, (A0)+      * '('
+    JSR EA_DirectAddress
+    MOVE.B #$29, (A0)+      * ')'
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* register # = D7
+EA_PostDecAddress:
+    MOVEM.L PARAMS, -(A7)
+
+    JSR EA_IndirectAddress
+    MOVE.B #$2B, (A0)+      * '+'
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* register # = D7
+EA_PreDecAddress:
+    MOVEM.L PARAMS, -(A7)
+
+    MOVE.B #$2D, (A0)+      * '-'
+    JSR EA_IndirectAddress
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* D4 = shift & mask data (LW)
+* D6 = Shift right amount (LW)
+* D7 = # of bits wanted (LW)
+* Return in D2 (LW)
+EA_ShiftAndMask:
+    MOVEM.L PARAMS, -(A7)
+    CLR.L   D2
+    LSR.L   D6, D4
+    * build masking data
+    CLR.L D1                * D1 = #$0000 0000
+    * for D7 > 0
+    EA_ShiftAndMask_ForLoop:
+        CMP.B   #0, D7
+        BLE EA_ShiftAndMask_ForLoopDone
+
+        LSL.L   #1, D1
+        ADD.L   #%00000000000000000000000000000001, D1
+        SUBQ.L  #1, D7      * Decrement loop
+        BRA EA_ShiftAndMask_ForLoop
+    EA_ShiftAndMask_ForLoopDone:
+    AND.L   D1, D4
+    MOVE.L  D4, D2
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+* ============================ END EA_ShiftAndMask
+
+*===============================================================================================* GLOBAL VARIABLE BLOCK
+
 
 **GLOBAL VARIABLE BLOCK**
 IO_STARTADDR    DS.L    1
@@ -1269,26 +1512,6 @@ OP_CODE_UNKNWN  DS.B    1
 
 
     END    START        ; last line of source
-    
-
-
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 *~Font name~Courier New~
 *~Font size~10~
