@@ -1391,12 +1391,17 @@ EA_DECODE:
     * IF case == 1:
     CMP.B #1, (A3)
     BEQ     EA_DECODE_BranchCase1
+    CMP.B #2, (A3)
+    BEQ     EA_DECODE_BranchCase2
 
     * IF CAse is anything else
     BRA EA_DECODE_UnsupportedCase
 
     EA_DECODE_BranchCase1:
         JSR EA_DECODE_CASE1
+        BRA EA_DECODE_EndIf
+    EA_DECODE_BranchCase2:
+        JSR EA_DECODE_CASE2
         BRA EA_DECODE_EndIf
     EA_DECODE_UnsupportedCase:
         * do soemthing
