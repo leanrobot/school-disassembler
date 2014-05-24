@@ -555,11 +555,96 @@ OP_Code0100:
         
 *SUBQ.B, SUBQ.W, SUBQ.L
 OP_Code0101:
+    MOVE.W      D4,D1
+    ANDI.W      #$01C0,D1 
+    *SUBQ.B?
+    MOVE.W      #$0100,D2
+    CMP.W       D2,D1
+    BEQ         OP_SUBQ_B
+    *SUBQ.W?
+    MOVE.W      #$0140,D2
+    CMP.W       D2,D1
+    BEQ         OP_SUBQ_W
+    *SUBQ.L?
+    MOVE.W      #$0180,D2
+    CMP.W       D2,D1
+    BEQ         OP_SUBQ_L
+    *error?
+    BNE         OP_NOT_FOUND_ERROR 
+    
+    OP_SUBQ:
+        MOVE.B #'S', (A0)+
+        MOVE.B #'U', (A0)+
+        MOVE.B #'B', (A0)+
+        MOVE.B #'Q', (A0)+
+        MOVE.B #'.', (A0)+
+        RTS
+    
+    OP_SUBQ_B:
+        JSR     OP_SUBQ
+        MOVE.B #'B', (A0)+
+        *TODO add EA processing
+        BRA         OP_Done_Decoding
+    OP_SUBQ_W:
+        JSR     OP_SUBQ
+        MOVE.B #'B', (A0)+
+        *TODO add EA processing
+        BRA         OP_Done_Decoding
+    OP_SUBQ_L:
+        JSR     OP_SUBQ
+        MOVE.B #'B', (A0)+
+        *TODO add EA processing
+        BRA         OP_Done_Decoding
 
 *BCS, BGE, BLT, BVC, BRA
 OP_Code0110:
     BRA         OP_NOT_FOUND_ERROR
+    MOVE.W      D4,D1
+    ANDI.W      #$0F00,D1
+    * BCS?
+    MOVE.W      #$0500,D2
+    CMP.W       D2,D1
+    BEQ         OP_BCS
+    * BGE?
+    MOVE.W      #$0C00,D2
+    CMP.W       D2,D1
+    BEQ         OP_BGE
+    * BLT?
+    MOVE.W      #$0C00,D2
+    CMP.W       D2,D1
+    BEQ         OP_BLT
+    * BVC?
+    MOVE.W      #$0C00,D2
+    CMP.W       D2,D1
+    BEQ         OP_BVC
+    * error
+    BNE         OP_NOT_FOUND_ERROR    
 
+    OP_BCS:
+        MOVE.B #'B', (A0)+
+        MOVE.B #'C', (A0)+
+        MOVE.B #'S', (A0)+
+        *TODO add EA processing
+        BRA         OP_Done_Decoding
+    OP_BGE:
+        MOVE.B #'B', (A0)+
+        MOVE.B #'G', (A0)+
+        MOVE.B #'E', (A0)+
+        *TODO add EA processing
+        BRA         OP_Done_Decoding
+    OP_BLT:
+        MOVE.B #'B', (A0)+
+        MOVE.B #'L', (A0)+
+        MOVE.B #'T', (A0)+
+        *TODO add EA processing
+        BRA         OP_Done_Decoding
+    OP_BVC:
+        MOVE.B #'B', (A0)+
+        MOVE.B #'V', (A0)+
+        MOVE.B #'C', (A0)+
+        *TODO add EA processing
+        BRA         OP_Done_Decoding
+    
 ****NOT USED!!!
 OP_Code0111:
     BRA         OP_NOT_FOUND_ERROR
@@ -652,13 +737,8 @@ OP_Code1000:
         JSR         OP_OR_L
         *TODO EA processing
         BRA         OP_Done_Decoding 
-    
-    
-    
-    
-
-
-*SUB.B*, SUB.W*, SUB.L*
+        
+* SUB.B*, SUB.W*, SUB.L*
 OP_Code1001:
     MOVE.W      D4,D1
     ANDI.W      #$01C0,D1 
@@ -1085,6 +1165,7 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
 
 
 
