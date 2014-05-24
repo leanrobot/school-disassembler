@@ -345,6 +345,36 @@ BRANCH NOP
     ROR.L #4,D0 
     ROL.B #4,D0
     
+    **************NEG*********************    
+    
+    NEG.B       D1
+    NEG.B       (A1)
+    NEG.B       (A1)+
+    NEG.B       -(A1)
+    NEG.B       $8000
+    NEG.B       $4000
+
+	NEG.W       D1
+    NEG.W       (A1)
+    NEG.W       (A1)+
+    NEG.W       -(A1)
+    NEG.W       $8000
+    NEG.W       $4000
+
+	NEG.L       D1
+    NEG.L       (A1)
+    NEG.L       (A1)+
+    NEG.L       -(A1)
+    NEG.L       $8000
+    NEG.L       $4000
+
+************BRA**************
+
+LABEL1  
+    BRA LABEL1
+
+
+    
 TEST RTS
 
 
@@ -360,6 +390,7 @@ TESTI DC.B 'yoyoma'
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
