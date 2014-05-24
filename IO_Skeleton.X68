@@ -330,17 +330,109 @@ OP_DECODER:
     
 *ORI.B, ORI.W, ORI.L, BCLR.B, BCLS.L, CMPI.B, CMPI.W, CMPI.I
 OP_Code0000:
+    * BCLR?
+    MOVE.W      D4,D1
+    ANDI.W      #$01C0,D1
+    MOVE.W      #$0180,D2
+    CMP.W       D1,D2
+    BEQ         OP_BCLR
+    * ORI?
+    MOVE.W      D4,D1
+    ANDI.W      #$FF00,D1
+    MOVE.W      #$0000,D2
+    CMP.W       D1,D2
+    BEQ         OP_ORI
+    * CMPI
+    MOVE.W      #$0C00,D2
+    CMP.W       D1,D2
+    BEQ         OP_CMPI
+    * else, error. 
+    BNE         OP_NOT_FOUND_ERROR
+    
+    OP_0000_GetSize:
+        MOVE.W      D4,D1
+        ANDI.W      #$00C0,D1
+        *Byte?
+        MOVE.W      #$0000,D2
+        CMP.W       D1,D2
+        BEQ         OP_0000_byte
+        *Word?
+        MOVE.W      #$0000,D2
+        CMP.W       D1,D2
+        BEQ         OP_0000_word
+        *Long?
+        MOVE.W      #$0000,D2
+        CMP.W       D1,D2
+        BEQ         OP_0000_long
+        *error
+        BNE         OP_NOT_FOUND_ERROR
+        
+        OP_0000_byte:
+            MOVE.B #'B', (A0)+
+            RTS
+        OP_0000_word:
+            MOVE.B #'W', (A0)+
+            RTS
+        OP_0000_long:
+            MOVE.B #'L', (A0)+
+            RTS
+            
+    OP_BCLR:
+        MOVE.W      D4,D1
+        ANDI.W      #$0038,D1
+        MOVE.W      #$0000,D2
+        BEQ         OP_BCLR_L
+        BNE         OP_BCLR_B
+        
+        OP_BCLR_L:
+            MOVE.B #'B', (A0)+
+            MOVE.B #'C', (A0)+
+            MOVE.B #'L', (A0)+
+            MOVE.B #'R', (A0)+
+            MOVE.B #'.', (A0)+
+            MOVE.B #'L', (A0)+ 
+            *TODO EA Processing
+            BRA         OP_Done_Decoding
+        OP_BCLR_B:
+            MOVE.B #'B', (A0)+
+            MOVE.B #'C', (A0)+
+            MOVE.B #'L', (A0)+
+            MOVE.B #'R', (A0)+
+            MOVE.B #'.', (A0)+
+            MOVE.B #'B', (A0)+ 
+            *TODO EA Processing
+            BRA         OP_Done_Decoding
+        
+    OP_ORI:
+        MOVE.B #'O', (A0)+
+        MOVE.B #'R', (A0)+
+        MOVE.B #'I', (A0)+
+        MOVE.B #'.', (A0)+    OP_CMPI:    
+        JSR         OP_0000_GetSize
+        *TODO EA Processing
+        BRA         OP_Done_Decoding
+        
+    OP_CMPI:
+        MOVE.B #'C', (A0)+
+        MOVE.B #'M', (A0)+
+        MOVE.B #'P', (A0)+
+        MOVE.B #'I', (A0)+
+        MOVE.B #'.', (A0)+    OP_CMPI:    
+        JSR         OP_0000_GetSize
+        *TODO EA Processing
+        BRA         OP_Done_Decoding
+    
 
 *MOVE.B
 OP_Code0001:
-    *only possibility, can we garuntee test data will compile? do we need error checking here?
     OP_MOVE_B:
          MOVE.B #'M', (A0)+
          MOVE.B #'O', (A0)+
          MOVE.B #'V', (A0)+
          MOVE.B #'E', (A0)+
          MOVE.B #'.', (A0)+
-         MOVE.B #'B', (A0)+          *TODO EA Processing
+         MOVE.B #'B', (A0)+     
+         *TODO EA Processing
          BRA         OP_Done_Decoding 
     
 *MOVE.L, MOVEA.L
