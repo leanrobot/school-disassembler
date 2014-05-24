@@ -523,6 +523,15 @@ OP_Code0100:
         BEQ         OP_MOVEM_MEM2REG
         BNE         OP_MOVEM_REG2MEM
         
+        OP_MOVEM_DISPLAY:
+            MOVE.B #'M', (A0)+
+            MOVE.B #'O', (A0)+
+            MOVE.B #'V', (A0)+
+            MOVE.B #'E', (A0)+
+            MOVE.B #'M', (A0)+
+            MOVE.B #'.', (A0)+
+            RTS
+        
         OP_MOVEM_MEM2REG:
             MOVE.W      D4,D1
             MOVE.W      #$0040,D2
@@ -532,10 +541,14 @@ OP_Code0100:
             BNE         OP_MOVEM_MEM2REG_W
             
             OP_MOVEM_MEM2REG_L:
-                *TODO print and EA
+                JSR         OP_MOVEM_DISPLAY
+                MOVE.B #'L', (A0)+
+                *TODO  EA
                 BRA         OP_Done_Decoding
             OP_MOVEM_MEM2REG_W:
-                *TODO print and EA
+                JSR         OP_MOVEM_DISPLAY
+                MOVE.B #'W', (A0)+
+                *TODO  EA
                 BRA         OP_Done_Decoding
         
         OP_MOVEM_REG2MEM:
@@ -547,10 +560,14 @@ OP_Code0100:
             BNE         OP_MOVEM_REG2MEM_W     
             
             OP_MOVEM_REG2MEM_L:
-                *TODO print and EA
+                JSR         OP_MOVEM_DISPLAY
+                MOVE.B #'L', (A0)+
+                *TODO  EA
                 BRA         OP_Done_Decoding
             OP_MOVEM_REG2MEM_W:
-                *TODO print and EA
+                JSR         OP_MOVEM_DISPLAY
+                MOVE.B #'W', (A0)+
+                *TODO  EA
                 BRA         OP_Done_Decoding
         
 *SUBQ.B, SUBQ.W, SUBQ.L
@@ -1165,6 +1182,7 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
 
 
 
