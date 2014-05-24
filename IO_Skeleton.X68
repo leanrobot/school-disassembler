@@ -1380,8 +1380,16 @@ OP_jmp_table
 * D2 = EA Case Code
 * D3 = Size of Operation
 EA_DECODE:
+    * To save d reg space, move: 
+    *       EA_Case into (A3)
+    *       EA_Size into (A4)
+    MOVEA EA_CASE, A3
+    MOVEA EA_SIZE, A4
+    MOVE.B D2, (A3)
+    MOVE.B D3, (A4)
+
     * IF case == 1:
-    CMP.B #1, D2
+    CMP.B #1, (A3)
     BEQ     EA_DECODE_BranchCase1
 
     * IF CAse is anything else
@@ -1419,9 +1427,7 @@ EA_DECODE_CASE1:
     * HandleOperand(src=d6, reg=d7)
     JSR EA_HandleOperand
 
-    *Print comma & space.
-    MOVE.B #$2C, (A0)+
-    MOVE.B #$20, (A0)+
+    JSR EA_PrintCommaSpace
 
     * Get dest mode =================
     MOVE.L #$00000006, D6 * shift
@@ -1440,6 +1446,84 @@ EA_DECODE_CASE1:
 
     MOVEM.L (A7)+, PARAMS
     RTS
+
+***** Case 2 includes:
+EA_DECODE_CASE2:
+    MOVEM.L PARAMS, -(A7)
+    * D3 Stores OpMode
+    * D5 Stores Register
+    * D6 Stores EA Mode
+    * D7 Store EA Register
+
+    *Retrieve register bits
+    MOVEM.L PARAMS, -(A7)  * scope -->
+    MOVE.B #9, D6   * shift
+    MOVE.B #3, D7   * keep
+    JSR EA_ShiftAndMask
+    MOVEM.L (A7)+, PARAMS  * end scope <--
+    MOVE.B D2, D5
+
+    *Retrieve EA Mode
+    MOVEM.L PARAMS, -(A7)  * scope -->
+    MOVE.B #3, D6   * shift
+    MOVE.B #3, D7   * keep
+    JSR EA_ShiftAndMask
+    MOVEM.L (A7)+, PARAMS  * end scope <--
+    MOVE.B D2, D6
+
+    *Retrieve EA register
+    MOVEM.L PARAMS, -(A7)  * scope -->
+    MOVE.B #0, D6   * shift
+    MOVE.B #3, D7   * keep
+    JSR EA_ShiftAndMask
+    MOVEM.L (A7)+, PARAMS  * end scope <--
+    MOVE.B D2, D7
+
+    *Retrieve OpMode
+    MOVEM.L PARAMS, -(A7)  * scope -->
+    MOVE.B #6, D6   * shift
+    MOVE.B #3, D7   * keep
+    JSR EA_ShiftAndMask
+    MOVEM.L (A7)+, PARAMS  * end scope <--
+    MOVE.B D2, D5
+
+    * Opmode --> D3
+    * if op mode >= 4, --> Dn + <EA>
+
+    CMPI.B #4, D3
+    BGE EA_DECODE_CASE2_IfDnEa
+    BRA EA_DECODE_CASE2_IfEaDn
+
+    EA_DECODE_CASE2_IfDnEa:
+        MOVEM.L PARAMS, -(A7)  * scope -->
+        MOVE.B D5, D7
+        JSR EA_DirectData
+        MOVEM.L (A7)+, PARAMS  * end scope <--
+
+        JSR EA_PrintCommaSpace
+        JSR EA_HandleOperand
+        BRA EA_DECODE_CASE2_IfEnd
+
+    EA_DECODE_CASE2_IfEaDn:
+        JSR EA_HandleOperand
+        JSR EA_PrintCommaSpace
+
+        MOVEM.L PARAMS, -(A7)  * scope -->
+        MOVE.B D5, D7
+        JSR EA_DirectData
+        MOVEM.L (A7)+, PARAMS  * end scope <--
+        BRA EA_DECODE_CASE2_IfEnd
+    EA_DECODE_CASE2_IfEnd:
+    
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+EA_DECODE_CASE3:
+    *MOVEM.L PARAMS, -(A7)
+    RTS
+
+
+
 
 * Mode = D6
 * Register = D7
@@ -1547,6 +1631,9 @@ EA_PreDecAddress:
     MOVEM.L (A7)+, PARAMS
     RTS
 
+* # of bytes to read.
+EA_ImmediateData:
+
 * D4 = shift & mask data (LW)
 * D6 = Shift right amount (LW)
 * D7 = # of bits wanted (LW)
@@ -1572,6 +1659,12 @@ EA_ShiftAndMask:
 
     MOVEM.L (A7)+, PARAMS
     RTS
+
+EA_PrintCommaSpace:
+    *Print comma & space.
+    MOVE.B #$2C, (A0)+
+    MOVE.B #$20, (A0)+
+    RTS
 * ============================ END EA_ShiftAndMask
 
 *===============================================================================================* GLOBAL VARIABLE BLOCK
@@ -1582,6 +1675,9 @@ IO_STARTADDR    DS.L    1
 IO_ENDADDR      DS.L    1
 OP_CODE         DS.B    10
 OP_CODE_UNKNWN  DS.B    1
+
+EA_CASE         DS.B    1
+EA_SIZE         DS.B    1
 
 
 
