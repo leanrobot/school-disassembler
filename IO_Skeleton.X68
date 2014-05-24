@@ -11,7 +11,7 @@ stack   EQU     $A000    *sp initial
 shift   EQU     12
 
 
-    ORG    $4000
+    ORG    $1000
 START:      
     LEA stack, SP                ; first instruction of program
     LEA OP_jmp_table,A5
