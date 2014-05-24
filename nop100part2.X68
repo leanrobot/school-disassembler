@@ -128,11 +128,134 @@ START:                  ; first instruction of program
     SUB.L       $8002,D1 
     SUB.L       $4002,D1
 
+*************MOVE**************
 
-    MOVE.B D0,D1
+    MOVE.B D0,D2
+	MOVE.B (A5),D2
+	MOVE.B (A5)+,D2
+	MOVE.B -(A5),D2
+	MOVE.B D2,$5000
+	MOVE.B (A0),$5000
     MOVE.B #$10,D0
-    MOVE.W D0,D1
+    
+    
+    MOVE.W D0,D2
+	MOVE.W A0,D2
+	MOVE.W (A5),D2
+	MOVE.W A1,D2
+	MOVE.W (A5)+,D2
+	MOVE.W -(A5),D2
+	MOVE.W D2,$5000
+	MOVE.W (A0),$5000
     MOVE.W #$10,D0
+    
+    MOVE.L D0,D2
+	MOVE.L A0,D2
+	MOVE.L (A5),D2
+	MOVE.L A1,D2
+	MOVE.L (A5)+,D2
+	MOVE.L -(A5),D2
+	MOVE.L D2,$5000
+	MOVE.L (A0),$5000
+	MOVE.L #$8000,D0
+	
+	**********LEA**************
+	LEA (A1),A2
+	LEA $07FFF,A2    	* Word addr
+	LEA $8000,A2 		* Word addr
+	LEA $00008000,A2 	* Long word addr
+	
+	**********OR**************
+    	*** <EA> --> Dn ***
+
+	OR.B D0,D1
+	OR.B (A1),D1
+	OR.B (A1)+,D1
+	OR.B -(A1),D1
+	OR.B #$10,D1
+	OR.B $100,D1
+	OR.B $1234A,D1
+
+	OR.W D0,D1
+	OR.W (A1),D1
+	OR.W (A1)+,D1
+	OR.W -(A1),D1
+	OR.W #$10,D1
+	OR.W $100,D1
+	OR.W $1234A,D1
+
+	OR.L D0,D1
+	OR.L (A1),D1
+	OR.L (A1)+,D1
+	OR.L -(A1),D1
+	OR.L #$10,D1
+	OR.L $100,D1
+	OR.L $1234A,D1
+	
+		*** Dn --> <EA> ***
+
+	OR.B D1,(A1)
+	OR.B D1,(A1)+
+	OR.B D1,-(A1)
+	OR.B D1,$07FF * Word addr
+	OR.B D1,$8000 * Long word addr
+
+	OR.W D1,(A1)
+	OR.W D1,(A1)+
+	OR.W D1,-(A1)
+	OR.W D1,$07FF * Word addr
+	OR.W D1,$8000 * Long word addr
+
+	OR.L D1,(A1)
+	OR.L D1,(A1)+
+	OR.L D1,-(A1)
+	OR.L D1,$07FF * Word addr
+	OR.L D1,$8000 * Long word addr
+    
+    **********ORI**************
+    ORI.B #$0000,D1
+	ORI.B #$0000,(A1)
+	ORI.B #$0000,(A1)+
+	ORI.B #$0000,-(A1)
+	ORI.B #$0000, $07FF * Word addr
+	ORI.B #$0000, $8000 * Word addr
+
+	ORI.W #$0000,D1
+	ORI.W #$0000,(A1)
+	ORI.W #$0000,(A1)+
+	ORI.W #$0000,-(A1)
+	ORI.W #$0000, $07FF * Word addr
+	ORI.W #$0000, $8000 * Word addr
+
+	ORI.L #$0000,D1
+	ORI.L #$0000,(A1)
+	ORI.L #$0000,(A1)+
+	ORI.L #$0000,-(A1)
+	ORI.L #$0000, $07FF * Word addr
+	ORI.L #$0000, $8000 * Word addr
+    
+    **********BCC***************
+BRANCH NOP
+	    BCC BRANCH
+	    BCS BRANCH
+    	BEQ BRANCH
+    	BGE BRANCH
+	    BGT BRANCH
+    	BHI BRANCH
+	    BLE BRANCH
+    	BLS BRANCH
+	    BLT BRANCH
+	    BMI BRANCH
+	    BNE BRANCH
+	    BPL BRANCH
+	    BVC BRANCH
+	    BVS BRANCH
+	    
+*********MOVEM**************
+
+	MOVEM D0-D7, $4500
+	MOVEM $4500, D0-D7
+    
     JSR TEST
     LEA TESTI, A0
     NOP
@@ -237,6 +360,8 @@ TESTI DC.B 'yoyoma'
 * Put variables and constants here
 
     END    START        ; last line of source
+
+
 
 
 
