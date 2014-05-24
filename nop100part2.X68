@@ -255,6 +255,231 @@ BRANCH NOP
 
 	MOVEM D0-D7, $4500
 	MOVEM $4500, D0-D7
+	
+**************NEG*********************    
+    
+    NEG.B       D1
+    NEG.B       (A1)
+    NEG.B       (A1)+
+    NEG.B       -(A1)
+    NEG.B       $8000
+    NEG.B       $4000
+
+	NEG.W       D1
+    NEG.W       (A1)
+    NEG.W       (A1)+
+    NEG.W       -(A1)
+    NEG.W       $8000
+    NEG.W       $4000
+
+	NEG.L       D1
+    NEG.L       (A1)
+    NEG.L       (A1)+
+    NEG.L       -(A1)
+    NEG.L       $8000
+    NEG.L       $4000
+
+************BRA**************
+
+LABEL1  
+    BRA LABEL1
+    
+************MOVEA**************    
+    MOVEA.W D0,A2
+	MOVEA.W A1,A2
+	MOVEA.W (A1),A2
+	MOVEA.W (A1)+,A2
+	MOVEA.W -(A1),A2
+	MOVEA.W $07FFF,A2 		* Word addr
+	MOVEA.W $FFFF8000,A2 	* Word addr TODO NOT SURE
+
+	MOVEA.L D0,A2
+	MOVEA.L A1,A2
+	MOVEA.L (A1),A2
+	MOVEA.L (A1)+,A2
+	MOVEA.L -(A1),A2
+	MOVEA.L $8005,A2		* Long Word addr
+    
+************EOR************** 
+    EOR.B    D0, D1
+    EOR.B    D0,(A1)
+    EOR.B    D0,(A1)+
+    EOR.B    D0,-(A1)
+    EOR.B    D0,$8000
+    EOR.B    D0,$4000
+   
+    EOR.W    D0, D1
+    EOR.W    D0,(A1)
+    EOR.W    D0,(A1)+
+    EOR.W    D0,-(A1)
+    EOR.W    D0,$8000
+    EOR.W    D0,$4000
+    
+    EOR.L    D0, D1
+    EOR.L    D0,(A1)
+    EOR.L    D0,(A1)+
+    EOR.L    D0,-(A1)
+    EOR.L    D0,$8000
+    EOR.L    D0,$4000
+    
+************CMP************** 
+    CMP.B    D0, D1
+    CMP.B    (A1),D1
+    CMP.B    (A1)+,D1
+    CMP.B    -(A1),D1
+    CMP.B    $8000,D1
+    CMP.B    $4000,D1
+    CMP.B    #123,D1   
+    
+    CMP.W    D0, D1
+    CMP.W    A1, D1  
+    CMP.W    (A1),D1
+    CMP.W    (A1)+,D1
+    CMP.W    -(A1),D1
+    CMP.W    $8000,D1
+    CMP.W    $4000,D1
+    CMP.W    #1234,D1   
+    
+    CMP.L    D0, D1
+    CMP.L    A1, D1  
+    CMP.L    (A1),D1
+    CMP.L    (A1)+,D1
+    CMP.L    -(A1),D1
+    CMP.L    $8000,D1
+    CMP.L    $4000,D1
+    CMP.L    #12340000,D1   
+    
+    ************CMPI************** 
+    CMPI.B    #12, D1
+    CMPI.B    #12, (A1)
+    CMPI.B    #12, (A1)+
+    CMPI.B    #12, -(A1)
+    CMPI.B    #12, $8000
+    CMPI.B    #12, $4000
+    
+    CMPI.W    #1234, D1
+    CMPI.W    #1234, (A1)
+    CMPI.W    #1234, (A1)+
+    CMPI.W    #1234, -(A1)
+    CMPI.W    #1234, $8000
+    CMPI.W    #1234, $4000
+    
+    CMPI.L    #12345678, D1
+    CMPI.L    #12345678, (A1)
+    CMPI.L    #12345678, (A1)+
+    CMPI.L    #12345678, -(A1)
+    CMPI.L    #12345678, $8000
+    CMPI.L    #12345678, $4000
+    
+************BCLR************** 
+    BCLR.L    D1, D0
+    BCLR.B    D1, (A1)
+    BCLR.B    D1, (A1)+
+    BCLR.B    D1, -(A1)
+    BCLR.B    D1, $4000
+    BCLR.B    D1, $8000
+    
+    
+    BCLR.L    #1234, D1
+    BCLR.B    #1234, (A1)
+    BCLR.B    #1234, (A1)+
+    BCLR.B    #1234, -(A1)
+    BCLR.B    #1234, $4000
+    BCLR.B    #1234, $8000
+    
+    BCLR.L    D1, D0
+    
+************LSL**************
+    
+    LSL.B    D1, D3
+    LSL.B    #1, D1
+    
+    LSL.W    D1, D3
+    LSL.W    #1, D1
+    LSL.W    (A1)      
+    LSL.W    (A1)+
+    LSL.W    -(A1)
+    LSL.W    $4000
+    LSL.W    $8000
+    
+    LSL.L    D1, D3
+    LSL.L    #1, D1
+    
+    
+************LSR**************
+    LSR.B    D1, D3
+    LSR.B    #1, D1
+    
+    LSR.W    D1, D3
+    LSR.W    #1, D1
+    LSR.W    (A1)      
+    LSR.W    (A1)+
+    LSR.W    -(A1)
+    LSR.W    $4000
+    LSR.W    $8000
+    
+    LSR.L    D1, D3
+    LSR.L    #1, D1
+    
+************ASL**************
+    ASL.B    D1, D3
+    ASL.B    #1, D1
+    
+    ASL.W    D1, D3
+    ASL.W    #1, D1
+    ASL.W    (A1)      
+    ASL.W    (A1)+
+    ASL.W    -(A1)
+    ASL.W    $4000
+    ASL.W    $8000
+    
+    ASL.L    D1, D3
+    ASL.L    #1, D1
+    
+************ASL**************
+    ASR.B    D1, D3
+    ASR.B    #1, D1
+    
+    ASR.W    D1, D3
+    ASR.W    #1, D1
+    ASR.W    (A1)      
+    ASR.W    (A1)+
+    ASR.W    -(A1)
+    ASR.W    $4000
+    ASR.W    $8000
+    
+    ASR.L    D1, D3
+    ASR.L    #1, D1
+    
+************ROL************** 
+    ROL.B    D1, D3
+    ROL.B    #1, D1
+    
+    ROL.W    D1, D3
+    ROL.W    #1, D1
+    ROL.W    (A1)      
+    ROL.W    (A1)+
+    ROL.W    -(A1)
+    ROL.W    $4000
+    ROL.W    $8000
+    
+    ROL.L    D1, D3
+    ROL.L    #1, D1   
+
+************ROR**************
+    ROR.B    D1, D3
+    ROR.B    #1, D1
+    
+    ROR.W    D1, D3
+    ROR.W    #1, D1
+    ROR.W    (A1)      
+    ROR.W    (A1)+
+    ROR.W    -(A1)
+    ROR.W    $4000
+    ROR.W    $8000
+    
+    ROR.L    D1, D3
+    ROR.L    #1, D1
     
     JSR TEST
     LEA TESTI, A0
@@ -345,33 +570,6 @@ BRANCH NOP
     ROR.L #4,D0 
     ROL.B #4,D0
     
-    **************NEG*********************    
-    
-    NEG.B       D1
-    NEG.B       (A1)
-    NEG.B       (A1)+
-    NEG.B       -(A1)
-    NEG.B       $8000
-    NEG.B       $4000
-
-	NEG.W       D1
-    NEG.W       (A1)
-    NEG.W       (A1)+
-    NEG.W       -(A1)
-    NEG.W       $8000
-    NEG.W       $4000
-
-	NEG.L       D1
-    NEG.L       (A1)
-    NEG.L       (A1)+
-    NEG.L       -(A1)
-    NEG.L       $8000
-    NEG.L       $4000
-
-************BRA**************
-
-LABEL1  
-    BRA LABEL1
 
 
     
@@ -390,6 +588,8 @@ TESTI DC.B 'yoyoma'
 * Put variables and constants here
 
     END    START        ; last line of source
+
+
 
 
 
