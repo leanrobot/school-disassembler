@@ -7,8 +7,87 @@
 *-----------------------------------------------------------
     ORG    $7000
 START:                  ; first instruction of program
-    NOP
-    NOP
+**************ADD**************
+    
+    ADD.B       D0,D1
+    ADD.B       D0,(A1)
+    ADD.B       D0,(A1)+
+    ADD.B       D0,-(A1)
+    ADD.B       D0,$8000
+    ADD.B       D0,$4000  
+    ADD.B       (A0),D1
+    ADD.B       (A0)+,D1
+    ADD.B       -(A0),D1
+    ADD.B       $8002,D1
+    ADD.B       $4002,D1
+    
+    ADD.W       D0,D1
+    ADD.W       D0,(A1)
+    ADD.W       D0,(A1)+
+    ADD.W       D0,-(A1)
+    ADD.W       D0,$8000
+    ADD.W       D0,$4000
+    ADD.W       A0,D1
+    ADD.W       (A0),D1
+    ADD.W       (A0)+,D1
+    ADD.W       -(A0),D1
+    ADD.W       $8002,D1
+    ADD.W       $4002,D1
+
+ 	ADD.L       D0,D1
+    ADD.L       D0,(A1)
+    ADD.L       D0,(A1)+
+    ADD.L       D0,-(A1)
+    ADD.L       D0,$8000
+    ADD.L       D0,$4000
+    ADD.L       A0,D1
+    ADD.L       (A0),D1   
+    ADD.L       (A0)+,D1  
+    ADD.L       -(A0),D1  
+    ADD.L       $8002,D1 
+    ADD.L       $4002,D1
+
+
+**************ADDA************** 
+   
+    ADDA.W       D1,A2
+    ADDA.W       A0,A2
+    ADDA.W       (A1),A2
+    ADDA.W       #1234,A2
+    ADDA.W       (A1)+,A2
+    ADDA.W       -(A1),A2
+    ADDA.W       $8000,A2
+    ADDA.W       $4000,A2
+ 	
+	ADDA.L       D1,A2
+    ADDA.L       A0,A2
+    ADDA.L       (A1),A2
+    ADDA.L       #1234,A2
+    ADDA.L       (A1)+,A2
+    ADDA.L       -(A1),A2
+    ADDA.L       $8000,A2
+    ADDA.L       $4000,A2
+   
+**************MULS**************
+ 
+    MULS.W       D1,D0
+    MULS.W       (A1),D0
+    MULS.W       #1234,D0
+    MULS.W       (A1)+,D0
+    MULS.W       -(A1),D0
+    MULS.W       $8000,D0
+    MULS.W       $4000,D0
+    
+**************DIVS**************
+
+ 	DIVS.W       D1,D0
+    DIVS.W       (A1),D0
+    DIVS.W       #1234,D0
+    DIVS.W       (A1)+,D0
+    DIVS.W       -(A1),D0
+    DIVS.W       $8000,D0
+    DIVS.W       $4000,D0
+
     MOVE.B D0,D1
     MOVE.B #$10,D0
     MOVE.W D0,D1
@@ -117,6 +196,7 @@ TESTI DC.B 'yoyoma'
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
