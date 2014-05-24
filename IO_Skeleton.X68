@@ -11,7 +11,7 @@ stack   EQU     $A000    *sp initial
 shift   EQU     12
 
 
-    ORG    $1000
+    ORG    $4000
 START:      
     LEA stack, SP                ; first instruction of program
     LEA OP_jmp_table,A5
@@ -568,81 +568,6 @@ OP_Code1000:
 
 *SUB.B*, SUB.W*, SUB.L*
 OP_Code1001:
-MOVE.W      D4,D1
-    ANDI.W      #$01C0,D1 
-    * SUB.B <ea> + Dn -> Dn?
-    MOVE.W      #$0000,D2
-    CMP.W       D2,D1
-    BEQ         OP_SUB_B_DestDn
-    * SUB.W <ea> + Dn -> Dn?
-    MOVE.W      #$0040,D2
-    CMP.W       D2,D1
-    BEQ         OP_SUB_W_DestDn
-    * SUB.L <ea> + Dn -> Dn?
-    MOVE.W      #$0080,D2
-    CMP.W       D2,D1
-    BEQ         OP_SUB_L_DestDn 
-    * SUB.B Dn + <ea> -> <ea>?
-    MOVE.W      #$0100,D2
-    CMP.W       D2,D1
-    BEQ         OP_SUB_B_DestEA 
-    * SUB.W Dn + <ea> -> <ea>?
-    MOVE.W      #$0140,D2
-    CMP.W       D2,D1
-    BEQ         OP_SUB_W_DestEA 
-    * SUB.L Dn + <ea> -> <ea>?
-    MOVE.W      #$0180,D2
-    CMP.W       D2,D1
-    BEQ         OP_SUB_L_DestEA 
-    * Error
-    BNE         OP_NOT_FOUND_ERROR
-    
-    OP_SUB_B:
-        MOVE.B #'S', (A0)+
-        MOVE.B #'U', (A0)+
-        MOVE.B #'B', (A0)+
-        MOVE.B #'.', (A0)+
-        MOVE.B #'B', (A0)+
-        RTS
-    OP_SUB_W:
-        MOVE.B #'S', (A0)+
-        MOVE.B #'U', (A0)+
-        MOVE.B #'B', (A0)+
-        MOVE.B #'.', (A0)+
-        MOVE.B #'W', (A0)+
-        RTS
-    OP_SUB_L:
-        MOVE.B #'S', (A0)+
-        MOVE.B #'U', (A0)+
-        MOVE.B #'B', (A0)+
-        MOVE.B #'.', (A0)+
-        MOVE.B #'L', (A0)+
-        RTS
-        
-    OP_SUB_B_DestDn:
-        JSR         OP_SUB_B
-        *TODO EA processing
-        BRA         OP_Done_Decoding     
-    OP_SUB_W_DestDn:
-        JSR         OP_SUB_W
-        *TODO EA processing
-        BRA         OP_Done_Decoding
-    OP_SUB_L_DestDn:
-        JSR         OP_SUB_L
-        *TODO EA processing
-        BRA         OP_Done_Decoding
-    OP_SUB_B_DestEA:
-        JSR         OP_SUB_B
-        *TODO EA processing
-        BRA         OP_Done_Decoding 
-    OP_SUB_W_DestEA:
-        JSR         OP_SUB_W
-        *TODO EA processing
-        BRA         OP_Done_Decoding
-    OP_SUB_L_DestEA:
-        JSR         OP_SUB_L
-        *TODO EA processing
-        BRA         OP_Done_Decoding
 
 ****NOT USED!!!
 OP_Code1010:
@@ -653,127 +578,9 @@ OP_Code1011:
 
 *MULS.W
 OP_Code1100:
-    MOVE.W      D4,D1
-    MOVE.W      #$01C0,D2
-    ANDI.W      #$01C0,D1
-    CMP.W       D2,D1
-    BEQ         OP_MULS_W
-    BNE         OP_NOT_FOUND_ERROR
-    
-    OP_MULS_W:
-        MOVE.B #'M', (A0)+
-        MOVE.B #'U', (A0)+
-        MOVE.B #'L', (A0)+
-        MOVE.B #'S', (A0)+
-        MOVE.B #'.', (A0)+
-        MOVE.B #'W', (A0)+    
-        *TODO effective Address Processing
-        BRA         OP_Done_Decoding    
 
 *ADD.B*, ADD.W*, ADD.L*, ADDA.W, ADDA.L
 OP_Code1101:
-    MOVE.W      D4,D1
-    ANDI.W      #$01C0,D1 
-    * ADD.B <ea> + Dn -> Dn?
-    MOVE.W      #$0000,D2
-    CMP.W       D2,D1
-    BEQ         OP_ADD_B_DestDn
-    * ADD.W <ea> + Dn -> Dn?
-    MOVE.W      #$0040,D2
-    CMP.W       D2,D1
-    BEQ         OP_ADD_W_DestDn
-    * ADD.L <ea> + Dn -> Dn?
-    MOVE.W      #$0080,D2
-    CMP.W       D2,D1
-    BEQ         OP_ADD_L_DestDn 
-    * ADD.B Dn + <ea> -> <ea>?
-    MOVE.W      #$0100,D2
-    CMP.W       D2,D1
-    BEQ         OP_ADD_B_DestEA 
-    * ADD.W Dn + <ea> -> <ea>?
-    MOVE.W      #$0140,D2
-    CMP.W       D2,D1
-    BEQ         OP_ADD_W_DestEA 
-    * ADD.L Dn + <ea> -> <ea>?
-    MOVE.W      #$0180,D2
-    CMP.W       D2,D1
-    BEQ         OP_ADD_L_DestEA 
-    * ADDA.W?
-    MOVE.W      #$00C0,D2
-    CMP.W       D2,D1
-    BEQ         OP_ADDA_W
-    * ADDA.L?
-    MOVE.W      #$01C0,D2
-    CMP.W       D2,D1
-    BEQ         OP_ADDA_W
-    * Error
-    BNE         OP_NOT_FOUND_ERROR
-    
-    OP_ADD_B:
-        MOVE.B #'A', (A0)+
-        MOVE.B #'D', (A0)+
-        MOVE.B #'D', (A0)+
-        MOVE.B #'.', (A0)+
-        MOVE.B #'B', (A0)+
-        RTS
-    OP_ADD_W:
-        MOVE.B #'A', (A0)+
-        MOVE.B #'D', (A0)+
-        MOVE.B #'D', (A0)+
-        MOVE.B #'.', (A0)+
-        MOVE.B #'W', (A0)+
-        RTS
-    OP_ADD_L:
-        MOVE.B #'A', (A0)+
-        MOVE.B #'D', (A0)+
-        MOVE.B #'D', (A0)+
-        MOVE.B #'.', (A0)+
-        MOVE.B #'L', (A0)+
-        RTS
-        
-    OP_ADD_B_DestDn:
-        JSR         OP_ADD_B
-        *TODO EA processing
-        BRA         OP_Done_Decoding     
-    OP_ADD_W_DestDn:
-        JSR         OP_ADD_W
-        *TODO EA processing
-        BRA         OP_Done_Decoding
-    OP_ADD_L_DestDn:
-        JSR         OP_ADD_L
-        *TODO EA processing
-        BRA         OP_Done_Decoding
-    OP_ADD_B_DestEA:
-        JSR         OP_ADD_B
-        *TODO EA processing
-        BRA         OP_Done_Decoding 
-    OP_ADD_W_DestEA:
-        JSR         OP_ADD_W
-        *TODO EA processing
-        BRA         OP_Done_Decoding
-    OP_ADD_L_DestEA:
-        JSR         OP_ADD_L
-        *TODO EA processing
-        BRA         OP_Done_Decoding
-        
-     OP_ADDA_W:
-        MOVE.B #'A', (A0)+
-        MOVE.B #'D', (A0)+
-        MOVE.B #'D', (A0)+
-        MOVE.B #'A', (A0)+
-        MOVE.B #'.', (A0)+
-        MOVE.B #'W', (A0)+
-        *TODO EA processing
-        BRA         OP_Done_Decoding
-    OP_ADDA_L:
-        MOVE.B #'A', (A0)+
-        MOVE.B #'D', (A0)+
-        MOVE.B #'D', (A0)+
-        MOVE.B #'A', (A0)+
-        MOVE.B #'.', (A0)+
-        MOVE.B #'L', (A0)+
-        *TODO EA processing
-        BRA         OP_Done_Decoding
 
 *LSd.B*, LSd.W*, LSd.L*, ASd.B*, ASd.W*, ASd.L*, ROd.B*, ROd.W*, ROd.L*
 OP_Code1110:
@@ -845,27 +652,19 @@ OP_Code1110:
         BRA         OP_Done_Decoding
         
     OP_ASd:
-        MOVE.B #'A', (A0)+
-        MOVE.B #'S', (A0)+
-        JSR         OP_1110_CheckRightOrLeft
-        MOVE.B #'.', (A0)+
-        JSR         OP_1110_GetSize
-         *TODO add EA processing
-        BRA         OP_Done_Decoding
+    *check Right or Left
     
     OP_ROd:
-        MOVE.B #'R', (A0)+
-        MOVE.B #'O', (A0)+
-        JSR         OP_1110_CheckRightOrLeft
-        MOVE.B #'.', (A0)+
-        JSR         OP_1110_GetSize
-         *TODO add EA processing
-        BRA         OP_Done_Decoding
+    *check Right or Left
+    
+    
 
 ****NOT USED!!!
 OP_Code1111:
     BRA         OP_NOT_FOUND_ERROR
-
+    
+OP_Jump_ERROR:
+    BRA         OP_NOT_FOUND_ERROR
 
 OP_Done_Decoding:
     RTS
@@ -874,7 +673,14 @@ OP_NOT_FOUND_ERROR:
     MOVE.B #'D', (A0)+
     MOVE.B #'A', (A0)+
     MOVE.B #'T', (A0)+
-    MOVE.B #'A', (A0)+   
+    MOVE.B #'A', (A0)+
+
+    JSR IO_INSERT_TAB
+    MOVE.B    #'$', (A0)+
+    *Printing hex word of undecodable instruction
+    MOVE.L    D4, D2
+    MOVE.B    #$4, D3
+    JSR IO_HEX2ASCII
     RTS    
 
 *===============================================================================================* OP CODE CONSTANTS
@@ -895,8 +701,8 @@ OP_jmp_table
     JMP         OP_Code1011
     JMP         OP_Code1100
     JMP         OP_Code1101
-    JMP         OP_Code1110
     JMP         OP_Code1111
+    JMP         OP_Jump_ERROR
 
 *===============================================================================================* EA
 
