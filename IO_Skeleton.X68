@@ -1032,13 +1032,19 @@ OP_Code1111:
 OP_Done_Decoding:
     RTS
 
+
 OP_NOT_FOUND_ERROR:
-    MOVE.B #'E', (A0)+
-    MOVE.B #'R', (A0)+
-    MOVE.B #'R', (A0)+
-    MOVE.B #'O', (A0)+
-    MOVE.B #'R', (A0)+
-    MOVE.B #'!', (A0)+    
+    MOVE.B #'D', (A0)+
+    MOVE.B #'A', (A0)+
+    MOVE.B #'T', (A0)+
+    MOVE.B #'A', (A0)+
+    
+    JSR IO_INSERT_TAB
+    MOVE.B #'$',(A0)+
+    *Printing hex word of undecodable instruction
+    MOVE.L D4, D2
+    MOVE.B #$4,D3
+    JSR IO_HEX2ASCII
     RTS    
 
 *===============================================================================================* OP CODE CONSTANTS
@@ -1079,6 +1085,8 @@ OP_CODE_UNKNWN  DS.B    1
 
     
     
+
+
 
 
 
