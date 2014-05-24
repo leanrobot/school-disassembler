@@ -87,6 +87,47 @@ START:                  ; first instruction of program
     DIVS.W       -(A1),D0
     DIVS.W       $8000,D0
     DIVS.W       $4000,D0
+    
+*************SUB**************
+    
+    SUB.B       D0,D1
+    SUB.B       D0,(A1)
+    SUB.B       D0,(A1)+
+    SUB.B       D0,-(A1)
+    SUB.B       D0,$8000
+    SUB.B       D0,$4000  
+    SUB.B       (A0),D1
+    SUB.B       (A0)+,D1
+    SUB.B       -(A0),D1
+    SUB.B       $8002,D1
+    SUB.B       $4002,D1
+    
+    SUB.W       D0,D1
+    SUB.W       D0,(A1)
+    SUB.W       D0,(A1)+
+    SUB.W       D0,-(A1)
+    SUB.W       D0,$8000
+    SUB.W       D0,$4000
+    SUB.W       A0,D1
+    SUB.W       (A0),D1
+    SUB.W       (A0)+,D1
+    SUB.W       -(A0),D1
+    SUB.W       $8002,D1
+    SUB.W       $4002,D1
+
+ 	SUB.L       D0,D1
+    SUB.L       D0,(A1)
+    SUB.L       D0,(A1)+
+    SUB.L       D0,-(A1)
+    SUB.L       D0,$8000
+    SUB.L       D0,$4000
+    SUB.L       A0,D1
+    SUB.L       (A0),D1   
+    SUB.L       (A0)+,D1  
+    SUB.L       -(A0),D1  
+    SUB.L       $8002,D1 
+    SUB.L       $4002,D1
+
 
     MOVE.B D0,D1
     MOVE.B #$10,D0

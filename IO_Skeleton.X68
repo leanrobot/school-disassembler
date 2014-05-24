@@ -568,6 +568,81 @@ OP_Code1000:
 
 *SUB.B*, SUB.W*, SUB.L*
 OP_Code1001:
+MOVE.W      D4,D1
+    ANDI.W      #$01C0,D1 
+    * SUB.B <ea> + Dn -> Dn?
+    MOVE.W      #$0000,D2
+    CMP.W       D2,D1
+    BEQ         OP_SUB_B_DestDn
+    * SUB.W <ea> + Dn -> Dn?
+    MOVE.W      #$0040,D2
+    CMP.W       D2,D1
+    BEQ         OP_SUB_W_DestDn
+    * SUB.L <ea> + Dn -> Dn?
+    MOVE.W      #$0080,D2
+    CMP.W       D2,D1
+    BEQ         OP_SUB_L_DestDn 
+    * SUB.B Dn + <ea> -> <ea>?
+    MOVE.W      #$0100,D2
+    CMP.W       D2,D1
+    BEQ         OP_SUB_B_DestEA 
+    * SUB.W Dn + <ea> -> <ea>?
+    MOVE.W      #$0140,D2
+    CMP.W       D2,D1
+    BEQ         OP_SUB_W_DestEA 
+    * SUB.L Dn + <ea> -> <ea>?
+    MOVE.W      #$0180,D2
+    CMP.W       D2,D1
+    BEQ         OP_SUB_L_DestEA 
+    * Error
+    BNE         OP_NOT_FOUND_ERROR
+    
+    OP_SUB_B:
+        MOVE.B #'S', (A0)+
+        MOVE.B #'U', (A0)+
+        MOVE.B #'B', (A0)+
+        MOVE.B #'.', (A0)+
+        MOVE.B #'B', (A0)+
+        RTS
+    OP_SUB_W:
+        MOVE.B #'S', (A0)+
+        MOVE.B #'U', (A0)+
+        MOVE.B #'B', (A0)+
+        MOVE.B #'.', (A0)+
+        MOVE.B #'W', (A0)+
+        RTS
+    OP_SUB_L:
+        MOVE.B #'S', (A0)+
+        MOVE.B #'U', (A0)+
+        MOVE.B #'B', (A0)+
+        MOVE.B #'.', (A0)+
+        MOVE.B #'L', (A0)+
+        RTS
+        
+    OP_SUB_B_DestDn:
+        JSR         OP_SUB_B
+        *TODO EA processing
+        BRA         OP_Done_Decoding     
+    OP_SUB_W_DestDn:
+        JSR         OP_SUB_W
+        *TODO EA processing
+        BRA         OP_Done_Decoding
+    OP_SUB_L_DestDn:
+        JSR         OP_SUB_L
+        *TODO EA processing
+        BRA         OP_Done_Decoding
+    OP_SUB_B_DestEA:
+        JSR         OP_SUB_B
+        *TODO EA processing
+        BRA         OP_Done_Decoding 
+    OP_SUB_W_DestEA:
+        JSR         OP_SUB_W
+        *TODO EA processing
+        BRA         OP_Done_Decoding
+    OP_SUB_L_DestEA:
+        JSR         OP_SUB_L
+        *TODO EA processing
+        BRA         OP_Done_Decoding
 
 ****NOT USED!!!
 OP_Code1010:
