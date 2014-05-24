@@ -1383,8 +1383,8 @@ EA_DECODE:
     * To save d reg space, move: 
     *       EA_Case into (A3)
     *       EA_Size into (A4)
-    MOVEA EA_CASE, A3
-    MOVEA EA_SIZE, A4
+    LEA EA_CASE, A3
+    LEA EA_SIZE, A4
     MOVE.B D2, (A3)
     MOVE.B D3, (A4)
 
