@@ -388,12 +388,15 @@ OP_Code0000:
         
         OP_0000_byte:
             MOVE.B #'B', (A0)+
+            MOVEQ #1, D3 *For EA
             RTS
         OP_0000_word:
             MOVE.B #'W', (A0)+
+            MOVEQ #3, D3 *For EA
             RTS
         OP_0000_long:
             MOVE.B #'L', (A0)+
+            MOVEQ #2, D3 *For EA
             RTS
             
     OP_BCLR:
@@ -410,7 +413,9 @@ OP_Code0000:
             MOVE.B #'R', (A0)+
             MOVE.B #'.', (A0)+
             MOVE.B #'L', (A0)+ 
-            *TODO EA Processing
+            *Set EA Case 1, op size long(2)
+            MOVEQ #9, D2
+            MOVEQ #2, D3           
             BRA         OP_Done_Decoding
         OP_BCLR_B:
             MOVE.B #'B', (A0)+
@@ -419,7 +424,9 @@ OP_Code0000:
             MOVE.B #'R', (A0)+
             MOVE.B #'.', (A0)+
             MOVE.B #'B', (A0)+ 
-            *TODO EA Processing
+            *Set EA Case 1, op size byte(1)
+            MOVEQ #9, D2
+            MOVEQ #1, D3
             BRA         OP_Done_Decoding
         
     OP_ORI:
@@ -428,7 +435,8 @@ OP_Code0000:
         MOVE.B #'I', (A0)+
         MOVE.B #'.', (A0)+    OP_CMPI:    
         JSR         OP_0000_GetSize
-        *TODO EA Processing
+        *Set EA Case 3, op size set by get size
+        MOVEQ #3, D2
         BRA         OP_Done_Decoding
         
     OP_CMPI:
@@ -438,7 +446,8 @@ OP_Code0000:
         MOVE.B #'I', (A0)+
         MOVE.B #'.', (A0)+    OP_CMPI:    
         JSR         OP_0000_GetSize
-        *TODO EA Processing
+        *Set EA Case 3, op size set by get size
+        MOVEQ #3, D2
         BRA         OP_Done_Decoding
     
 
@@ -451,7 +460,9 @@ OP_Code0001:
          MOVE.B #'E', (A0)+
          MOVE.B #'.', (A0)+
          MOVE.B #'B', (A0)+     
-         *TODO EA Processing
+         *Set EA Case 1, op size byte(1)
+         MOVEQ #1, D2
+         MOVEQ #1, D3
          BRA         OP_Done_Decoding 
     
 *MOVE.L, MOVEA.L
@@ -472,7 +483,9 @@ OP_Code0010:
          MOVE.B #'A', (A0)+
          MOVE.B #'.', (A0)+
          MOVE.B #'L', (A0)+ 
-         *TODO EA Processing
+         *Set EA Case 1, op size long(2)
+         MOVEQ #1, D2
+         MOVEQ #2, D3
          BRA         OP_Done_Decoding     
          
     OP_MOVE_L:
@@ -482,7 +495,9 @@ OP_Code0010:
          MOVE.B #'E', (A0)+
          MOVE.B #'.', (A0)+
          MOVE.B #'L', (A0)+ 
-         *TODO EA Processing
+         *Set EA Case 1, op size long(2)
+         MOVEQ #1, D2
+         MOVEQ #2, D3
          BRA         OP_Done_Decoding      
 
 *MOVE.W, MOVEA.W
@@ -715,17 +730,23 @@ OP_Code0101:
     OP_SUBQ_B:
         JSR     OP_SUBQ
         MOVE.B #'B', (A0)+
-        *TODO add EA processing
+        *Set EA Case 4, op size byte(1)
+        MOVEQ #4, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding
     OP_SUBQ_W:
         JSR     OP_SUBQ
-        MOVE.B #'B', (A0)+
-        *TODO add EA processing
+        MOVE.B #'W', (A0)+
+        *Set EA Case 4, op size word(3)
+        MOVEQ #4, D2
+        MOVEQ #3, D3
         BRA         OP_Done_Decoding
     OP_SUBQ_L:
         JSR     OP_SUBQ
-        MOVE.B #'B', (A0)+
-        *TODO add EA processing
+        MOVE.B #'L', (A0)+
+        *Set EA Case 4, op size long(2)
+        MOVEQ #4, D2
+        MOVEQ #2, D3
         BRA         OP_Done_Decoding
 
 *BCS, BGE, BLT, BVC, BRA
@@ -847,27 +868,39 @@ OP_Code1000:
         
     OP_OR_B_DestDn:
         JSR         OP_OR_B
-        *TODO EA processing
+        *Set EA Case 2, op size byte(1)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding 
     OP_OR_W_DestDn:
         JSR         OP_OR_W
-        *TODO EA processing
+        *Set EA Case 2, op size word(3)
+        MOVEQ #2, D2
+        MOVEQ #3, D3
         BRA         OP_Done_Decoding 
     OP_OR_L_DestDn:
         JSR         OP_OR_L
-        *TODO EA processing
+        *Set EA Case 2, op size long(2)
+        MOVEQ #2, D2
+        MOVEQ #2, D3
         BRA         OP_Done_Decoding 
     OP_OR_B_DestEA:
         JSR         OP_OR_B
-        *TODO EA processing
+        *Set EA Case 2, op size byte(1)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding 
     OP_OR_W_DestEA:
         JSR         OP_OR_W
-        *TODO EA processing
+        *Set EA Case 2, op size word(3)
+        MOVEQ #2, D2
+        MOVEQ #3, D3
         BRA         OP_Done_Decoding 
     OP_OR_L_DestEA:
         JSR         OP_OR_L
-        *TODO EA processing
+        *Set EA Case 2, op size long(2)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding 
         
 * SUB.B*, SUB.W*, SUB.L*
@@ -925,27 +958,39 @@ OP_Code1001:
         
     OP_SUB_B_DestDn:
         JSR         OP_SUB_B
-        *TODO EA processing
+        *Set EA Case 2, op size byte(1)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding     
     OP_SUB_W_DestDn:
         JSR         OP_SUB_W
-        *TODO EA processing
+        *Set EA Case 2, op size word(3)
+        MOVEQ #2, D2
+        MOVEQ #3, D3
         BRA         OP_Done_Decoding
     OP_SUB_L_DestDn:
         JSR         OP_SUB_L
-        *TODO EA processing
+        *Set EA Case 2, op size long(2)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding
     OP_SUB_B_DestEA:
         JSR         OP_SUB_B
-        *TODO EA processing
+        *Set EA Case 2, op size byte(1)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding 
     OP_SUB_W_DestEA:
         JSR         OP_SUB_W
-        *TODO EA processing
+        *Set EA Case 2, op size word(3)
+        MOVEQ #2, D2
+        MOVEQ #3, D3
         BRA         OP_Done_Decoding
     OP_SUB_L_DestEA:
         JSR         OP_SUB_L
-        *TODO EA processing
+        *Set EA Case 2, op size long(2)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding
 
 ****NOT USED!!!
@@ -987,6 +1032,9 @@ OP_Code1011:
         MOVE.B #'R', (A0)+
         MOVE.B #'.', (A0)+
         MOVE.B #'B', (A0)+
+        *Set EA Case 2, op size byte(1)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         RTS
     OP_EOR_W:
         MOVE.B #'E', (A0)+
@@ -994,6 +1042,9 @@ OP_Code1011:
         MOVE.B #'R', (A0)+
         MOVE.B #'.', (A0)+
         MOVE.B #'W', (A0)+
+        *Set EA Case 2, op size word(3)
+        MOVEQ #2, D2
+        MOVEQ #3, D3
         RTS
     OP_EOR_L:
         MOVE.B #'E', (A0)+
@@ -1001,6 +1052,9 @@ OP_Code1011:
         MOVE.B #'R', (A0)+
         MOVE.B #'.', (A0)+
         MOVE.B #'L', (A0)+
+        *Set EA Case 2, op size long(2)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         RTS
     
     OP_CMP_B:
@@ -1009,6 +1063,9 @@ OP_Code1011:
         MOVE.B #'P', (A0)+
         MOVE.B #'.', (A0)+
         MOVE.B #'B', (A0)+
+        *Set EA Case 2, op size byte(1)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         RTS    
     OP_CMP_W:
         MOVE.B #'C', (A0)+
@@ -1016,6 +1073,9 @@ OP_Code1011:
         MOVE.B #'P', (A0)+
         MOVE.B #'.', (A0)+
         MOVE.B #'W', (A0)+
+        *Set EA Case 2, op size word(3)
+        MOVEQ #2, D2
+        MOVEQ #3, D3
         RTS  
     OP_CMP_L:
         MOVE.B #'C', (A0)+
@@ -1023,6 +1083,9 @@ OP_Code1011:
         MOVE.B #'P', (A0)+
         MOVE.B #'.', (A0)+
         MOVE.B #'L', (A0)+
+        *Set EA Case 2, op size long(2)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         RTS  
 
 *MULS.W
@@ -1107,27 +1170,39 @@ OP_Code1101:
         
     OP_ADD_B_DestDn:
         JSR         OP_ADD_B
-        *TODO EA processing
+        *Set EA Case 2, op size byte(1)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding     
     OP_ADD_W_DestDn:
         JSR         OP_ADD_W
-        *TODO EA processing
+        *Set EA Case 2, op size word(3)
+        MOVEQ #2, D2
+        MOVEQ #3, D3
         BRA         OP_Done_Decoding
     OP_ADD_L_DestDn:
         JSR         OP_ADD_L
-        *TODO EA processing
+        *Set EA Case 2, op size long(2)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding
     OP_ADD_B_DestEA:
         JSR         OP_ADD_B
-        *TODO EA processing
+        *Set EA Case 2, op size byte(1)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding 
     OP_ADD_W_DestEA:
         JSR         OP_ADD_W
-        *TODO EA processing
+        *Set EA Case 2, op size word(3)
+        MOVEQ #2, D2
+        MOVEQ #3, D3
         BRA         OP_Done_Decoding
     OP_ADD_L_DestEA:
         JSR         OP_ADD_L
-        *TODO EA processing
+        *Set EA Case 2, op size long(2)
+        MOVEQ #2, D2
+        MOVEQ #1, D3
         BRA         OP_Done_Decoding
         
      OP_ADDA_W:
@@ -1512,6 +1587,7 @@ OP_CODE_UNKNWN  DS.B    1
 
 
     END    START        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
