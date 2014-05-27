@@ -1243,14 +1243,16 @@ OP_Code1101:
 *LSd.B*, LSd.W*, LSd.L*, ASd.B*, ASd.W*, ASd.L*, ROd.B*, ROd.W*, ROd.L*
 OP_Code1110:
     *decide if LSd, ASd, or ROd
+    *decide if memory shift 
+    JSR         OP_1110_SizeMask
+    MOVE.W      #$00C0,D2
+    BEQ         OP_1110_MemoryShifts
+    BNE         OP_1110_RegisterShifts
+    
+OP_1110_RegisterShifts:
     *first check if LSd
     JSR         OP_1110_RegisterShiftMask   
     MOVE.W      #$0008,D2
-    CMP.W       D2,D1
-    BEQ         OP_LSd
-    *Or could be LSd memory shift
-    JSR         OP_1110_MemoryShiftMask
-    MOVE.W      #$0200,D2
     CMP.W       D2,D1
     BEQ         OP_LSd
     *Now check if ASd
@@ -1258,16 +1260,25 @@ OP_Code1110:
     MOVE.W      #$0000,D2
     CMP.W       D2,D1
     BEQ         OP_ASd
-    *Check if ASd memory shift
-    JSR         OP_1110_MemoryShiftMask
-    MOVE.W      #$0000,D2
-    CMP.W       D2,D1
-    BEQ         OP_ASd
     *Finally check if ROd
     JSR         OP_1110_RegisterShiftMask 
     MOVE.W      #$0018,D2
     CMP.W       D2,D1
-    BEQ         OP_ROd  
+    BEQ         OP_ROd
+    *error
+    BNE         OP_NOT_FOUND_ERROR 
+    
+OP_1110_MemoryShifts:  
+    *LSd memory shift
+    JSR         OP_1110_MemoryShiftMask
+    MOVE.W      #$0200,D2
+    CMP.W       D2,D1
+    BEQ         OP_LSd
+    *Check if ASd memory shift
+    JSR         OP_1110_MemoryShiftMask
+    MOVE.W      #$0000,D2
+    CMP.W       D2,D1
+    BEQ         OP_ASd 
     *check if memory shift
     JSR         OP_1110_MemoryShiftMask
     MOVE.W      #$0600,D2
@@ -1283,7 +1294,11 @@ OP_Code1110:
     OP_1110_MemoryShiftMask:
         MOVE.W      D4,D1
         ANDI.W      #$0E00,D1
-        RTS
+        RTS 
+    OP_1110_SizeMask:
+        MOVE.W      D4,D1
+        ANDI.W      #$00C0,D1
+        RTS    
     
     OP_1110_CheckRightOrLeft:
         MOVE.W      D4,D1
@@ -1301,10 +1316,8 @@ OP_Code1110:
             RTS
             
     OP_1110_GetSize:
-        MOVE.W      D4,D1
-        * first check for byte size
-        MOVE.W      #$0000,D2
-        ANDI.W      #$00C0,D1
+        JSR         OP_1110_SizeMask
+        MOVE.W      #$0000
         CMP.W       D2,D1
         BEQ         OP_1110_Byte
         * then check for word
@@ -1316,7 +1329,7 @@ OP_Code1110:
         CMP.W       D2,D1
         BEQ         OP_1110_Long
         * Memory shift only case not detailed, will always be word
-        BEQ         OP_1110_Word
+        BNE         OP_1110_Word
         
         OP_1110_Byte:
             MOVE.B #'B', (A0)+
