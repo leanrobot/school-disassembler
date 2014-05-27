@@ -1317,7 +1317,7 @@ OP_1110_MemoryShifts:
             
     OP_1110_GetSize:
         JSR         OP_1110_SizeMask
-        MOVE.W      #$0000
+        MOVE.W      #$0000, D2
         CMP.W       D2,D1
         BEQ         OP_1110_Byte
         * then check for word
@@ -1745,6 +1745,7 @@ EA_SIZE         DS.B    1
 
 
     END    START        ; last line of source
+
 
 
 
