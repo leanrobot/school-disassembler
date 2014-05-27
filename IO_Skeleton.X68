@@ -1246,6 +1246,7 @@ OP_Code1110:
     *decide if memory shift 
     JSR         OP_1110_SizeMask
     MOVE.W      #$00C0,D2
+    CMP         D1,D2
     BEQ         OP_1110_MemoryShifts
     BNE         OP_1110_RegisterShifts
     
@@ -1283,7 +1284,7 @@ OP_1110_MemoryShifts:
     JSR         OP_1110_MemoryShiftMask
     MOVE.W      #$0600,D2
     CMP.W       D2,D1
-    BEQ         OP_ASd  
+    BEQ         OP_ROd  
     *error
     BNE         OP_NOT_FOUND_ERROR
     
@@ -1745,6 +1746,7 @@ EA_SIZE         DS.B    1
 
 
     END    START        ; last line of source
+
 
 
 
