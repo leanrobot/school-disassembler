@@ -1228,20 +1228,46 @@ OP_Code1101:
 OP_Code1110:
     *decide if LSd, ASd, or ROd
     *first check if LSd
-    MOVE.W      D4,D1
+    JSR         OP_1110_RegisterShiftMask   
     MOVE.W      #$0008,D2
-    ANDI.W      #$0018,D1
+    CMP.W       D2,D1
+    BEQ         OP_LSd
+    *Or could be LSd memory shift
+    JSR         OP_1110_MemoryShiftMask
+    MOVE.W      #$0200,D2
     CMP.W       D2,D1
     BEQ         OP_LSd
     *Now check if ASd
+    JSR         OP_1110_RegisterShiftMask     
     MOVE.W      #$0000,D2
     CMP.W       D2,D1
     BEQ         OP_ASd
-    *Finally check if ROd, error if not
+    *Check if ASd memory shift
+    JSR         OP_1110_MemoryShiftMask
+    MOVE.W      #$0000,D2
+    CMP.W       D2,D1
+    BEQ         OP_ASd
+    *Finally check if ROd
+    JSR         OP_1110_RegisterShiftMask 
     MOVE.W      #$0018,D2
     CMP.W       D2,D1
     BEQ         OP_ROd  
+    *check if memory shift
+    JSR         OP_1110_MemoryShiftMask
+    MOVE.W      #$0600,D2
+    CMP.W       D2,D1
+    BEQ         OP_ASd  
+    *error
     BNE         OP_NOT_FOUND_ERROR
+    
+    OP_1110_RegisterShiftMask:
+        MOVE.W      D4,D1
+        ANDI.W      #$0018,D1
+        RTS
+    OP_1110_MemoryShiftMask:
+        MOVE.W      D4,D1
+        ANDI.W      #$0E00,D1
+        RTS
     
     OP_1110_CheckRightOrLeft:
         MOVE.W      D4,D1
@@ -1688,6 +1714,7 @@ EA_SIZE         DS.B    1
 
 
     END    START        ; last line of source
+
 
 
 
