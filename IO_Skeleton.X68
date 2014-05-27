@@ -1,5 +1,5 @@
 *-----------------------------------------------------------
-* Title      :
+* Title      : Razrs Dissambler
 * Written by :
 * Date       :
 * Description:
@@ -584,7 +584,9 @@ OP_Code0100:
         MOVE.B #'J', (A0)+
         MOVE.B #'S', (A0)+
         MOVE.B #'R', (A0)+   
-        *TODO effective Address Processing
+        *Set EA Case 6, no size
+        MOVEQ #6, D2
+        MOVEQ #0, D3
         BRA         OP_Done_Decoding
     
     OP_RTS:
@@ -617,32 +619,38 @@ OP_Code0100:
             MOVE.B #'G', (A0)+
             MOVE.B #'.', (A0)+
             MOVE.B #'B', (A0)+    
-            *TODO effective Address Processing
+            *Set EA Case 6, op size byte(1)
+            MOVEQ #6, D2
+            MOVEQ #1, D3
             BRA         OP_Done_Decoding
- 
         OP_NEG_W:
             MOVE.B #'N', (A0)+
             MOVE.B #'E', (A0)+
             MOVE.B #'G', (A0)+
             MOVE.B #'.', (A0)+
             MOVE.B #'W', (A0)+    
-            *TODO effective Address Processing
+            *Set EA Case 6, op size word(3)
+            MOVEQ #6, D2
+            MOVEQ #3, D3
             BRA         OP_Done_Decoding
- 
         OP_NEG_L:
             MOVE.B #'N', (A0)+
             MOVE.B #'E', (A0)+
             MOVE.B #'G', (A0)+
             MOVE.B #'.', (A0)+
             MOVE.B #'L', (A0)+   
-            *TODO effective Address Processing
+            *Set EA Case 6, op size long(2)
+            MOVEQ #6, D2
+            MOVEQ #2, D3
             BRA         OP_Done_Decoding
     
     OP_LEA:
         MOVE.B #'L', (A0)+
         MOVE.B #'E', (A0)+
         MOVE.B #'A', (A0)+  
-        *TODO effective Address Processing
+        *Set EA Case 2, no size info (0 is default)
+        MOVEQ #2, D2
+        MOVEQ #0, D3
         BRA         OP_Done_Decoding
     
     OP_MOVEM:
@@ -844,7 +852,9 @@ OP_Code1000:
         MOVE.B #'S', (A0)+
         MOVE.B #'.', (A0)+
         MOVE.B #'W', (A0)+
-        *TODO ea processing
+        *Set EA Case 7, op size word(3)
+        MOVEQ #7, D2
+        MOVEQ #3, D3
         BRA         OP_Done_Decoding
 
     OP_OR_B:
@@ -1104,7 +1114,9 @@ OP_Code1100:
         MOVE.B #'S', (A0)+
         MOVE.B #'.', (A0)+
         MOVE.B #'W', (A0)+    
-        *TODO effective Address Processing
+        *Set EA Case 7, op size word(3)
+        MOVEQ #7, D2
+        MOVEQ #3, D3
         BRA         OP_Done_Decoding    
 
 *ADD.B*, ADD.W*, ADD.L*, ADDA.W, ADDA.L
@@ -1202,7 +1214,7 @@ OP_Code1101:
         JSR         OP_ADD_L
         *Set EA Case 2, op size long(2)
         MOVEQ #2, D2
-        MOVEQ #1, D3
+        MOVEQ #2, D3
         BRA         OP_Done_Decoding
         
      OP_ADDA_W:
@@ -1212,7 +1224,9 @@ OP_Code1101:
         MOVE.B #'A', (A0)+
         MOVE.B #'.', (A0)+
         MOVE.B #'W', (A0)+
-        *TODO EA processing
+        *Set EA Case 2, op size word(3)
+        MOVEQ #5, D2
+        MOVEQ #3, D3
         BRA         OP_Done_Decoding
     OP_ADDA_L:
         MOVE.B #'A', (A0)+
@@ -1221,7 +1235,9 @@ OP_Code1101:
         MOVE.B #'A', (A0)+
         MOVE.B #'.', (A0)+
         MOVE.B #'L', (A0)+
-        *TODO EA processing
+        *Set EA Case 2, op size long(2)
+        MOVEQ #5, D2
+        MOVEQ #2, D3
         BRA         OP_Done_Decoding
 
 *LSd.B*, LSd.W*, LSd.L*, ASd.B*, ASd.W*, ASd.L*, ROd.B*, ROd.W*, ROd.L*
@@ -1299,6 +1315,8 @@ OP_Code1110:
         MOVE.W      #$0080,D2    
         CMP.W       D2,D1
         BEQ         OP_1110_Long
+        * Memory shift only case not detailed, will always be word
+        BEQ         OP_1110_Word
         
         OP_1110_Byte:
             MOVE.B #'B', (A0)+
@@ -1714,6 +1732,7 @@ EA_SIZE         DS.B    1
 
 
     END    START        ; last line of source
+
 
 
 
