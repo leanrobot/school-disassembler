@@ -1246,7 +1246,11 @@ OP_Code1110:
     *decide if memory shift 
     JSR         OP_1110_SizeMask
     MOVE.W      #$00C0,D2
+<<<<<<< Updated upstream
     CMP         D1,D2
+=======
+    CMP.W       D1, D2
+>>>>>>> Stashed changes
     BEQ         OP_1110_MemoryShifts
     BNE         OP_1110_RegisterShifts
     
