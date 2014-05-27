@@ -1,4 +1,5 @@
 
+
 *-----------------------------------------------------------
 * Title      :
 * Written by :
@@ -164,7 +165,6 @@ START:                  ; first instruction of program
 	LEA $07FFF,A2    	* Word addr
 	LEA $8000,A2 		* Word addr
 	LEA $00008000,A2 	* Long word addr
-	LEA $FFFFA000,A2
 	
 	**********OR**************
     	*** <EA> --> Dn ***
@@ -489,7 +489,56 @@ LABEL1
     ROR.L    D1, D3
     ROR.L    #1, D1
     
+************SUBQ**************
+    SUBQ.B    #1, D2
+    SUBQ.B    #8, (A1)
+    SUBQ.B    #2, (A1)+
+    SUBQ.B    #3, -(A1)
+    SUBQ.B    #3, $4000
+    SUBQ.B    #2, $8000
+    
+    SUBQ.W    #1, D2
+    SUBQ.W    #6, A1
+    SUBQ.W    #8, (A1)
+    SUBQ.W    #2, (A1)+
+    SUBQ.W    #3, -(A1)
+    SUBQ.W    #3, $4000
+    SUBQ.W    #2, $8000
+    
+    SUBQ.L    #1, D2
+    SUBQ.L    #6, A1
+    SUBQ.L    #8, (A1)
+    SUBQ.L    #2, (A1)+
+    SUBQ.L    #3, -(A1)
+    SUBQ.L    #3, $4000
+    SUBQ.L    #2, $8000
+    
+ ************JSR and RTS**************
     JSR TEST
+
+ ************BLT and BRA**************
+    MOVE.B    #$4, D0
+    MOVE.B    #$5, D1
+    CMP.B     D0, D1
+    BLT TEST_BLT
+BLT_TEST_DONE   
+
+ ************BGE and BRA**************
+    
+    MOVE.B    #$5, D0
+    MOVE.B    #$5, D1
+    CMP.B D0, D1
+    BGE TEST_BGE
+BGE_TEST_DONE
+    
+ ************BCS**************
+     BCS   TEST_BCS
+BCS_TEST_DONE 
+
+ ************BVC**************
+     BVC   TEST_BVC
+BVC_TEST_DONE 
+    
     LEA TESTI, A0
     NOP
     NOP
@@ -578,17 +627,22 @@ LABEL1
     ROR.L #4,D0 
     ROL.B #4,D0
     
-
-
-    
 TEST RTS
 
 
 TESTI DC.B 'yoyoma'
-    END    START        ; last line of source
     
+TEST_BLT:
+    BRA BLT_TEST_DONE
 
+TEST_BGE:
+    BRA BGE_TEST_DONE
     
+TEST_BCS:
+    BRA BCS_TEST_DONE
+    
+TEST_BVC:
+    BRA BVC_TEST_DONE
 * Put program code here
 
     SIMHALT             ; halt simulator
@@ -596,6 +650,7 @@ TESTI DC.B 'yoyoma'
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
