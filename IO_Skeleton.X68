@@ -1519,35 +1519,35 @@ EA_DECODE_CASE2:
 
     *Retrieve register bits
     MOVEM.L PARAMS, -(A7)  * scope -->
-    MOVE.B #9, D6   * shift
-    MOVE.B #3, D7   * keep
+    MOVE.L #$00000009, D6   * shift
+    MOVE.L #$00000003, D7   * keep
     JSR EA_ShiftAndMask
     MOVEM.L (A7)+, PARAMS  * end scope <--
-    MOVE.B D2, D5
+    MOVE.L D2, D5
 
     *Retrieve EA Mode
     MOVEM.L PARAMS, -(A7)  * scope -->
-    MOVE.B #3, D6   * shift
-    MOVE.B #3, D7   * keep
+    MOVE.L #$00000003, D6   * shift
+    MOVE.L #$00000003, D7   * keep
     JSR EA_ShiftAndMask
     MOVEM.L (A7)+, PARAMS  * end scope <--
-    MOVE.B D2, D6
+    MOVE.L D2, D6
 
     *Retrieve EA register
     MOVEM.L PARAMS, -(A7)  * scope -->
-    MOVE.B #0, D6   * shift
-    MOVE.B #3, D7   * keep
+    MOVE.B #$00000000, D6   * shift
+    MOVE.B #$00000003, D7   * keep
     JSR EA_ShiftAndMask
     MOVEM.L (A7)+, PARAMS  * end scope <--
-    MOVE.B D2, D7
+    MOVE.L D2, D7
 
     *Retrieve OpMode
     MOVEM.L PARAMS, -(A7)  * scope -->
-    MOVE.B #6, D6   * shift
-    MOVE.B #3, D7   * keep
+    MOVE.L #00000006, D6   * shift
+    MOVE.L #00000003, D7   * keep
     JSR EA_ShiftAndMask
     MOVEM.L (A7)+, PARAMS  * end scope <--
-    MOVE.B D2, D5
+    MOVE.L D2, D3
 
     * Opmode --> D3
     * if op mode >= 4, --> Dn + <EA>

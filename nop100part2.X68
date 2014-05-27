@@ -172,45 +172,52 @@ START:                  ; first instruction of program
 	OR.B (A1),D1
 	OR.B (A1)+,D1
 	OR.B -(A1),D1
-	OR.B #$10,D1
-	OR.B $100,D1
-	OR.B $1234A,D1
+	
 
 	OR.W D0,D1
 	OR.W (A1),D1
 	OR.W (A1)+,D1
 	OR.W -(A1),D1
-	OR.W #$10,D1
-	OR.W $100,D1
-	OR.W $1234A,D1
+	
 
 	OR.L D0,D1
 	OR.L (A1),D1
 	OR.L (A1)+,D1
 	OR.L -(A1),D1
-	OR.L #$10,D1
-	OR.L $100,D1
-	OR.L $1234A,D1
 	
+    OR.B #$10,D1
+    OR.B $100,D1
+    OR.B $1234A,D1
+
+    OR.W #$10,D1
+    OR.W $100,D1
+    OR.W $1234A,D1
+
+    OR.L #$10,D1
+    OR.L $100,D1
+    OR.L $1234A,D1
+
 		*** Dn --> <EA> ***
 
 	OR.B D1,(A1)
 	OR.B D1,(A1)+
 	OR.B D1,-(A1)
-	OR.B D1,$07FF * Word addr
-	OR.B D1,$8000 * Long word addr
 
 	OR.W D1,(A1)
 	OR.W D1,(A1)+
 	OR.W D1,-(A1)
-	OR.W D1,$07FF * Word addr
-	OR.W D1,$8000 * Long word addr
+
 
 	OR.L D1,(A1)
 	OR.L D1,(A1)+
 	OR.L D1,-(A1)
-	OR.L D1,$07FF * Word addr
-	OR.L D1,$8000 * Long word addr
+	
+    OR.B D1,$07FF * Word addr
+    OR.B D1,$8000 * Long word addr
+    OR.W D1,$07FF * Word addr
+    OR.W D1,$8000 * Long word addr
+    OR.L D1,$07FF * Word addr
+    OR.L D1,$8000 * Long word addr
     
     **********ORI**************
     ORI.B #$0000,D1
