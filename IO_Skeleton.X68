@@ -6,7 +6,7 @@
 *-----------------------------------------------------------
 CR      EQU     $0D
 LF      EQU     $0A
-PARAMS  REG     D3-D7/A2-A6
+PARAMS  REG     D3-D7/A2-A5
 
 stack   EQU     $A000    *sp initial
 shift   EQU     12
