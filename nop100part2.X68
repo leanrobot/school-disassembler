@@ -164,6 +164,7 @@ START:                  ; first instruction of program
 	LEA $07FFF,A2    	* Word addr
 	LEA $8000,A2 		* Word addr
 	LEA $00008000,A2 	* Long word addr
+	LEA $FFFFA000,A2
 	
 	**********OR**************
     	*** <EA> --> Dn ***
@@ -595,6 +596,7 @@ TESTI DC.B 'yoyoma'
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 

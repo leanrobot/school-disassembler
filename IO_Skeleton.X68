@@ -1597,25 +1597,29 @@ EA_DECODE_CASE3:
 EA_HandleOperand:
     MOVEM.L PARAMS, -(A7)
 
-    *if src == 0 --> directData
+    *if mode == 0 --> directData
     CMP.B #0, D6
     BEQ EA_HandleOperand_IfDirectData
 
-    *elif src == 1 --> direct address
+    *elif mode == 1 --> direct address
     CMP.B #1, D6
     BEQ EA_HandleOperand_IfDirectAddress
 
-    *elif src == 2 --> indirect address
+    *elif mode == 2 --> indirect address
     CMP.B #2, D6
     BEQ EA_HandleOperand_IfIndirectAddr
 
-    *elif src == 3 --> post dec address
+    *elif mode == 3 --> post dec address
     CMP.B #3, D6
     BEQ EA_HandleOperand_IfPostDec
 
-    *elif src == 4 --> pre dec address
+    *elif mode == 4 --> pre dec address
     CMP.B #4, D6
     BEQ EA_HandleOperand_IfPreDec
+
+    *elif mode == 7 --> immediate data
+    CMP.B #7, D6
+    BEQ EA_HandleOperand_ifImmMode
 
     BRA EA_HandleOperand_IfElse     * Not any of the supported modes, error.
 
@@ -1637,6 +1641,27 @@ EA_HandleOperand:
     EA_HandleOperand_IfElse:
     * TODO ERROR HANDLING HERE -----------
         BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_ifImmMode:
+    	* check the register
+    	* if reg == 0 --> (xxx).W
+    	CMP.B 	#0, D7
+    	BEQ 	EA_HandleOperand_IfWordAddr
+    	* if reg == 1 --> (xxx).L
+    	CMP.B 	#1, D7
+    	BEQ		EA_HandleOperand_IfLongWordAddr
+    	* if reg == 4 --> #data
+    	CMP.B #4, D7
+    	BEQ 	EA_HandleOperand_IfImmData
+    	BRA EA_HandleOperand_IfElse
+    EA_HandleOperand_IfWordAddr:
+    	JSR EA_WordAddr
+    	BRA EA_HandleOperand_IfElse
+    EA_HandleOperand_IfLongWordAddr:
+    	JSR EA_LongWordAddr
+    	BRA EA_HandleOperand_IfElse
+    EA_HandleOperand_IfImmData:
+    	JSR EA_ImmData 
+    	BRA EA_HandleOperand_IfElse
     EA_HandleOperand_IfEnd:
 
     MOVEM.L (A7)+, PARAMS
@@ -1698,8 +1723,66 @@ EA_PreDecAddress:
     MOVEM.L (A7)+, PARAMS
     RTS
 
-* # of bytes to read.
-EA_ImmediateData:
+* no arguments
+EA_WordAddr:
+	MOVEM.L PARAMS, -(A7)
+
+	MOVE.L #1, D6
+	JSR EA_GetData 					* returned in D2
+
+	MOVE.B #$24, (A0)+ 		* '$'
+	MOVE.L #$4, D3
+	* Data is in D2 already
+	JSR IO_HEX2ASCII 		* '<addr>'
+
+	MOVEM.L (A7)+, PARAMS
+	RTS
+
+EA_LongWordAddr:
+	MOVEM.L PARAMS, -(A7)
+
+	MOVE.L #2, D6
+	JSR EA_GetData 					* returned in D2
+
+	MOVE.B #$24, (A0)+ 		* '$'
+	MOVE.L #$8, D3
+	* Data is in D2 already
+	JSR IO_HEX2ASCII 		* '<addr>'
+
+	MOVEM.L (A7)+, PARAMS
+	RTS
+
+EA_ImmData:
+	MOVEM.L PARAMS, -(A7)
+
+	MOVE.B #$4D, (A0)+
+	MOVE.B #$4D, (A0)+
+	MOVE.B #$4D, (A0)+
+	MOVE.B #$4D, (A0)+
+
+	MOVEM.L (A7)+, PARAMS
+	RTS
+
+
+* D6 = # of words to read, must be 1 or 2
+EA_GetData:
+	MOVEM.L PARAMS, -(A7)
+	*ADD.L #$2, A6
+	CLR.L D2
+	EA_GetData_Loop:
+	CMPI.B #0, D6
+	BLE EA_GetData_LoopDone
+		MOVE.L #16, D0
+		LSL.L D0, D2
+		ADD.W (A6)+, D2
+		
+		SUBQ.B #1, D6
+		BRA EA_GetData_Loop
+	EA_GetData_LoopDone:
+
+	MOVEM.L (A7)+, PARAMS
+	RTS
+
 
 * D4 = shift & mask data (LW)
 * D6 = Shift right amount (LW)
