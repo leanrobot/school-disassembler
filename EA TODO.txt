@@ -1,0 +1,6 @@
+- LEA is in wrong grouping.
+
+- ERROR with --> "CMP.L #12340000,D1" line 358
+	- CMP.L is returning 'byte (01)' as size from OPcode,
+		this is incorrect
+

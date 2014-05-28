@@ -1453,10 +1453,15 @@ EA_DECODE:
     EA_DECODE_BranchCase2:
         JSR EA_DECODE_CASE2
         BRA EA_DECODE_EndIf
+    EA_DECODE_BranchCase4:
+    	JSR EA_DECODE_CASE4
     EA_DECODE_UnsupportedCase:
-        * do soemthing
+        MOVE.B #$4E, (A0)+ * 'N'
+        MOVE.B #$4F, (A0)+ * 'O'
+        MOVE.B #$20, (A0)+ * ' '
+        MOVE.B #$45, (A0)+ * 'E'
+        MOVE.B #$41, (A0)+ * 'A'
         BRA EA_DECODE_EndIf
-
     EA_DECODE_EndIf:
     RTS
 
@@ -1573,8 +1578,39 @@ EA_DECODE_CASE2:
     MOVEM.L (A7)+, PARAMS
     RTS
 
-EA_DECODE_CASE3:
-    *MOVEM.L PARAMS, -(A7)
+EA_DECODE_CASE4:
+    MOVEM.L PARAMS, -(A7)
+
+    * size is 6 shift, 2 keep.
+
+    * data is 9 shift, 3 keep.
+    MOVE.L #$9, D6
+    MOVE.L #$6, D7
+    JSR EA_ShiftAndMask
+
+    * data is in D2 already.
+    MOVE.L #1, D3
+    JSR IO_HEX2ASCII
+
+    JSR EA_PrintCommaSpace
+
+    * EA Mode is 3 shift, 3 keep.
+    MOVE.L #3, D6
+    MOVE.L #3, D7
+    JSR EA_ShiftAndMask
+    MOVE.L D2, D3 		* temp store D3
+
+    * EA Register is 0 shift, 3 keep.
+    MOVE.L #0, D6
+    MOVE.L #3, D7
+    JSR EA_ShiftAndMask
+
+    * call handle operand
+    MOVE.L D3, D6
+    MOVE.L D2, D7
+    JSR EA_HandleOperand
+
+    MOVEM.L (A7)+, PARAMS
     RTS
 
 
@@ -1740,13 +1776,42 @@ EA_LongWordAddr:
 	MOVEM.L (A7)+, PARAMS
 	RTS
 
+* size of operation is (A4)
 EA_ImmData:
 	MOVEM.L PARAMS, -(A7)
 
-	MOVE.B #$4D, (A0)+
-	MOVE.B #$4D, (A0)+
-	MOVE.B #$4D, (A0)+
-	MOVE.B #$4D, (A0)+
+	* if size == 1 --> byte
+	CMP.B #$1, (A4)
+	BEQ EA_ImmData_IfByte
+	* elif size == 3 --> word
+	CMP.B #$3, (A4)
+	BEQ EA_ImmData_IfWord
+	* elif size ==2 --> long
+	CMP.B #$2, (A4)
+	BEQ EA_ImmData_IfLongWord
+
+	BRA EA_ImmData_IfEnd
+
+	EA_ImmData_IfByte:
+		MOVE.B #$1, D6
+		JSR EA_GetData
+		MOVE.B #$2, D3
+		BRA EA_ImmData_IfEnd
+	EA_ImmData_IfWord:
+		MOVE.B #$1, D6
+		JSR EA_GetData
+		MOVE.B #$4, D3
+		BRA EA_ImmData_IfEnd
+	EA_ImmData_IfLongWord:
+		MOVE.B #$2, D6
+		JSR EA_GetData
+		MOVE.B #$8, D3
+		BRA EA_ImmData_IfEnd
+	EA_ImmData_IfEnd:
+
+	MOVE.B #$23, (A0)+ 		* '#'
+	MOVE.B #$24, (A0)+ 		* '$'
+	JSR IO_HEX2ASCII
 
 	MOVEM.L (A7)+, PARAMS
 	RTS
