@@ -1249,8 +1249,6 @@ OP_Code1110:
 
     CMP.W       D1, D2
 
->>>>>>> Stashed changes
->>>>>>> Stashed changes
     BEQ         OP_1110_MemoryShifts
     BNE         OP_1110_RegisterShifts
     
