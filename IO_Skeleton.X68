@@ -1249,6 +1249,8 @@ OP_Code1110:
 
     CMP.W       D1, D2
 
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
     BEQ         OP_1110_MemoryShifts
     BNE         OP_1110_RegisterShifts
     
@@ -1424,17 +1426,6 @@ OP_jmp_table
 *|   |___ |   |    |   |      |   _   ||       ||       ||   |  | |
 *|_______||___|    |___|      |__| |__||______| |______| |___|  |_|
 
-*    MOVE.W #$7000, A0
-*
-*    * MOVE.W A2, D4 == 380A
-*    * MOVE.W (A3), D5 == 3A13
-*    * MOVE.W -(A1), (A0)+ == 30E1
-*    *
-*    *
-*
-*    MOVE.L #$000030E1, D4   
-*    JSR EA_DECODE
-*    SIMHALT
 
 ***************************** Main Method for EA
 * D2 = EA Case Code
@@ -1451,6 +1442,7 @@ EA_DECODE:
     * IF case == 1:
     CMP.B #1, (A3)
     BEQ     EA_DECODE_BranchCase1
+    * If case == 2:
     CMP.B #2, (A3)
     BEQ     EA_DECODE_BranchCase2
 
