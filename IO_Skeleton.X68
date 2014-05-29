@@ -1467,6 +1467,9 @@ EA_DECODE:
     * if case == 11
     CMP.B #11, (A3)
     BEQ     EA_DECODE_BranchCase11
+    * if case == 12
+    CMP.B #12, (A3)
+    BEQ     EA_DECODE_BranchCase12
 
     * IF CAse is anything else
     BRA EA_DECODE_UnsupportedCase
@@ -1486,14 +1489,17 @@ EA_DECODE:
     EA_DECODE_BranchCase6:
         JSR EA_DECODE_CASE6
         BRA EA_DECODE_EndIf
-    EA_DECODE_BranchCase11:
-        JSR EA_DECODE_CASE11
-        BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase7:
         JSR EA_DECODE_CASE7
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase8:
         JSR EA_DECODE_CASE8
+        BRA EA_DECODE_EndIf
+    EA_DECODE_BranchCase11:
+        JSR EA_DECODE_CASE11
+        BRA EA_DECODE_EndIf
+    EA_DECODE_BranchCase12:
+        JSR EA_DECODE_CASE12
         BRA EA_DECODE_EndIf
     EA_DECODE_UnsupportedCase:
         MOVE.B #$4E, (A0)+ * 'N'
@@ -1826,6 +1832,43 @@ EA_DECODE_CASE8:
 
 EA_DECODE_CASE11:
     RTS
+    
+EA_DECODE_CASE12:
+    MOVEM.L PARAMS, -(A7)
+    
+    * get direction of transfer (dr field)
+    MOVE.L #$10, D6   * shift
+    MOVE.L #$1, D7   * keep
+    JSR EA_ShiftAndMask
+    MOVE.L D2, D3
+    
+    *if dr == 0, --> register to memory (push)
+    *if dr == 1, --> memory to register (pop)
+    CMP.B #1, D3
+    BEQ EA_DECODE_CASE12_MemToReg
+    BRA EA_DECODE_CASE12_RegToMem
+    
+    *Put D3 (dr) into D7 when calling EA_RegList
+    
+    *register to memory (push)
+    EA_DECODE_CASE12_RegToMem:
+        MOVE.L D3, D7
+        JSR EA_RegList
+        JSR EA_PrintCommaSpace
+        JSR EA_HandleOperand
+        BRA EA_DECODE_CASE12_END
+    
+    *memory to register (pop)
+    EA_DECODE_CASE12_RegToMem:
+        MOVE.L D3, D7
+        JSR EA_HandleOperand
+        JSR EA_PrintCommaSpace
+        JSR EA_RegList
+        BRA EA_DECODE_CASE12_END
+    
+    EA_DECODE_CASE12_END:
+    MOVEM.L (A7)+, PARAMS
+    RTS
 
 * Mode = D6
 * Register = D7
@@ -2117,6 +2160,7 @@ EA_SIZE         DS.B    1
 
 
     END    START        ; last line of source
+
 
 
 
