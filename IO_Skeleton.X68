@@ -1452,6 +1452,9 @@ EA_DECODE:
     * if case == 6
     CMP.B #6, (A3)
     BEQ     EA_DECODE_BranchCase6
+    * if case == 11
+    CMP.B #11, (A3)
+    BEQ     EA_DECODE_BranchCase11
 
     * IF CAse is anything else
     BRA EA_DECODE_UnsupportedCase
@@ -1471,6 +1474,9 @@ EA_DECODE:
     EA_DECODE_BranchCase6:
         JSR EA_DECODE_CASE6
         BRA EA_DECODE_EndIf
+    EA_DECODE_BranchCase11:
+        JSR EA_DECODE_CASE11
+        BRA EA_DECODE_EndIf
     EA_DECODE_UnsupportedCase:
         MOVE.B #$4E, (A0)+ * 'N'
         MOVE.B #$4F, (A0)+ * 'O'
@@ -1479,7 +1485,7 @@ EA_DECODE:
         MOVE.B #$41, (A0)+ * 'A'
         MOVE.B #$20, (A0)+ * ' '
         MOVE.B (A3), D2
-        MOVE.L #1, D3
+        MOVE.L #2, D3
         JSR IO_HEX2ASCII
 
         BRA EA_DECODE_EndIf
@@ -1695,6 +1701,8 @@ EA_DECODE_CASE6:
     MOVEM.L (A7)+, PARAMS
     RTS
 
+EA_DECODE_CASE11:
+    RTS
 
 * Mode = D6
 * Register = D7
