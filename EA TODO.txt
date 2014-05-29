@@ -4,3 +4,5 @@
 	- CMP.L is returning 'byte (01)' as size from OPcode,
 		this is incorrect
 
+- ADDA.L is registering as ADDA.L
+
