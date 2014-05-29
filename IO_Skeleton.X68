@@ -1443,6 +1443,9 @@ EA_DECODE:
     * If case == 2:
     CMP.B #2, (A3)
     BEQ     EA_DECODE_BranchCase2
+    * if case == 4:
+    CMP.B #4, (A3)
+    BEQ     EA_DECODE_BranchCase4
 
     * IF CAse is anything else
     BRA EA_DECODE_UnsupportedCase
@@ -1455,12 +1458,18 @@ EA_DECODE:
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase4:
     	JSR EA_DECODE_CASE4
+        BRA EA_DECODE_EndIf
     EA_DECODE_UnsupportedCase:
         MOVE.B #$4E, (A0)+ * 'N'
         MOVE.B #$4F, (A0)+ * 'O'
         MOVE.B #$20, (A0)+ * ' '
         MOVE.B #$45, (A0)+ * 'E'
         MOVE.B #$41, (A0)+ * 'A'
+        MOVE.B #$20, (A0)+ * ' '
+        MOVE.B (A3), D2
+        MOVE.L #1, D3
+        JSR IO_HEX2ASCII
+
         BRA EA_DECODE_EndIf
     EA_DECODE_EndIf:
     RTS
@@ -1581,13 +1590,19 @@ EA_DECODE_CASE2:
 EA_DECODE_CASE4:
     MOVEM.L PARAMS, -(A7)
 
-    * size is 6 shift, 2 keep.
-
     * data is 9 shift, 3 keep.
     MOVE.L #$9, D6
-    MOVE.L #$6, D7
+    MOVE.L #$3, D7
     JSR EA_ShiftAndMask
 
+    * if data is 0, it is really 8
+    CMP.B #0, D2
+    BNE EA_DECODE_CASE4_NoTransform
+    MOVE.B #8, D2
+
+    EA_DECODE_CASE4_NoTransform:
+    MOVE.B #'#', (A0)+
+    MOVE.B #'$', (A0)+
     * data is in D2 already.
     MOVE.L #1, D3
     JSR IO_HEX2ASCII
