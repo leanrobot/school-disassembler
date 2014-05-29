@@ -1452,6 +1452,9 @@ EA_DECODE:
     * if case == 6
     CMP.B #6, (A3)
     BEQ     EA_DECODE_BranchCase6
+    * if case == 7
+    CMP.B #7, (A3)
+    BEQ     EA_DECODE_BranchCase7
     * if case == 11
     CMP.B #11, (A3)
     BEQ     EA_DECODE_BranchCase11
@@ -1476,6 +1479,9 @@ EA_DECODE:
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase11:
         JSR EA_DECODE_CASE11
+        BRA EA_DECODE_EndIf
+    EA_DECODE_BranchCase7:
+        JSR EA_DECODE_CASE7
         BRA EA_DECODE_EndIf
     EA_DECODE_UnsupportedCase:
         MOVE.B #$4E, (A0)+ * 'N'
@@ -1698,6 +1704,45 @@ EA_DECODE_CASE6:
     MOVE.L  D2, D7
     JSR EA_HandleOperand
     
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+EA_DECODE_CASE7:
+    * D5 Stores Register
+    * D6 Stores EA Mode
+    * D7 Store EA Register
+
+    MOVEM.L PARAMS, -(A7)
+
+    *Retrieve EA Mode
+    MOVEM.L PARAMS, -(A7)  * scope -->
+    MOVE.L #$00000003, D6   * shift
+    MOVE.L #$00000003, D7   * keep
+    JSR EA_ShiftAndMask
+    MOVEM.L (A7)+, PARAMS  * end scope <--
+    MOVE.L D2, D6
+
+    *Retrieve EA register
+    MOVEM.L PARAMS, -(A7)  * scope -->
+    MOVE.B #$00000000, D6   * shift
+    MOVE.B #$00000003, D7   * keep
+    JSR EA_ShiftAndMask
+    MOVEM.L (A7)+, PARAMS  * end scope <--
+    MOVE.L D2, D7
+
+    JSR EA_HandleOperand
+    JSR EA_PrintCommaSpace
+
+    *Retrieve register bits
+    MOVEM.L PARAMS, -(A7)  * scope -->
+    MOVE.L #$00000009, D6   * shift
+    MOVE.L #$00000003, D7   * keep
+    JSR EA_ShiftAndMask
+    MOVEM.L (A7)+, PARAMS  * end scope <--
+    MOVE.L D2, D7
+
+    JSR EA_DirectData
+
     MOVEM.L (A7)+, PARAMS
     RTS
 

@@ -6,3 +6,5 @@
 
 - ADDA.L is registering as ADDA.L
 
+- No Case 11 code passed for NOP & RTS
+
