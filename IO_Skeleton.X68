@@ -1350,7 +1350,9 @@ OP_1110_MemoryShifts:
         JSR         OP_1110_CheckRightOrLeft
         MOVE.B #'.', (A0)+
         JSR         OP_1110_GetSize
-         *TODO add EA processing
+        * D2 = EA Case, D3 = EA Size
+        MOVEQ #8, D2
+        * TODO ADD Size for EA
         BRA         OP_Done_Decoding
         
     OP_ASd:
@@ -1359,7 +1361,9 @@ OP_1110_MemoryShifts:
         JSR         OP_1110_CheckRightOrLeft
         MOVE.B #'.', (A0)+
         JSR         OP_1110_GetSize
-         *TODO add EA processing
+        * D2 = EA Case, D3 = EA Size
+        MOVEQ #8, D2
+        * TODO ADD Size for EA
         BRA         OP_Done_Decoding
     
     OP_ROd:
@@ -1368,7 +1372,9 @@ OP_1110_MemoryShifts:
         JSR         OP_1110_CheckRightOrLeft
         MOVE.B #'.', (A0)+
         JSR         OP_1110_GetSize
-         *TODO add EA processing
+        * D2 = EA Case, D3 = EA Size
+        MOVEQ #8, D2
+        * TODO ADD Size for EA
         BRA         OP_Done_Decoding
 
 ****NOT USED!!!
@@ -1455,6 +1461,9 @@ EA_DECODE:
     * if case == 7
     CMP.B #7, (A3)
     BEQ     EA_DECODE_BranchCase7
+    * if case == 8
+    CMP.B #8, (A3)
+    BEQ EA_DECODE_BranchCase8
     * if case == 11
     CMP.B #11, (A3)
     BEQ     EA_DECODE_BranchCase11
@@ -1482,6 +1491,9 @@ EA_DECODE:
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase7:
         JSR EA_DECODE_CASE7
+        BRA EA_DECODE_EndIf
+    EA_DECODE_BranchCase8:
+        JSR EA_DECODE_CASE8
         BRA EA_DECODE_EndIf
     EA_DECODE_UnsupportedCase:
         MOVE.B #$4E, (A0)+ * 'N'
@@ -1619,17 +1631,8 @@ EA_DECODE_CASE4:
     MOVE.L #$3, D7
     JSR EA_ShiftAndMask
 
-    * if data is 0, it is really 8
-    CMP.B #0, D2
-    BNE EA_DECODE_CASE4_NoTransform
-    MOVE.B #8, D2
-
-    EA_DECODE_CASE4_NoTransform:
-    MOVE.B #'#', (A0)+
-    MOVE.B #'$', (A0)+
-    * data is in D2 already.
-    MOVE.L #1, D3
-    JSR IO_HEX2ASCII
+    MOVE.L D2, D7
+    JSR EA_InstrData
 
     JSR EA_PrintCommaSpace
 
@@ -1743,6 +1746,81 @@ EA_DECODE_CASE7:
 
     JSR EA_DirectData
 
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+EA_DECODE_CASE8:
+    MOVEM.L PARAMS, -(A7)
+
+    * get the size to determine whether
+    * two operands, or one
+    MOVE.L #6, D6 * shift
+    MOVE.L #2, D7 * keep
+    JSR EA_ShiftAndMask
+
+    CMP.B #3, D2
+    BLT EA_DECODE_CASE8_TwoOperands
+    BRA EA_DECODE_CASE8_OneOperand
+
+    EA_DECODE_CASE8_TwoOperands:
+
+        * read i/r bit
+        MOVE.L #$5, D6   * shift
+        MOVE.L #$1, D7   * keep
+        JSR EA_ShiftAndMask
+        MOVE.L D2, D3
+
+        * read reg/count
+        MOVE.L #9, D6 * shift
+        MOVE.L #3, D7 * keep
+        JSR EA_ShiftAndMask
+        MOVE.L D2, D7
+
+        *if i/r == 0, --> immediate data
+        CMP.B #1, D3
+        BEQ EA_DECODE_CASE8_Two_Reg
+        BRA EA_DECODE_CASE8_Two_Instr
+
+        EA_DECODE_CASE8_Two_Reg:
+            JSR EA_DirectData
+            BRA EA_DECODE_CASE8_Two_RegInstrEnd
+        EA_DECODE_CASE8_Two_Instr:
+            JSR EA_InstrData
+            BRA EA_DECODE_CASE8_Two_RegInstrEnd
+        EA_DECODE_CASE8_Two_RegInstrEnd:
+
+        JSR EA_PrintCommaSpace
+
+        * Get register bits
+        MOVE.L #0, D6 * shift
+        MOVE.L #3, D7 * keep
+        JSR EA_ShiftAndMask
+
+        MOVE.L D2, D7
+        JSR EA_DirectData
+
+        BRA EA_DECODE_CASE8_End
+
+    EA_DECODE_CASE8_OneOperand:
+
+        * get EA mode 
+        MOVE.L #$3, D6 * shift
+        MOVE.L #$3, D7 * keep
+        JSR EA_ShiftAndMask
+        MOVE.L D2, D5
+
+        * get EA register
+        MOVE.L #$0, D6 * shift
+        MOVE.L #$3, D7 * keep
+        JSR EA_ShiftAndMask
+
+        MOVE.L D5, D6
+        MOVE.L D2, D7
+        JSR EA_HandleOperand
+
+        BRA EA_DECODE_CASE8_End
+
+    EA_DECODE_CASE8_End:
     MOVEM.L (A7)+, PARAMS
     RTS
 
@@ -1948,6 +2026,26 @@ EA_ImmData:
 
 	MOVEM.L (A7)+, PARAMS
 	RTS
+
+* d7 = data
+EA_InstrData:
+    MOVEM.L PARAMS, -(A7)
+
+    * if data is 0, it is really 8
+    CMP.B #0, D7
+    BNE EA_InstrData_NoTransform
+    MOVE.B #8, D7
+
+    EA_InstrData_NoTransform:
+    MOVE.B #'#', (A0)+
+    MOVE.B #'$', (A0)+
+
+    MOVE.B D7, D2
+    MOVE.B #1, D3
+    JSR IO_HEX2ASCII
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
 
 
 * D6 = # of words to read, must be 1 or 2
