@@ -1449,6 +1449,9 @@ EA_DECODE:
     * if case == 5
     CMP.B #5, (A3)
     BEQ     EA_DECODE_BranchCase5
+    * if case == 6
+    CMP.B #6, (A3)
+    BEQ     EA_DECODE_BranchCase6
 
     * IF CAse is anything else
     BRA EA_DECODE_UnsupportedCase
@@ -1464,6 +1467,9 @@ EA_DECODE:
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase5:
         JSR EA_DECODE_CASE5
+        BRA EA_DECODE_EndIf
+    EA_DECODE_BranchCase6:
+        JSR EA_DECODE_CASE6
         BRA EA_DECODE_EndIf
     EA_DECODE_UnsupportedCase:
         MOVE.B #$4E, (A0)+ * 'N'
@@ -1663,7 +1669,29 @@ EA_DECODE_CASE5:
 
     MOVE.L D2, D7
     JSR EA_DirectAddress
+    
+    MOVEM.L (A7)+, PARAMS
+    RTS
 
+EA_DECODE_CASE6:
+    MOVEM.L PARAMS, -(A7)
+    
+    * Mode is 3 shift, 3 keep
+    MOVE.L  #3, D6
+    MOVE.L  #3, D7
+    JSR EA_ShiftAndMask
+    MOVE.L  D2, D3   *temp store D3
+    
+    *Register is 0 shift, 3 keep
+    MOVE.L  #0, D6
+    MOVE.L  #3, D7
+    JSR EA_ShiftAndMask
+    
+    *call handle operand
+    MOVE.L  D3, D6
+    MOVE.L  D2, D7
+    JSR EA_HandleOperand
+    
     MOVEM.L (A7)+, PARAMS
     RTS
 
@@ -1938,6 +1966,8 @@ EA_SIZE         DS.B    1
 
 
     END    START        ; last line of source
+
+
 
 
 
