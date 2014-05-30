@@ -2090,6 +2090,11 @@ EA_InstrData:
     MOVEM.L (A7)+, PARAMS
     RTS
 
+* D7 = 0 if (push) predec mode, d0-d7,a0-a7, 16->0
+* D7 = 1 if (pop) postdec mode, a7-a0,d7-d0, 16->0
+EA_RegList:
+    RTS
+
 
 * D6 = # of words to read, must be 1 or 2
 EA_GetData:
