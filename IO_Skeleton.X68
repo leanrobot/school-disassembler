@@ -1511,6 +1511,9 @@ EA_DECODE:
     * if case == 8
     CMP.B #8, (A3)
     BEQ EA_DECODE_BranchCase8
+    * if case == 10
+    CMP.B #10, (A3)
+    BEQ EA_DECODE_BranchCase10
     * if case == 11
     CMP.B #11, (A3)
     BEQ     EA_DECODE_BranchCase11
@@ -1544,6 +1547,9 @@ EA_DECODE:
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase8:
         JSR EA_DECODE_CASE8
+        BRA EA_DECODE_EndIf
+    EA_DECODE_BranchCase10:
+        JSR EA_DECODE_CASE10
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase11:
         JSR EA_DECODE_CASE11
@@ -1903,6 +1909,37 @@ EA_DECODE_CASE8:
         BRA EA_DECODE_CASE8_End
 
     EA_DECODE_CASE8_End:
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+EA_DECODE_CASE10:
+    MOVEM.L PARAMS, -(A7)
+
+    * get the 8-bit displacement value
+    MOVE.L #0, D6    * shift
+    MOVE.L #8, D7    * keep
+    JSR EA_ShiftAndMask
+
+    * if it is 00, then 16-bit displacement
+    *   as immediate data, else 8-bit
+    CMP.L #$0, D2
+    BEQ EA_DECODE_CASE10_If16Bit
+    BRA EA_DECODE_CASE10_If8Bit
+
+    EA_DECODE_CASE10_If8Bit:
+        * print the displacement
+        *data is in D2 already.
+        MOVE.B #'$', (A0)+
+        MOVE.L #4, D3
+        JSR IO_HEX2ASCII
+        BRA EA_DECODE_CASE10_EndIf
+    EA_DECODE_CASE10_If16Bit:
+        * set the size to word
+        MOVE.B #3, (A4)
+        JSR EA_WordAddr
+        BRA EA_DECODE_CASE10_EndIf
+    EA_DECODE_CASE10_EndIf:
+
     MOVEM.L (A7)+, PARAMS
     RTS
 

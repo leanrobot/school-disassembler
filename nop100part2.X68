@@ -515,134 +515,213 @@ LABEL1
     
  ************JSR and RTS**************
     JSR TEST
+    TEST:
 
- ************BLT and BRA**************
-    MOVE.B    #$4, D0
-    MOVE.B    #$5, D1
-    CMP.B     D0, D1
-    BLT TEST_BLT
-BLT_TEST_DONE   
+******* BCS *******
+    BCS Bcc_16bit_test
+BCS_MIN5 NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    BCS BCS_MIN5
+BCS_MIN1 NOP
+    BCS BCS_MIN1
 
- ************BGE and BRA**************
-    
-    MOVE.B    #$5, D0
-    MOVE.B    #$5, D1
-    CMP.B D0, D1
-    BGE TEST_BGE
-BGE_TEST_DONE
-    
- ************BCS**************
-     BCS   TEST_BCS
-BCS_TEST_DONE 
+    BCS BCS_PLUS1
+BCS_PLUS1 NOP
 
- ************BVC**************
-     BVC   TEST_BVC
-BVC_TEST_DONE 
-    
-    LEA TESTI, A0
-    NOP
-    NOP
-    MOVE.L D0,D2
-    MOVEA.L D5,A4
-    NOP
-    JSR TEST
-    NOP
-    LEA TESTI, A0
-    ASL.L #4,D0 
-    ASL.B #4,D2
-    ASL.W #4,D4 
-    ASR.B #4,D0
-    ASR.L #4,D7 
-    ASR.W #4,D0
-    ASR.L #4,D0 
-    ASL.B #4,D0
-    JSR TEST
-    NOP
-    LEA TESTI, A0
-    LEA TESTI, A0
-    LEA TESTI, A0
-    LEA TESTI, A0
-    LEA TESTI, A0
+    BCS BCS_PLUS5
     NOP
     NOP
     NOP
-    JSR TEST
-    NEG D0
-    NEG D1
-    NEG $000
-    NEG $7999
     NOP
-    NOP
-    NOP
-    LSL.L #4,D0 
-    LSL.B #4,D2
-    LSL.W #4,D4 
-    LSR.B #4,D0
-    LSR.L #4,D7 
-    LSR.W #4,D0
-    LSR.L #4,D0 
-    LSL.B #4,D0
-    LSR.L #4,D4 
-    LSL.B #4,D0
-    LSR.L #4,D0 
-    LSL.B #4,D5
-    LSR.L #4,D0 
-    LSL.B #4,D0
-    LSR.L #4,D0 
-    LSL.B #4,D0
-    MOVE.B D0,D1
-    MOVE.B #$10,D0
-    MOVE.W D0,D1
-    MOVE.W #$10,D0
-    JSR TEST
-    LEA TESTI, A0
-    NOP
-    NOP
-    MOVE.L D0,D2
-    MOVEA.L D5,A4
-    NOP
-    JSR TEST
-    NOP
-    LEA TESTI, A0
-    NOP
-    NOP
-    JSR TEST
-    NOP
-    LEA TESTI, A0
-    LEA TESTI, A0
-    LEA TESTI, A0
-    LEA TESTI, A0
-    LEA TESTI, A0
-    JSR TEST
-    NEG D0
-    NEG D1
-    NEG $000
-    NEG $7999
-    ROL.L #4,D0 
-    ROL.B #4,D2
-    ROL.W #4,D4 
-    ROR.B #4,D0
-    ROR.L #4,D7 
-    ROR.W #4,D0
-    ROR.L #4,D0 
-    ROL.B #4,D0
-    
-TEST RTS
+BCS_PLUS5 NOP
 
 
-TESTI DC.B 'yoyoma'
-    
-TEST_BLT:
-    BRA BLT_TEST_DONE
+******* BGE *******
+    BGE Bcc_16bit_test
+BGE_MIN5 NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    BGE BGE_MIN5
+BGE_MIN1 NOP
+    BGE BGE_MIN1
 
-TEST_BGE:
-    BRA BGE_TEST_DONE
-    
-TEST_BCS:
-    BRA BCS_TEST_DONE
-    
-TEST_BVC:
-    BRA BVC_TEST_DONE
+    BGE BGE_PLUS1
+BGE_PLUS1 NOP
+
+    BGE BGE_PLUS5
+    NOP
+    NOP
+    NOP
+    NOP
+BGE_PLUS5 NOP
+
+******* BLT *******
+    BLT Bcc_16bit_test
+
+BLT_MIN5 NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    BLT BLT_MIN5
+BLT_MIN1 NOP
+    BLT BLT_MIN1
+
+    BLT BLT_PLUS1
+BLT_PLUS1 NOP
+
+    BLT BLT_PLUS5
+    NOP
+    NOP
+    NOP
+    NOP
+BLT_PLUS5 NOP
+
+******* BVC *******
+    BVC Bcc_16bit_test
+BVC_MIN5 NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    BVC BVC_MIN5
+BVC_MIN1 NOP
+    BVC BVC_MIN1
+
+    BVC BVC_PLUS1
+BVC_PLUS1 NOP
+
+    BVC BVC_PLUS5
+    NOP
+    NOP
+    NOP
+    NOP
+BVC_PLUS5 NOP
+
+******* BRA *******
+    BRA Bcc_16bit_test
+BRA_MIN5 NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    BRA BRA_MIN5
+BRA_MIN1 NOP
+    BRA BRA_MIN1
+
+    BRA BRA_PLUS1
+BRA_PLUS1 NOP
+
+    BRA BRA_PLUS5
+    NOP
+    NOP
+    NOP
+    NOP
+BRA_PLUS5 NOP
+
+* Test the 16-bit displacement ***************
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+Bcc_16bit_test NOP
 * Put program code here
 
     SIMHALT             ; halt simulator
