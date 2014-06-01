@@ -409,6 +409,7 @@ OP_Code0000:
         MOVE.W      D4,D1
         ANDI.W      #$0038,D1
         MOVE.W      #$0000,D2
+        CMP.W       D1,D2
         BEQ         OP_BCLR_L
         BNE         OP_BCLR_B
         
