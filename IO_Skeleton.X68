@@ -771,7 +771,6 @@ OP_Code0101:
 
 *BCS, BGE, BLT, BVC, BRA
 OP_Code0110:
-    BRA         OP_NOT_FOUND_ERROR
     MOVE.W      D4,D1
     ANDI.W      #$0F00,D1
     * BCS?
@@ -783,13 +782,17 @@ OP_Code0110:
     CMP.W       D2,D1
     BEQ         OP_BGE
     * BLT?
-    MOVE.W      #$0C00,D2
+    MOVE.W      #$0D00,D2
     CMP.W       D2,D1
     BEQ         OP_BLT
     * BVC?
-    MOVE.W      #$0C00,D2
+    MOVE.W      #$0800,D2
     CMP.W       D2,D1
     BEQ         OP_BVC
+    * BRA?
+    MOVE.W      #$0000,D2
+    CMP.W       D2,D1
+    BEQ         OP_BRA
     * error
     BNE         OP_NOT_FOUND_ERROR    
 
@@ -818,6 +821,13 @@ OP_Code0110:
         MOVE.B #'B', (A0)+
         MOVE.B #'V', (A0)+
         MOVE.B #'C', (A0)+
+        *set EA case 10
+        MOVEQ  #10,D2
+        BRA         OP_Done_Decoding
+    OP_BRA:
+        MOVE.B #'B', (A0)+
+        MOVE.B #'R', (A0)+
+        MOVE.B #'A', (A0)+
         *set EA case 10
         MOVEQ  #10,D2
         BRA         OP_Done_Decoding
