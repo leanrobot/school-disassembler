@@ -358,7 +358,7 @@ OP_Code0000:
     * BCLR (part duex) 
     MOVE.W      D4,D1
     ANDI.W      #$0FC0,D1
-    MOVE.W      #$0880
+    MOVE.W      #$0880,D2
     CMP.W       D1,D2
     BEQ         OP_BCLR
     * ORI?
@@ -2233,6 +2233,7 @@ EA_SIZE         DS.B    1
 
 
     END    START        ; last line of source
+
 
 
 
