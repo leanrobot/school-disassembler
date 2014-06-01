@@ -104,7 +104,7 @@ READ_IN_AND_PROCESS:
     ROL.W       #8,D4
     MOVE.B (A6)+,D4
     JSR OP_DETERMINE_OP_CODE                *Determine what the opcode is
-
+    JSR IO_MAKE_OPCODES_SAME_SIZE
     JSR IO_INSERT_TAB
     JSR IO_INSERT_TAB
 
@@ -283,6 +283,14 @@ IO_INSERT_TAB:
     MOVE.B #$9,(A0)+
     RTS
     
+* Add spaces to end of opcode so the opcode is 7 characters long
+IO_MAKE_OPCODES_SAME_SIZE:
+    *subtract the starting address of line buffer from current pointer to line buffer
+    LEA        IO_LINE_BUF,A3
+    MOVE.W     A0,D1
+    SUB.W      A3,D1
+
+    RTS
     
 IO_CLEAR_SCREEN:
         LEA  IO_LOAD_MORE_DATA_TO_SCREEN, A1      *Prompt user to hit tap a key
