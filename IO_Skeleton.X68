@@ -1874,7 +1874,7 @@ EA_DECODE_CASE12:
     *if dr == 0, --> register to memory (push)
     *if dr == 1, --> memory to register (pop)
     CMP.B #1, D3
-    BEQ EA_DECODE_CASE12_MemToReg
+    *BEQ EA_DECODE_CASE12_MemToReg
     BRA EA_DECODE_CASE12_RegToMem
     
     *Put D3 (dr) into D7 when calling EA_RegList
@@ -1882,17 +1882,17 @@ EA_DECODE_CASE12:
     *register to memory (push)
     EA_DECODE_CASE12_RegToMem:
         MOVE.L D3, D7
-        JSR EA_RegList
+        *JSR EA_RegList
         JSR EA_PrintCommaSpace
         JSR EA_HandleOperand
         BRA EA_DECODE_CASE12_END
     
     *memory to register (pop)
-    EA_DECODE_CASE12_RegToMem:
+    EA_DECODE_CASE12_MemToReg:
         MOVE.L D3, D7
         JSR EA_HandleOperand
         JSR EA_PrintCommaSpace
-        JSR EA_RegList
+        *JSR EA_RegList
         BRA EA_DECODE_CASE12_END
     
     EA_DECODE_CASE12_END:
@@ -2189,6 +2189,7 @@ EA_SIZE         DS.B    1
 
 
     END    START        ; last line of source
+
 
 
 
