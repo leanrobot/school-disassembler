@@ -771,7 +771,6 @@ OP_Code0101:
 
 *BCS, BGE, BLT, BVC, BRA
 OP_Code0110:
-    BRA         OP_NOT_FOUND_ERROR
     MOVE.W      D4,D1
     ANDI.W      #$0F00,D1
     * BCS?
@@ -783,13 +782,17 @@ OP_Code0110:
     CMP.W       D2,D1
     BEQ         OP_BGE
     * BLT?
-    MOVE.W      #$0C00,D2
+    MOVE.W      #$0D00,D2
     CMP.W       D2,D1
     BEQ         OP_BLT
     * BVC?
-    MOVE.W      #$0C00,D2
+    MOVE.W      #$0800,D2
     CMP.W       D2,D1
     BEQ         OP_BVC
+    * BRA?
+    MOVE.W      #$0000,D2
+    CMP.W       D2,D1
+    BEQ         OP_BRA
     * error
     BNE         OP_NOT_FOUND_ERROR    
 
@@ -818,6 +821,13 @@ OP_Code0110:
         MOVE.B #'B', (A0)+
         MOVE.B #'V', (A0)+
         MOVE.B #'C', (A0)+
+        *set EA case 10
+        MOVEQ  #10,D2
+        BRA         OP_Done_Decoding
+    OP_BRA:
+        MOVE.B #'B', (A0)+
+        MOVE.B #'R', (A0)+
+        MOVE.B #'A', (A0)+
         *set EA case 10
         MOVEQ  #10,D2
         BRA         OP_Done_Decoding
@@ -1170,7 +1180,7 @@ OP_Code1101:
     * ADDA.L?
     MOVE.W      #$01C0,D2
     CMP.W       D2,D1
-    BEQ         OP_ADDA_W
+    BEQ         OP_ADDA_L
     * Error
     BNE         OP_NOT_FOUND_ERROR
     
@@ -1864,7 +1874,7 @@ EA_DECODE_CASE12:
     *if dr == 0, --> register to memory (push)
     *if dr == 1, --> memory to register (pop)
     CMP.B #1, D3
-    BEQ EA_DECODE_CASE12_MemToReg
+    *BEQ EA_DECODE_CASE12_MemToReg
     BRA EA_DECODE_CASE12_RegToMem
     
     *Put D3 (dr) into D7 when calling EA_RegList
@@ -1872,17 +1882,17 @@ EA_DECODE_CASE12:
     *register to memory (push)
     EA_DECODE_CASE12_RegToMem:
         MOVE.L D3, D7
-        JSR EA_RegList
+        *JSR EA_RegList
         JSR EA_PrintCommaSpace
         JSR EA_HandleOperand
         BRA EA_DECODE_CASE12_END
     
     *memory to register (pop)
-    EA_DECODE_CASE12_RegToMem:
+    EA_DECODE_CASE12_MemToReg:
         MOVE.L D3, D7
         JSR EA_HandleOperand
         JSR EA_PrintCommaSpace
-        JSR EA_RegList
+        *JSR EA_RegList
         BRA EA_DECODE_CASE12_END
     
     EA_DECODE_CASE12_END:
@@ -2184,6 +2194,7 @@ EA_SIZE         DS.B    1
 
 
     END    START        ; last line of source
+
 
 
 
