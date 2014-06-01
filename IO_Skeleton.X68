@@ -106,7 +106,6 @@ READ_IN_AND_PROCESS:
     JSR OP_DETERMINE_OP_CODE                *Determine what the opcode is
     JSR IO_MAKE_OPCODES_SAME_SIZE
     JSR IO_INSERT_TAB
-    JSR IO_INSERT_TAB
 
     * EA_DECODE(d2=opcode case, d3=operation size)
     JSR EA_DECODE
@@ -121,9 +120,6 @@ DISPLAY_LINE_BUFFER:
     LEA     IO_LINE_BUF, A1
     MOVE.B #13, D0
     TRAP #15
-
-
-   
 
     BRA IO_READING
 
@@ -290,7 +286,20 @@ IO_MAKE_OPCODES_SAME_SIZE:
     MOVE.W     A0,D1
     SUB.W      A3,D1
 
+    *loop through adding spaces until d1 == 16
+    CMPI       #$16,D1
+    BLT        IO_ADD_SINGLE_SPACE
+    
+IO_SPACES_ADDED:
     RTS
+    
+IO_ADD_SINGLE_SPACE:
+    MOVE.B     #' ', (A0)+
+    ADDQ       #$1,D1
+    CMPI       #$16,D1
+    BEQ        IO_SPACES_ADDED  
+    BLT        IO_ADD_SINGLE_SPACE
+    
     
 IO_CLEAR_SCREEN:
         LEA  IO_LOAD_MORE_DATA_TO_SCREEN, A1      *Prompt user to hit tap a key
@@ -448,7 +457,7 @@ OP_Code0000:
         MOVE.B #'O', (A0)+
         MOVE.B #'R', (A0)+
         MOVE.B #'I', (A0)+
-        MOVE.B #'.', (A0)+    OP_CMPI:    
+        MOVE.B #'.', (A0)+       
         JSR         OP_0000_GetSize
         *Set EA Case 3, op size set by get size
         MOVEQ #3, D2
@@ -459,7 +468,7 @@ OP_Code0000:
         MOVE.B #'M', (A0)+
         MOVE.B #'P', (A0)+
         MOVE.B #'I', (A0)+
-        MOVE.B #'.', (A0)+    OP_CMPI:    
+        MOVE.B #'.', (A0)+      
         JSR         OP_0000_GetSize
         *Set EA Case 3, op size set by get size
         MOVEQ #3, D2
