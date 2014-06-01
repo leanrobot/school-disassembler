@@ -1180,7 +1180,7 @@ OP_Code1101:
     * ADDA.L?
     MOVE.W      #$01C0,D2
     CMP.W       D2,D1
-    BEQ         OP_ADDA_W
+    BEQ         OP_ADDA_L
     * Error
     BNE         OP_NOT_FOUND_ERROR
     
