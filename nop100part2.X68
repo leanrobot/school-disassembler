@@ -221,26 +221,26 @@ START:                  ; first instruction of program
     OR.L D1,$8000 * Long word addr
     
     **********ORI**************
-    ORI.B #$0000,D1
-	ORI.B #$0000,(A1)
-	ORI.B #$0000,(A1)+
-	ORI.B #$0000,-(A1)
-	ORI.B #$0000, $07FF * Word addr
-	ORI.B #$0000, $8000 * Word addr
+    ORI.B #$34,D1
+	ORI.B #$56,(A1)
+	ORI.B #$12,(A1)+
+	ORI.B #$56,-(A1)
+	ORI.B #$12, $07FF * Word addr
+	ORI.B #$56, $8000 * Word addr
 
-	ORI.W #$0000,D1
-	ORI.W #$0000,(A1)
-	ORI.W #$0000,(A1)+
-	ORI.W #$0000,-(A1)
-	ORI.W #$0000, $07FF * Word addr
-	ORI.W #$0000, $8000 * Word addr
+	ORI.W #$1234,D1
+	ORI.W #$1234,(A1)
+	ORI.W #$1234,(A1)+
+	ORI.W #$1234,-(A1)
+	ORI.W #$1234, $07FF * Word addr
+	ORI.W #$1234, $8000 * Word addr
 
-	ORI.L #$0000,D1
-	ORI.L #$0000,(A1)
-	ORI.L #$0000,(A1)+
-	ORI.L #$0000,-(A1)
-	ORI.L #$0000, $07FF * Word addr
-	ORI.L #$0000, $8000 * Word addr
+	ORI.L #$12341234,D1
+	ORI.L #$1234,(A1)
+	ORI.L #$1234,(A1)+
+	ORI.L #$12341234,-(A1)
+	ORI.L #$1234, $07FF * Word addr
+	ORI.L #$12341234, $8000 * Word addr
     
     **********BCC***************
 BRANCH NOP

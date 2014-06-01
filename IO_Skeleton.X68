@@ -1484,6 +1484,9 @@ EA_DECODE:
     * If case == 2:
     CMP.B #2, (A3)
     BEQ     EA_DECODE_BranchCase2
+    * if case ==3:
+    CMP.B #3, (A3)
+    BEQ     EA_DECODE_BranchCase3
     * if case == 4:
     CMP.B #4, (A3)
     BEQ     EA_DECODE_BranchCase4
@@ -1514,6 +1517,9 @@ EA_DECODE:
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase2:
         JSR EA_DECODE_CASE2
+        BRA EA_DECODE_EndIf
+    EA_DECODE_BranchCase3:
+        JSR EA_DECODE_CASE3
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase4:
     	JSR EA_DECODE_CASE4
@@ -1661,6 +1667,32 @@ EA_DECODE_CASE2:
         BRA EA_DECODE_CASE2_IfEnd
     EA_DECODE_CASE2_IfEnd:
     
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+EA_DECODE_CASE3:
+    MOVEM.L PARAMS, -(A7)
+
+    MOVE.L D2, D5
+
+    JSR EA_ImmData
+    JSR EA_PrintCommaSpace
+
+    *get the ea mode
+    MOVE.L #3, D6    * shift
+    MOVE.L #3, D7    * keep
+    JSR EA_ShiftAndMask
+    MOVE.L D2, D3
+
+    * get the ea register
+    MOVE.L #0, D6    * shift
+    MOVE.L #3, D7    * keep
+    JSR EA_ShiftAndMask
+
+    MOVE.L D3, D6
+    MOVE.L D2, D7
+    JSR EA_HandleOperand
+
     MOVEM.L (A7)+, PARAMS
     RTS
 
