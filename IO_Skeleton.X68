@@ -2034,18 +2034,18 @@ EA_DECODE_CASE12:
     *register to memory (push)
     EA_DECODE_CASE12_RegToMem:
         MOVE.L D3, D7
-        *JSR EA_RegList
+        JSR EA_PrintRegList
         JSR EA_PrintCommaSpace
         JSR EA_HandleOperand
         BRA EA_DECODE_CASE12_END
     
-    *memory to register (pop)
-    EA_DECODE_CASE12_MemToReg:
-        MOVE.L D3, D7
-        JSR EA_HandleOperand
-        JSR EA_PrintCommaSpace
-        *JSR EA_RegList
-        BRA EA_DECODE_CASE12_END
+*    *memory to register (pop)
+*    EA_DECODE_CASE12_MemToReg:
+*        MOVE.L D3, D7
+*        JSR EA_HandleOperand
+*        JSR EA_PrintCommaSpace
+*        JSR EA_PrintRegList
+*        BRA EA_DECODE_CASE12_END
     
     EA_DECODE_CASE12_END:
     MOVEM.L (A7)+, PARAMS
@@ -2273,11 +2273,150 @@ EA_InstrData:
 
 * D7 = 0 if (push) predec mode, d0-d7,a0-a7, 16->0
 * D7 = 1 if (pop) postdec mode, a7-a0,d7-d0, 16->0
-EA_RegList:
+EA_PrintRegList:
+    MOVEM.L PARAMS, -(A7)
+    *if pop(D7) == 0
+    CMP.B #0, D7
+    *BEQ PrintRegList_Pop
+    BRA PrintRegList_Push
+
+    *PrintRegList_Pop:
+
+    PrintRegList_Push:
+        *read the next byte
+        CLR.L D0
+        MOVE.L #1, D6
+        JSR EA_GetData
+        MOVE.L D2, D3
+
+        MOVE.L #0, D5
+        MOVE.L #8, D6
+        MOVE.L #1, D7
+        MOVE.L #'D', D0
+        JSR EA_PrintModular
+    PrintRegList_EndIf:
+   
+
+
+    MOVEM.L (A7)+, PARAMS
     RTS
 
+*D3 = current word
+*D5 = start index
+*D6 = end index
+*D7 = dr: 1 or -1
+*D0 = ch: 'A' or 'D'
+EA_PrintModular:
+    MOVEM.L PARAMS, -(A7)
+    *D4 = boolean list = false
+    *D1 = boolean first = true
+    *D2 = int last = 0
+    MOVE.L #0, D4
+    MOVE.L #1, D1
+    MOVE.L #0 , D2
+
+    *D4 = current bit
+    *while start != end
+    EA_PrintModular_LoopStart:
+    CMP.L D5, D6
+    BEQ EA_PrintModular_LoopDone
+        *ROL.B #1, D3
+        * protect the word with movem
+        MOVEM.L D3, -(A7)
+        * cur = b[i]
+        AND.L #%1, D3  
+
+        *compare cur
+        CMP.L #0, D3
+        BEQ EA_Cur0
+        BRA EA_Cur1
+
+        EA_Cur0:
+            *compare last
+            CMP.L #0, D2
+            BEQ EA_Cur0Last0
+            BRA EA_Cur0Last1
+        EA_Cur1:
+            *compare last
+            CMP.L #0, D2
+            BEQ EA_Cur1Last0
+            BRA EA_Cur1Last1
+
+        EA_Cur0Last0:
+            BRA EA_IfDone
+        EA_Cur0Last1:  ; 01
+            * if list == 1:
+            *   print '-'
+            *   print ch
+            *   print i-1
+            * list = 0
+            CMP.B #1, D4
+            BNE EA_Cur0Last1_SkipIf
+                MOVE.B #'-', (A0)+
+                MOVE.B D0, (A0)+
+                MOVEM.L PARAMS, -(A7) ---> scope
+                    SUB.L D7, D5
+                    MOVE.L D5, D2
+                    MOVE.L #1, D3
+                    JSR IO_HEX2ASCII
+                MOVEM.L (A7)+, PARAMS <--- end scope
+            EA_Cur0Last1_SkipIf:
+            MOVE.L #0, D4
+            BRA EA_IfDone
+        EA_Cur1Last0:
+            * if first == 0:
+            *   print '/'
+            * print ch
+            * print start
+            * first = 0
+            CMP.B #0, D1
+            BNE EA_Cur1Last0_SkipIf
+                MOVE.B #'/', (A0)+
+            EA_Cur1Last0_SkipIf:
+            MOVE.B D0, (A0)+
+            MOVEM.L PARAMS, -(A7) ---> scope
+                MOVE.L D5, D2
+                MOVE.L #1, D3
+                JSR IO_HEX2ASCII
+            MOVEM.L (A7)+, PARAMS <--- end scope
+            MOVE.L #0, D1
+            BRA EA_IfDone
+        EA_Cur1Last1:
+            * list = 1
+            MOVE.B #1, D4
+            BRA EA_IfDone
+        EA_IfDone:
+
+        * last = cur
+        * start ++
+        MOVE.L D3, D2
+        ADD.L D7, D5
+        MOVEM.L (A7)+, D3 * restore word value
+        LSR.W #1, D3
+
+        BRA EA_PrintModular_LoopStart
+    EA_PrintModular_LoopDone:
+    * if list == 1:
+    *   print '-'
+    *   print ch
+    *   print end - 1
+    CMP.B #1, D4
+    BNE EA_PrintModular_ListSkip
+        MOVE.B #'-', (A0)+
+        MOVE.B D0, (A0)+
+        MOVEM.L PARAMS, -(A7) * ----> scope
+            MOVE.L D6, D2
+            SUB.L D7, D2
+            MOVE.L #1, D3
+            JSR IO_HEX2ASCII
+        MOVEM.L (A7)+, PARAMS * <---- end scope
+    EA_PrintModular_ListSkip:
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
 
 * D6 = # of words to read, must be 1 or 2
+* returns in D2
 EA_GetData:
 	MOVEM.L PARAMS, -(A7)
 	*ADD.L #$2, A6
@@ -2330,7 +2469,7 @@ EA_PrintCommaSpace:
     RTS
 * ============================ END EA_ShiftAndMask
 
-*===============================================================================================* GLOBAL VARIABLE BLOCK
+*========================================================* GLOBAL VARIABLE BLOCK
 
 
 **GLOBAL VARIABLE BLOCK**
@@ -2343,23 +2482,7 @@ EA_CASE         DS.B    1
 EA_SIZE         DS.B    1
 
 
-
-
     END    START        ; last line of source
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 *~Font name~Courier New~
