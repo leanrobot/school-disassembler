@@ -574,7 +574,7 @@ OP_Code0100:
     BEQ         OP_JSR
     * is it RTS?
     MOVE.W      D4,D1
-    MOVE.W      #$4775,D2
+    MOVE.W      #$4E75,D2
     CMP.W       D2, D1
     BEQ         OP_RTS
     * is it NEG?
@@ -2287,6 +2287,7 @@ EA_SIZE         DS.B    1
 
 
     END    START        ; last line of source
+
 
 
 
