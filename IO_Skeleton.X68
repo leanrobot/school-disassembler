@@ -1520,6 +1520,9 @@ EA_DECODE:
     * if case == 8
     CMP.B #8, (A3)
     BEQ EA_DECODE_BranchCase8
+    * if case == 9
+    CMP.B #9, (A3)
+    BEQ     EA_DECODE_BranchCase9
     * if case == 10
     CMP.B #10, (A3)
     BEQ EA_DECODE_BranchCase10
@@ -1556,6 +1559,9 @@ EA_DECODE:
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase8:
         JSR EA_DECODE_CASE8
+        BRA EA_DECODE_EndIf
+    EA_DECODE_BranchCase9:
+        JSR EA_DECODE_CASE9
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase10:
         JSR EA_DECODE_CASE10
@@ -1918,6 +1924,59 @@ EA_DECODE_CASE8:
         BRA EA_DECODE_CASE8_End
 
     EA_DECODE_CASE8_End:
+    MOVEM.L (A7)+, PARAMS
+    RTS
+    
+EA_DECODE_CASE9:
+    MOVEM.L PARAMS, -(A7)
+    
+    *get bit 8 to determine mode
+    MOVE.L #8, D6 *shift 8
+    MOVE.L #1, D7 *keep 3
+    JSR EA_ShiftAndMask
+    
+    *if bit is 1, format is Dn, <ea>
+    * if 0, #<data>, <ea>
+    CMP.L   #1, D2
+    BEQ     EA_DECODE_CASE9_IfRegister
+    BRA     EA_DECODE_CASE9_IfImmediate
+    
+    EA_DECODE_CASE9_IfRegister:
+    
+        *get register
+        MOVE.L #9, D6 *shift 9
+        MOVE.L #3, D7 *keep 3
+        JSR EA_ShiftAndMask
+        MOVE.L D2, D7
+        JSR EA_DirectData
+        BRA EA_DECODE_CASE9_EA_PARAMETER
+    
+    
+    EA_DECODE_CASE9_IfImmediate:
+        MOVE.B #3, (A4)
+        JSR EA_ImmData    
+    
+    EA_DECODE_CASE9_EA_PARAMETER:
+        JSR EA_PrintCommaSpace
+    
+        * get EA mode 
+        MOVE.L #$3, D6 * shift
+        MOVE.L #$3, D7 * keep
+        JSR EA_ShiftAndMask
+        MOVE.L D2, D5
+
+        * get EA register
+        MOVE.L #$0, D6 * shift
+        MOVE.L #$3, D7 * keep
+        JSR EA_ShiftAndMask
+
+        MOVE.L D5, D6
+        MOVE.L D2, D7
+        JSR EA_HandleOperand
+
+        BRA EA_DECODE_CASE9_End
+    
+    EA_DECODE_CASE9_End:
     MOVEM.L (A7)+, PARAMS
     RTS
 
