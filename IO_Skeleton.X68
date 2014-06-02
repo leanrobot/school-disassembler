@@ -1546,7 +1546,7 @@ EA_DECODE:
         JSR EA_DECODE_CASE3
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase4:
-    	JSR EA_DECODE_CASE4
+        JSR EA_DECODE_CASE4
         BRA EA_DECODE_EndIf
     EA_DECODE_BranchCase5:
         JSR EA_DECODE_CASE5
@@ -1743,7 +1743,7 @@ EA_DECODE_CASE4:
     MOVE.L #3, D6
     MOVE.L #3, D7
     JSR EA_ShiftAndMask
-    MOVE.L D2, D3 		* temp store D3
+    MOVE.L D2, D3       * temp store D3
 
     * EA Register is 0 shift, 3 keep.
     MOVE.L #0, D6
@@ -2051,226 +2051,6 @@ EA_DECODE_CASE12:
     MOVEM.L (A7)+, PARAMS
     RTS
 
-* Mode = D6
-* Register = D7
-EA_HandleOperand:
-    MOVEM.L PARAMS, -(A7)
-
-    *if mode == 0 --> directData
-    CMP.B #0, D6
-    BEQ EA_HandleOperand_IfDirectData
-
-    *elif mode == 1 --> direct address
-    CMP.B #1, D6
-    BEQ EA_HandleOperand_IfDirectAddress
-
-    *elif mode == 2 --> indirect address
-    CMP.B #2, D6
-    BEQ EA_HandleOperand_IfIndirectAddr
-
-    *elif mode == 3 --> post dec address
-    CMP.B #3, D6
-    BEQ EA_HandleOperand_IfPostDec
-
-    *elif mode == 4 --> pre dec address
-    CMP.B #4, D6
-    BEQ EA_HandleOperand_IfPreDec
-
-    *elif mode == 7 --> immediate data
-    CMP.B #7, D6
-    BEQ EA_HandleOperand_ifImmMode
-
-    BRA EA_HandleOperand_IfElse     * Not any of the supported modes, error.
-
-    EA_HandleOperand_IfDirectData:
-        JSR EA_DirectData
-        BRA EA_HandleOperand_IfEnd
-    EA_HandleOperand_IfDirectAddress:
-        JSR EA_DirectAddress
-        BRA EA_HandleOperand_IfEnd
-    EA_HandleOperand_IfIndirectAddr:
-        JSR EA_IndirectAddress
-        BRA EA_HandleOperand_IfEnd
-    EA_HandleOperand_IfPostDec:
-        JSR EA_PostDecAddress
-        BRA EA_HandleOperand_IfEnd
-    EA_HandleOperand_IfPreDec:
-        JSR EA_PreDecAddress
-        BRA EA_HandleOperand_IfEnd
-    EA_HandleOperand_IfElse:
-    * TODO ERROR HANDLING HERE -----------
-        BRA EA_HandleOperand_IfEnd
-    EA_HandleOperand_ifImmMode:
-    	* check the register
-    	* if reg == 0 --> (xxx).W
-    	CMP.B 	#0, D7
-    	BEQ 	EA_HandleOperand_IfWordAddr
-    	* if reg == 1 --> (xxx).L
-    	CMP.B 	#1, D7
-    	BEQ		EA_HandleOperand_IfLongWordAddr
-    	* if reg == 4 --> #data
-    	CMP.B #4, D7
-    	BEQ 	EA_HandleOperand_IfImmData
-    	BRA EA_HandleOperand_IfElse
-    EA_HandleOperand_IfWordAddr:
-    	JSR EA_WordAddr
-    	BRA EA_HandleOperand_IfElse
-    EA_HandleOperand_IfLongWordAddr:
-    	JSR EA_LongWordAddr
-    	BRA EA_HandleOperand_IfElse
-    EA_HandleOperand_IfImmData:
-    	JSR EA_ImmData 
-    	BRA EA_HandleOperand_IfElse
-    EA_HandleOperand_IfEnd:
-
-    MOVEM.L (A7)+, PARAMS
-    RTS
-
-* register # = D7
-EA_DirectData:
-    MOVEM.L PARAMS, -(A7)
-
-    MOVE.B #$44, (A0)+      * Data (D)
-    *Print the register #
-    MOVE.L D7, D2
-    MOVE.L #$00000001, D3
-    JSR IO_HEX2ASCII
-
-    MOVEM.L (A7)+, PARAMS
-    RTS
-
-* register # = D7
-EA_DirectAddress:
-    MOVEM.L PARAMS, -(A7)
-    MOVE.B #$41, (A0)+      * Address (A)
-    *Print the register #
-    MOVE.L D7, D2
-    MOVE.L #$00000001, D3
-    JSR IO_HEX2ASCII
-
-    MOVEM.L (A7)+, PARAMS
-    RTS
-
-* register # = D7
-EA_IndirectAddress:
-    MOVEM.L PARAMS, -(A7)
-
-    MOVE.B #$28, (A0)+      * '('
-    JSR EA_DirectAddress
-    MOVE.B #$29, (A0)+      * ')'
-
-    MOVEM.L (A7)+, PARAMS
-    RTS
-
-* register # = D7
-EA_PostDecAddress:
-    MOVEM.L PARAMS, -(A7)
-
-    JSR EA_IndirectAddress
-    MOVE.B #$2B, (A0)+      * '+'
-
-    MOVEM.L (A7)+, PARAMS
-    RTS
-
-* register # = D7
-EA_PreDecAddress:
-    MOVEM.L PARAMS, -(A7)
-
-    MOVE.B #$2D, (A0)+      * '-'
-    JSR EA_IndirectAddress
-
-    MOVEM.L (A7)+, PARAMS
-    RTS
-
-* no arguments
-EA_WordAddr:
-	MOVEM.L PARAMS, -(A7)
-
-	MOVE.L #1, D6
-	JSR EA_GetData 					* returned in D2
-
-	MOVE.B #$24, (A0)+ 		* '$'
-	MOVE.L #$4, D3
-	* Data is in D2 already
-	JSR IO_HEX2ASCII 		* '<addr>'
-
-	MOVEM.L (A7)+, PARAMS
-	RTS
-
-EA_LongWordAddr:
-	MOVEM.L PARAMS, -(A7)
-
-	MOVE.L #2, D6
-	JSR EA_GetData 					* returned in D2
-
-	MOVE.B #$24, (A0)+ 		* '$'
-	MOVE.L #$8, D3
-	* Data is in D2 already
-	JSR IO_HEX2ASCII 		* '<addr>'
-
-	MOVEM.L (A7)+, PARAMS
-	RTS
-
-* size of operation is (A4)
-EA_ImmData:
-	MOVEM.L PARAMS, -(A7)
-
-	* if size == 1 --> byte
-	CMP.B #$1, (A4)
-	BEQ EA_ImmData_IfByte
-	* elif size == 3 --> word
-	CMP.B #$3, (A4)
-	BEQ EA_ImmData_IfWord
-	* elif size ==2 --> long
-	CMP.B #$2, (A4)
-	BEQ EA_ImmData_IfLongWord
-
-	BRA EA_ImmData_IfEnd
-
-	EA_ImmData_IfByte:
-		MOVE.B #$1, D6
-		JSR EA_GetData
-		MOVE.B #$2, D3
-		BRA EA_ImmData_IfEnd
-	EA_ImmData_IfWord:
-		MOVE.B #$1, D6
-		JSR EA_GetData
-		MOVE.B #$4, D3
-		BRA EA_ImmData_IfEnd
-	EA_ImmData_IfLongWord:
-		MOVE.B #$2, D6
-		JSR EA_GetData
-		MOVE.B #$8, D3
-		BRA EA_ImmData_IfEnd
-	EA_ImmData_IfEnd:
-
-	MOVE.B #$23, (A0)+ 		* '#'
-	MOVE.B #$24, (A0)+ 		* '$'
-	JSR IO_HEX2ASCII
-
-	MOVEM.L (A7)+, PARAMS
-	RTS
-
-* d7 = data
-EA_InstrData:
-    MOVEM.L PARAMS, -(A7)
-
-    * if data is 0, it is really 8
-    CMP.B #0, D7
-    BNE EA_InstrData_NoTransform
-    MOVE.B #8, D7
-
-    EA_InstrData_NoTransform:
-    MOVE.B #'#', (A0)+
-    MOVE.B #'$', (A0)+
-
-    MOVE.B D7, D2
-    MOVE.B #1, D3
-    JSR IO_HEX2ASCII
-
-    MOVEM.L (A7)+, PARAMS
-    RTS
-
 * D7 = 0 if (push) predec mode, d0-d7,a0-a7, 16->0
 * D7 = 1 if (pop) postdec mode, a7-a0,d7-d0, 16->0
 EA_PrintRegList:
@@ -2293,7 +2073,7 @@ EA_PrintRegList:
         MOVE.L #8, D6
         MOVE.L #1, D7
         MOVE.L #'D', D0
-        JSR EA_PrintModular
+        JSR EA_ParseRegMask
     PrintRegList_EndIf:
    
 
@@ -2306,7 +2086,7 @@ EA_PrintRegList:
 *D6 = end index
 *D7 = dr: 1 or -1
 *D0 = ch: 'A' or 'D'
-EA_PrintModular:
+EA_ParseRegMask:
     MOVEM.L PARAMS, -(A7)
     *D4 = boolean list = false
     *D1 = boolean first = true
@@ -2415,25 +2195,247 @@ EA_PrintModular:
     MOVEM.L (A7)+, PARAMS
     RTS
 
+* Mode = D6
+* Register = D7
+EA_HandleOperand:
+    MOVEM.L PARAMS, -(A7)
+
+    *if mode == 0 --> directData
+    CMP.B #0, D6
+    BEQ EA_HandleOperand_IfDirectData
+
+    *elif mode == 1 --> direct address
+    CMP.B #1, D6
+    BEQ EA_HandleOperand_IfDirectAddress
+
+    *elif mode == 2 --> indirect address
+    CMP.B #2, D6
+    BEQ EA_HandleOperand_IfIndirectAddr
+
+    *elif mode == 3 --> post dec address
+    CMP.B #3, D6
+    BEQ EA_HandleOperand_IfPostDec
+
+    *elif mode == 4 --> pre dec address
+    CMP.B #4, D6
+    BEQ EA_HandleOperand_IfPreDec
+
+    *elif mode == 7 --> immediate data
+    CMP.B #7, D6
+    BEQ EA_HandleOperand_ifImmMode
+
+    BRA EA_HandleOperand_IfElse     * Not any of the supported modes, error.
+
+    EA_HandleOperand_IfDirectData:
+        JSR EA_DirectData
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_IfDirectAddress:
+        JSR EA_DirectAddress
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_IfIndirectAddr:
+        JSR EA_IndirectAddress
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_IfPostDec:
+        JSR EA_PostDecAddress
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_IfPreDec:
+        JSR EA_PreDecAddress
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_IfElse:
+    * TODO ERROR HANDLING HERE -----------
+        BRA EA_HandleOperand_IfEnd
+    EA_HandleOperand_ifImmMode:
+        * check the register
+        * if reg == 0 --> (xxx).W
+        CMP.B   #0, D7
+        BEQ     EA_HandleOperand_IfWordAddr
+        * if reg == 1 --> (xxx).L
+        CMP.B   #1, D7
+        BEQ     EA_HandleOperand_IfLongWordAddr
+        * if reg == 4 --> #data
+        CMP.B #4, D7
+        BEQ     EA_HandleOperand_IfImmData
+        BRA EA_HandleOperand_IfElse
+    EA_HandleOperand_IfWordAddr:
+        JSR EA_WordAddr
+        BRA EA_HandleOperand_IfElse
+    EA_HandleOperand_IfLongWordAddr:
+        JSR EA_LongWordAddr
+        BRA EA_HandleOperand_IfElse
+    EA_HandleOperand_IfImmData:
+        JSR EA_ImmData 
+        BRA EA_HandleOperand_IfElse
+    EA_HandleOperand_IfEnd:
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* register # = D7
+EA_DirectData:
+    MOVEM.L PARAMS, -(A7)
+
+    MOVE.B #$44, (A0)+      * Data (D)
+    *Print the register #
+    MOVE.L D7, D2
+    MOVE.L #$00000001, D3
+    JSR IO_HEX2ASCII
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* register # = D7
+EA_DirectAddress:
+    MOVEM.L PARAMS, -(A7)
+    MOVE.B #$41, (A0)+      * Address (A)
+    *Print the register #
+    MOVE.L D7, D2
+    MOVE.L #$00000001, D3
+    JSR IO_HEX2ASCII
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* register # = D7
+EA_IndirectAddress:
+    MOVEM.L PARAMS, -(A7)
+
+    MOVE.B #$28, (A0)+      * '('
+    JSR EA_DirectAddress
+    MOVE.B #$29, (A0)+      * ')'
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* register # = D7
+EA_PostDecAddress:
+    MOVEM.L PARAMS, -(A7)
+
+    JSR EA_IndirectAddress
+    MOVE.B #$2B, (A0)+      * '+'
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* register # = D7
+EA_PreDecAddress:
+    MOVEM.L PARAMS, -(A7)
+
+    MOVE.B #$2D, (A0)+      * '-'
+    JSR EA_IndirectAddress
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* no arguments
+EA_WordAddr:
+    MOVEM.L PARAMS, -(A7)
+
+    MOVE.L #1, D6
+    JSR EA_GetData                  * returned in D2
+
+    MOVE.B #$24, (A0)+      * '$'
+    MOVE.L #$4, D3
+    * Data is in D2 already
+    JSR IO_HEX2ASCII        * '<addr>'
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+EA_LongWordAddr:
+    MOVEM.L PARAMS, -(A7)
+
+    MOVE.L #2, D6
+    JSR EA_GetData                  * returned in D2
+
+    MOVE.B #$24, (A0)+      * '$'
+    MOVE.L #$8, D3
+    * Data is in D2 already
+    JSR IO_HEX2ASCII        * '<addr>'
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* size of operation is (A4)
+EA_ImmData:
+    MOVEM.L PARAMS, -(A7)
+
+    * if size == 1 --> byte
+    CMP.B #$1, (A4)
+    BEQ EA_ImmData_IfByte
+    * elif size == 3 --> word
+    CMP.B #$3, (A4)
+    BEQ EA_ImmData_IfWord
+    * elif size ==2 --> long
+    CMP.B #$2, (A4)
+    BEQ EA_ImmData_IfLongWord
+
+    BRA EA_ImmData_IfEnd
+
+    EA_ImmData_IfByte:
+        MOVE.B #$1, D6
+        JSR EA_GetData
+        MOVE.B #$2, D3
+        BRA EA_ImmData_IfEnd
+    EA_ImmData_IfWord:
+        MOVE.B #$1, D6
+        JSR EA_GetData
+        MOVE.B #$4, D3
+        BRA EA_ImmData_IfEnd
+    EA_ImmData_IfLongWord:
+        MOVE.B #$2, D6
+        JSR EA_GetData
+        MOVE.B #$8, D3
+        BRA EA_ImmData_IfEnd
+    EA_ImmData_IfEnd:
+
+    MOVE.B #$23, (A0)+      * '#'
+    MOVE.B #$24, (A0)+      * '$'
+    JSR IO_HEX2ASCII
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+* d7 = data
+EA_InstrData:
+    MOVEM.L PARAMS, -(A7)
+
+    * if data is 0, it is really 8
+    CMP.B #0, D7
+    BNE EA_InstrData_NoTransform
+    MOVE.B #8, D7
+
+    EA_InstrData_NoTransform:
+    MOVE.B #'#', (A0)+
+    MOVE.B #'$', (A0)+
+
+    MOVE.B D7, D2
+    MOVE.B #1, D3
+    JSR IO_HEX2ASCII
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+
+
 * D6 = # of words to read, must be 1 or 2
 * returns in D2
 EA_GetData:
-	MOVEM.L PARAMS, -(A7)
-	*ADD.L #$2, A6
-	CLR.L D2
-	EA_GetData_Loop:
-	CMPI.B #0, D6
-	BLE EA_GetData_LoopDone
-		MOVE.L #16, D0
-		LSL.L D0, D2
-		ADD.W (A6)+, D2
-		
-		SUBQ.B #1, D6
-		BRA EA_GetData_Loop
-	EA_GetData_LoopDone:
+    MOVEM.L PARAMS, -(A7)
+    *ADD.L #$2, A6
+    CLR.L D2
+    EA_GetData_Loop:
+    CMPI.B #0, D6
+    BLE EA_GetData_LoopDone
+        MOVE.L #16, D0
+        LSL.L D0, D2
+        ADD.W (A6)+, D2
+        
+        SUBQ.B #1, D6
+        BRA EA_GetData_Loop
+    EA_GetData_LoopDone:
 
-	MOVEM.L (A7)+, PARAMS
-	RTS
+    MOVEM.L (A7)+, PARAMS
+    RTS
 
 
 * D4 = shift & mask data (LW)
