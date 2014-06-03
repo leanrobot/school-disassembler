@@ -675,7 +675,7 @@ OP_Code0100:
         MOVE.B #'E', (A0)+
         MOVE.B #'A', (A0)+  
         *Set EA Case 2, no size info (0 is default)
-        MOVEQ #2, D2
+        MOVEQ #5, D2
         MOVEQ #0, D3
         BRA         OP_Done_Decoding
     
@@ -1143,7 +1143,7 @@ OP_Code1011:
         MOVE.B #'L', (A0)+
         *Set EA Case 2, op size long(2)
         MOVEQ #2, D2
-        MOVEQ #1, D3
+        MOVEQ #2, D3
         RTS  
 
 *MULS.W
