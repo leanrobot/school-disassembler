@@ -13,6 +13,7 @@ shift   EQU     12
 
 
     ORG    $1000
+*sets stack and jump table, prints welcome message
 START:      
     LEA stack, SP
     LEA OP_jmp_table,A5
@@ -20,7 +21,9 @@ START:
     LEA     IO_OPEN, A1        *Print welcome message
     MOVE.B  #14, D0
     TRAP    #15
-
+    
+*beginning of interaction portion
+*Prompts user for starting and ending addresses
 DISPLAY_AND_PROMPT_FOR_INPUT:
     LEA    IO_NEW_LINE, A1
     MOVE.B    #14, D0
@@ -73,6 +76,8 @@ IO_READING:
     BLT         PROMPT_TO_RESTART
     BGE         READ_IN_AND_PROCESS
 
+* Asks user if they want to run the program again
+* Anything that is not a Y or y is read as a no
 PROMPT_TO_RESTART:
     LEA    IO_RESTART_PROMPT, A1
     MOVE.B    #14, D0
@@ -84,7 +89,6 @@ PROMPT_TO_RESTART:
     TRAP      #15
 
     *Y/y = 59 OR 79
-    *N/n = 4E or 6E
     CMP.B     #$59, D1
     BEQ    DISPLAY_AND_PROMPT_FOR_INPUT
     CMP.B     #$79, D1
@@ -93,6 +97,7 @@ PROMPT_TO_RESTART:
 * DO NOT PUT METHODS BETWEEN PROMPT_TO_RESTART
     SIMHALT ;*********** END OF MAIN ********************
 
+* Reads in a line, converts the adddress to hex, passes line to OpCode and EA for processing
 READ_IN_AND_PROCESS:
     LEA IO_LINE_BUF, A0                   * pointer to line buffer
     MOVE.L A6, D2               * Parameter setup for IO_HEX2ASCII
@@ -113,6 +118,8 @@ READ_IN_AND_PROCESS:
 
     CMP.B   #0, D6                         *Compare counter to 30
     BEQ     IO_CLEAR_SCREEN
+    
+*Prints contents line buffer to the screen
 DISPLAY_LINE_BUFFER:
     SUB.B    #1, D6                        *Decrement counter
     
@@ -135,7 +142,11 @@ DISPLAY_LINE_BUFFER:
 IO_CONVERT_ASCII_ADDR:
     MOVE.B  D1,D2           *Move length of address from D1 to D2    
 
-* Puts final converted address into D3
+*************************************
+* @params: Length of address is in D2
+*          Line buffer is in A1
+* @returns: converted address is in D3
+***************************************
 IO_LOOP: 
      MOVE.B    (A1)+, D1
      JSR IO_AS2HEX          *Go to conversion loop for each digit
@@ -145,8 +156,12 @@ IO_LOOP:
      BNE IO_LOOP
      RTS
 
-
+*************************************
 * Checks that the start address is an even number
+* @params: Start address is in D3
+*        
+* @returns: None
+***************************************
 IO_CHECK_EVEN_START_ADDRESS:
      MOVE.L   D3, D4
      ANDI.B   #$1, D4
@@ -209,19 +224,25 @@ IO_END_CHAR_RANGE_CHECKING:
 IO_AS2HEX_COMPLETE:         
          RTS
          
-         
+*Converts a 0-9 in ASCII to Hex
+*D1 contains the character to check         
 IO_DIGIHEX:  
          SUB.B    #$30, D1   *Subtract 30 from D1 to convert from ASCII digit to Hex digit
          BRA  IO_AS2HEX_COMPLETE              *Return to IO
-            
+
+*Converts A-F in ASCII to Hex
+*D1 contains the character to check             
 IO_NUMHEX:   
          SUB.B    #$37, D1   *Subtract 37 from D1 to convert from ASCII A-F to Hex
          BRA IO_AS2HEX_COMPLETE
-         
+
+*Checks to see if an ASCII character is entered between 9 and A
+*D1 contains the character to check          
 IO_CHECK_BETWEEN_9_AND_A:
          CMP.B    #$3A, D1
          BLT     IO_END_CHAR_RANGE_CHECKING
 
+*Indicates that a
 IO_INVALID_CHARACTER_ENTERED:
          LEA    IO_INVALID_CHARACTER_ERROR_MSG, A1
          MOVE.B    #14, D0
