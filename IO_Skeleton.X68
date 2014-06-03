@@ -4,72 +4,78 @@
 * Date       :
 * Description:
 *-----------------------------------------------------------
-CR      EQU     $0D
-LF      EQU     $0A
-PARAMS  REG     D0-D1/D3-D7/A2-A5
+CR      EQU         $0D
+LF      EQU         $0A
+PARAMS  REG         D0-D1/D3-D7/A2-A5
 
-stack   EQU     $A000    *sp initial
-shift   EQU     12
+stack   EQU         $A000    *sp initial
+shift   EQU         12
 
 
-    ORG    $1000
-*sets stack and jump table, prints welcome message
+    ORG             $1000
+* sets stack and jump table, prints welcome message
 START:      
-    LEA stack, SP
-    LEA OP_jmp_table,A5
+    LEA             stack, SP
+    LEA             OP_jmp_table,A5
 
-    LEA     IO_OPEN, A1        *Print welcome message
-    MOVE.B  #14, D0
-    TRAP    #15
+    *Print welcome message
+    LEA             IO_OPEN, A1
+    MOVE.B          #14, D0
+    TRAP            #15
     
 *beginning of interaction portion
 *Prompts user for starting and ending addresses
 DISPLAY_AND_PROMPT_FOR_INPUT:
-    LEA    IO_NEW_LINE, A1
-    MOVE.B    #14, D0
-    TRAP #15
+    LEA             IO_NEW_LINE, A1
+    MOVE.B          #14, D0
+    TRAP            #15
 
     *Clears D2 and D3 for new input/checking address validity
-    CLR.L    D2
-    CLR.L    D3
+    CLR.L           D2
+    CLR.L           D3
 
     LEA    IO_STARTMSSG, A1       *Print request for address
-    MOVE.B  #14, D0
-    TRAP    #15
-    MOVE.L  #$00000000, A1  *Clears A1 so that IO_STARTMSSG is not overwritten
-    MOVE.B  #2,D0           *Take in address from user and put in (A1)
-    TRAP #15
+    MOVE.B          #14, D0
+    TRAP            #15
+    * Clears A1 so that IO_STARTMSSG is not overwritten
+    MOVE.L          #$00000000, A1  
+    *Take in address from user and put in (A1)
+    MOVE.B          #2,D0
+    TRAP            #15
     
-    JSR     IO_CONVERT_ASCII_ADDR    *Convert user ASCII input to hex address
-    BRA     IO_CHECK_EVEN_START_ADDRESS   *Check start address is an even #
+    JSR             IO_CONVERT_ASCII_ADDR           *Convert user ASCII input 
+                                                    * to hex address
+
+    BRA             IO_CHECK_EVEN_START_ADDRESS     *Check start address is 
+                                                    * an even #
 IO_STORE_START:
-    MOVE.L  D3,IO_STARTADDR          *Store converted address in variable
-    MOVEA.L D3, A6                   * Move the starting address to a6, current soemthign
+    MOVE.L          D3,IO_STARTADDR          * Store converted address in variable
+    MOVEA.L         D3, A6                   * Move the starting address to a6, 
+                                             * current soemthign
     
-    CLR.L   D3              * RESET D3 to work with ending address
+    CLR.L           D3                  * RESET D3 to work with ending address
     
-    LEA    IO_ENDMSSG, A1       *Print request for address
-    MOVE.B  #14, D0
-    TRAP    #15
-    MOVE.L  #$00000000, A1   *Clears A1 so that IO_ENDMSSG is not overwritten
-    MOVE.B  #2,D0           *Take in address from user and put in (A1)
-    TRAP #15
+    LEA             IO_ENDMSSG, A1      *Print request for address
+    MOVE.B          #14, D0
+    TRAP            #15
+    MOVE.L          #$00000000, A1   *Clears A1 so that IO_ENDMSSG is not overwritten
+    MOVE.B          #2,D0           *Take in address from user and put in (A1)
+    TRAP            #15
     
-    JSR     IO_CONVERT_ASCII_ADDR     *Convert user ASCII input to hex address
-    BRA     IO_CHECK_EVEN_END_ADDRESS *Check end address is an even #
+    JSR             IO_CONVERT_ASCII_ADDR       *Convert user ASCII input 
+                                                * to hex address
+    BRA             IO_CHECK_EVEN_END_ADDRESS   *Check end address is an even #
 IO_STORE_END:
-    MOVE.L  D3,IO_ENDADDR             *Store converted address in variable
+    MOVE.L          D3,IO_ENDADDR               *Store converted address in variable
     
     * Verify starting address < ending address
-    BRA     IO_CHECK_ENDING_ADDR
+    BRA             IO_CHECK_ENDING_ADDR
 IO_INPUT_SUCCESSFUL:
     
     
-    *******************************************************************
-    * Begin Looping portion of code.
-    ****MOVEA.L (IO_STARTADDR),A6    *Move starting address to current address variable
+*================= MAIN LOOP ===================================================
 MAIN_LOOP:
-    MOVE.B    #25, D6                  *Counter for display looping, starts at 30
+    MOVE.B    #25, D6               *Counter for display looping, starts at 30
 IO_READING:
     MOVE.L      (IO_ENDADDR),D0
     CMP.L       A6,D0
@@ -79,7 +85,7 @@ IO_READING:
 * Asks user if they want to run the program again
 * Anything that is not a Y or y is read as a no
 PROMPT_TO_RESTART:
-    LEA    IO_RESTART_PROMPT, A1
+    LEA       IO_RESTART_PROMPT, A1
     MOVE.B    #14, D0
     TRAP      #15
 
@@ -90,46 +96,47 @@ PROMPT_TO_RESTART:
 
     *Y/y = 59 OR 79
     CMP.B     #$59, D1
-    BEQ    DISPLAY_AND_PROMPT_FOR_INPUT
+    BEQ       DISPLAY_AND_PROMPT_FOR_INPUT
     CMP.B     #$79, D1
-    BEQ    DISPLAY_AND_PROMPT_FOR_INPUT
+    BEQ       DISPLAY_AND_PROMPT_FOR_INPUT
 
 * DO NOT PUT METHODS BETWEEN PROMPT_TO_RESTART
-    SIMHALT ;*********** END OF MAIN ********************
+    SIMHALT 
+*======================= END OF MAIN LOOP ======================================
 
 * Reads in a line, converts the adddress to hex, passes line to OpCode and EA for processing
 READ_IN_AND_PROCESS:
-    LEA IO_LINE_BUF, A0                   * pointer to line buffer
-    MOVE.L A6, D2               * Parameter setup for IO_HEX2ASCII
-    MOVE.L #$8, D3
-    JSR IO_HEX2ASCII             *Loop through address converting Hex to ascii
-    JSR IO_INSERT_TAB
-    MOVE.B (A6)+,D4    
+    LEA         IO_LINE_BUF, A0      * pointer to line buffer
+    MOVE.L      A6, D2               * Parameter setup for IO_HEX2ASCII
+    MOVE.L      #$8, D3
+    JSR         IO_HEX2ASCII         *Loop through address converting Hex to ascii
+    JSR         IO_INSERT_TAB
+    MOVE.B      (A6)+,D4    
     ROL.W       #8,D4
-    MOVE.B (A6)+,D4
-    JSR OP_DETERMINE_OP_CODE                *Determine what the opcode is
-    JSR IO_MAKE_OPCODES_SAME_SIZE
-    JSR IO_INSERT_TAB
+    MOVE.B      (A6)+,D4
+    JSR         OP_DETERMINE_OP_CODE           *Determine what the opcode is
+    JSR         IO_MAKE_OPCODES_SAME_SIZE
+    JSR         IO_INSERT_TAB
 
     * EA_DECODE(d2=opcode case, d3=operation size)
-    JSR EA_DECODE
+    JSR         EA_DECODE
 
-    MOVE.B #$0, (A0)+ * Terminate the line buffer
+    MOVE.B      #$0, (A0)+ * Terminate the line buffer
 
-    CMP.B   #0, D6                         *Compare counter to 30
-    BEQ     IO_CLEAR_SCREEN
+    CMP.B       #0, D6                         *Compare counter to 30
+    BEQ         IO_CLEAR_SCREEN
     
 *Prints contents line buffer to the screen
 DISPLAY_LINE_BUFFER:
-    SUB.B    #1, D6                        *Decrement counter
+    SUB.B       #1, D6                         *Decrement counter
     
-    LEA     IO_LINE_BUF, A1
-    MOVE.B #13, D0
-    TRAP #15
+    LEA         IO_LINE_BUF, A1
+    MOVE.B      #13, D0
+    TRAP        #15
 
-    BRA IO_READING
+    BRA         IO_READING
 
-*==================================================================* IO
+*===========================================================================* IO
 *
 * ___   __    _  _______  __   __  _______      _______  __   __  _______  _______  __   __  _______ 
 *|   | |  |  | ||       ||  | |  ||       |    |       ||  | |  ||       ||       ||  | |  ||       |
@@ -191,8 +198,8 @@ IO_CHECK_ENDING_ADDR:
      MOVE.L   IO_STARTADDR, D2
      MOVE.L   IO_ENDADDR, D3
      CMP.L    D2, D3      *Compare start and end address
-     BLE    IO_ENDADDR_AFTER_STARTADDR
-     BRA    IO_INPUT_SUCCESSFUL    *Go back to main
+     BLE      IO_ENDADDR_AFTER_STARTADDR
+     BRA      IO_INPUT_SUCCESSFUL    *Go back to main
      
 *Displays message indicating ending address is smaller
 *than starting address. Jumps to main to have user re-enter
@@ -200,11 +207,11 @@ IO_ENDADDR_AFTER_STARTADDR:
 
      CLR.L    IO_STARTADDR
      CLR.L    IO_ENDADDR
-     LEA IO_END_BEFORE_START_MSG, A1    
+     LEA      IO_END_BEFORE_START_MSG, A1    
      
      MOVE.B  #14, D0
      TRAP    #15
-     BRA    DISPLAY_AND_PROMPT_FOR_INPUT
+     BRA     DISPLAY_AND_PROMPT_FOR_INPUT
 
 *Convert ASCII to Hex
 IO_AS2HEX:   
@@ -219,35 +226,36 @@ IO_END_CHAR_RANGE_CHECKING:
          *End error checking
         
          CMP.B    #'A', D1    *Compare D1 
-         BMI    IO_DIGIHEX     * BLT branches if D1 for digit
-         BGE    IO_NUMHEX      *BGT branches if D1 for A-F
+         BMI      IO_DIGIHEX     * BLT branches if D1 for digit
+         BGE      IO_NUMHEX      *BGT branches if D1 for A-F
 IO_AS2HEX_COMPLETE:         
          RTS
          
 *Converts a 0-9 in ASCII to Hex
 *D1 contains the character to check         
-IO_DIGIHEX:  
-         SUB.B    #$30, D1   *Subtract 30 from D1 to convert from ASCII digit to Hex digit
-         BRA  IO_AS2HEX_COMPLETE              *Return to IO
+IO_DIGIHEX:
+        *Subtract 30 from D1 to convert from ASCII digit to Hex digit
+         SUB.B    #$30, D1   
+         BRA      IO_AS2HEX_COMPLETE              *Return to IO
 
 *Converts A-F in ASCII to Hex
 *D1 contains the character to check             
 IO_NUMHEX:   
-         SUB.B    #$37, D1   *Subtract 37 from D1 to convert from ASCII A-F to Hex
-         BRA IO_AS2HEX_COMPLETE
+         SUB.B      #$37, D1   *Subtract 37 from D1 to convert from ASCII A-F to Hex
+         BRA        IO_AS2HEX_COMPLETE
 
 *Checks to see if an ASCII character is entered between 9 and A
 *D1 contains the character to check          
 IO_CHECK_BETWEEN_9_AND_A:
-         CMP.B    #$3A, D1
-         BLT     IO_END_CHAR_RANGE_CHECKING
+         CMP.B      #$3A, D1
+         BLT        IO_END_CHAR_RANGE_CHECKING
 
 *Indicates that a
 IO_INVALID_CHARACTER_ENTERED:
-         LEA    IO_INVALID_CHARACTER_ERROR_MSG, A1
-         MOVE.B    #14, D0
-         TRAP      #15
-         BRA DISPLAY_AND_PROMPT_FOR_INPUT
+         LEA        IO_INVALID_CHARACTER_ERROR_MSG, A1
+         MOVE.B     #14, D0
+         TRAP       #15
+         BRA        DISPLAY_AND_PROMPT_FOR_INPUT
 
 
 
@@ -256,41 +264,42 @@ IO_INVALID_CHARACTER_ENTERED:
 * D3 contains # of bytes, number length.
 * A0 Contains the line buffer
 IO_HEX2ASCII:
-    MOVEM.L D0-D7/A1-A7, -(A7)
-    CLR.L D1
-    MOVE.B  #8, D4
-    SUB.B   D3, D4
+    MOVEM.L             D0-D7/A1-A7, -(A7)
+    CLR.L               D1
+    MOVE.B              #8, D4
+    SUB.B               D3, D4
+
     * discard unneeded front bits
     IO_HEX2ASCII_DiscardLoop:
-        CMP.B   #0, D4
-        BLE     IO_HEX2ASCII_DiscardLoopDone
-        ROL.L   #4, D2
-        SUBQ.B  #1, D4
-        BRA     IO_HEX2ASCII_DiscardLoop
+        CMP.B           #0, D4
+        BLE             IO_HEX2ASCII_DiscardLoopDone
+        ROL.L           #4, D2
+        SUBQ.B          #1, D4
+        BRA             IO_HEX2ASCII_DiscardLoop
     IO_HEX2ASCII_DiscardLoopDone:
     
-    MOVE.B D3, D1           * counter for loop
+    MOVE.B              D3, D1          * counter for loop
 
     IO_HEX2ASCII_ConvertLoop:
-        ROL.L #4, D2          * rotate the value once.
-        MOVE.L D2, D3         * copy
-        AND.L #$0000000F, D3
-        CMP.B #$09,D3        * if F <= d3, letter.
-        BGT IO_HEX2ASCII_IfLetter
-        BLE IO_HEX2ASCII_IfDigit             * else, digit.
+        ROL.L           #4, D2          * rotate the value once.
+        MOVE.L          D2, D3          * copy
+        AND.L           #$0000000F, D3
+        CMP.B           #$09,D3         * if F <= d3, letter.
+        BGT             IO_HEX2ASCII_IfLetter
+        BLE             IO_HEX2ASCII_IfDigit     * else, digit.
 
-            IO_HEX2ASCII_IfLetter:
-                ADD #$37,D3         * add $37
-                BRA IO_HEX2ASCII_EndIf
-            IO_HEX2ASCII_IfDigit:
-                ADD #$30,D3         * add $30
+        IO_HEX2ASCII_IfLetter:
+            ADD     #$37,D3         * add $37
+            BRA     IO_HEX2ASCII_EndIf
+        IO_HEX2ASCII_IfDigit:
+            ADD     #$30,D3         * add $30
         IO_HEX2ASCII_EndIf:
-            MOVE.B D3,(A0)+       * write to line buffer
+        MOVE.B      D3,(A0)+        * write to line buffer
 
-        SUB.B #1,D1         * decrement loop counter
-    BNE IO_HEX2ASCII_ConvertLoop    * repeat loop?
+        SUB.B       #1, D1           * decrement loop counter
+    BNE             IO_HEX2ASCII_ConvertLoop        * repeat loop?
 
-    MOVEM.L (A7)+, D0-D7/A1-A7
+    MOVEM.L         (A7)+, D0-D7/A1-A7
     RTS
 
 * A0 is the current place in line buffer
