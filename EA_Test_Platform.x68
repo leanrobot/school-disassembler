@@ -1,39 +1,38 @@
-	ORG $1000
+
+
+    ORG $1000
+PARAMS  REG     D0-D1/D3-D7/A2-A5
 START:
-PARAMS	REG 	D3-D7/A2-A5
+    
+    MOVE.L #$FFFF, D4
+    JSR ReverseBits
+    SIMHALT
 
-	MOVEA #$7000, A6
-	MOVE.L #$11223344, (A6)+
-	MOVE.L #$55667788, (A6)+
-	MOVEA #$7000, A6
+*D4 = word
+*returns in D2
+ReverseBits:
+    MOVEM.L PARAMS, -(A7)
+    * counter = 16
+    MOVE.L #16, D0
 
-	MOVE.L #2, D6
-	JSR EA_GetData
-	SIMHALT
+    LoopStart:
+    CMP.B #0, D0
+    BEQ LoopDone
+        LSL.W #1, D5
+        LSR.W #1, D4
+        BCC AddZero
+        ADD.W #1, D5
+        AddZero:
 
-* D6 = # of words to read, must be 1 or 2
-EA_GetData:
-	MOVEM.L PARAMS, -(A7)
-	*ADD.L #$2, A6
-	CLR.L D2
-	EA_GetData_Loop:
-	CMPI.B #0, D6
-	BLE EA_GetData_LoopDone
-		MOVE.L #16, D0
-		LSL.L D0, D2
-		ADD.W (A6)+, D2
-		
-		SUBQ.B #1, D6
-		BRA EA_GetData_Loop
-	EA_GetData_LoopDone:
+        SUB.B #1, D0
+        BRA LoopStart
+    LoopDone:
 
-	MOVEM.L (A7)+, PARAMS
-	RTS
+    MOVEM.L (A7)+, PARAMS
+    RTS
 
 
-	END START
-
-
+    END START
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~

@@ -6,7 +6,7 @@
 *-----------------------------------------------------------
 CR      EQU     $0D
 LF      EQU     $0A
-PARAMS  REG     D3-D7/A2-A5
+PARAMS  REG     D0-D1/D3-D7/A2-A5
 
 stack   EQU     $A000    *sp initial
 shift   EQU     12
@@ -14,10 +14,9 @@ shift   EQU     12
 
     ORG    $1000
 START:      
-    LEA stack, SP                ; first instruction of program
+    LEA stack, SP
     LEA OP_jmp_table,A5
 
-* Put program code here
     LEA     IO_OPEN, A1        *Print welcome message
     MOVE.B  #14, D0
     TRAP    #15
@@ -91,7 +90,7 @@ PROMPT_TO_RESTART:
     CMP.B     #$79, D1
     BEQ    DISPLAY_AND_PROMPT_FOR_INPUT
 
-*DO NOT PUT METHODS BETWEEN PROMPT_TO_RESTART
+* DO NOT PUT METHODS BETWEEN PROMPT_TO_RESTART
     SIMHALT ;*********** END OF MAIN ********************
 
 READ_IN_AND_PROCESS:
@@ -123,9 +122,8 @@ DISPLAY_LINE_BUFFER:
 
     BRA IO_READING
 
-* Put variables and constants here
 *==================================================================* IO
-
+*
 * ___   __    _  _______  __   __  _______      _______  __   __  _______  _______  __   __  _______ 
 *|   | |  |  | ||       ||  | |  ||       |    |       ||  | |  ||       ||       ||  | |  ||       |
 *|   | |   |_| ||    _  ||  | |  ||_     _|    |   _   ||  | |  ||_     _||    _  ||  | |  ||_     _|
@@ -137,7 +135,7 @@ DISPLAY_LINE_BUFFER:
 IO_CONVERT_ASCII_ADDR:
     MOVE.B  D1,D2           *Move length of address from D1 to D2    
 
-*puts final converted address into D3
+* Puts final converted address into D3
 IO_LOOP: 
      MOVE.B    (A1)+, D1
      JSR IO_AS2HEX          *Go to conversion loop for each digit
@@ -148,7 +146,7 @@ IO_LOOP:
      RTS
 
 
-*Checks that the start address is an even number
+* Checks that the start address is an even number
 IO_CHECK_EVEN_START_ADDRESS:
      MOVE.L   D3, D4
      ANDI.B   #$1, D4
@@ -156,7 +154,7 @@ IO_CHECK_EVEN_START_ADDRESS:
      BEQ      IO_ADDRESS_ODD_PRINT_ERROR_MSSG
      BRA      IO_STORE_START
 
-*Checks that the ending address is an even number
+* Checks that the ending address is an even number
 IO_CHECK_EVEN_END_ADDRESS:
      MOVE.L   D3, D4
      ANDI.B   #$1, D4
@@ -164,14 +162,14 @@ IO_CHECK_EVEN_END_ADDRESS:
      BEQ      IO_ADDRESS_ODD_PRINT_ERROR_MSSG
      BRA      IO_STORE_END
      
-*Prints odd address error message and returns main
+* Prints odd address error message and returns main
 IO_ADDRESS_ODD_PRINT_ERROR_MSSG:
      LEA   IO_ODD_ERROR_MSSG, A1
      MOVE.B   #14, D0
      TRAP     #15
      BRA   DISPLAY_AND_PROMPT_FOR_INPUT
      
-*Checks to see that address is after starting address
+* Checks to see that address is after starting address
 IO_CHECK_ENDING_ADDR:
      CLR.L    D2
      CLR.L    D3
@@ -312,7 +310,7 @@ IO_CLEAR_SCREEN:
         MOVE.B    #25, D6                          *Restart loop counter
         BRA       DISPLAY_LINE_BUFFER
 
-*IO CONSTANTS
+* IO CONSTANTS
 IO_OPEN     DC.B    ' ____ ____ ____ ', CR, LF 
          DC.B    '||6 |||8 |||k ||', CR, LF
          DC.B    '||__|||__|||__||', CR, LF
@@ -332,7 +330,7 @@ IO_LOAD_MORE_DATA_TO_SCREEN    DC.B    'Press enter to load more data...', CR, L
 IO_NEW_LINE    DC.B   '', CR, LF, 0
 IO_INVALID_CHARACTER_ERROR_MSG    DC.B    'Invalid character entered.', CR, LF, 0
 
-**IO VARIABLES
+* IO VARIABLES
 IO_LINE_BUF     DS.B    80
 IO_DISPLAY_LOOP_COUNTER    DS.B  1
 IO_CURR_ADDR    DS.L    1
@@ -347,7 +345,7 @@ IO_CURR_ADDR    DS.L    1
 *|       ||   |      |     |_ |       ||       ||   |___ 
 *|_______||___|      |_______||_______||______| |_______|
 
-*Address where opcode is to decode is in D4
+* Address where opcode is to decode is in D4
 * A0 is line buffer
 OP_DETERMINE_OP_CODE:
 
@@ -364,7 +362,7 @@ OP_DECODER:
     JSR         0(A5,D0) 
     RTS                  *jumps back to READ_IN_AND_PROCESS
     
-*ORI.B, ORI.W, ORI.L, BCLR.B, BCLS.L, CMPI.B, CMPI.W, CMPI.I
+* ORI.B, ORI.W, ORI.L, BCLR.B, BCLS.L, CMPI.B, CMPI.W, CMPI.I
 OP_Code0000:
     * BCLR?
     MOVE.W      D4,D1
@@ -475,7 +473,7 @@ OP_Code0000:
         BRA         OP_Done_Decoding
     
 
-*MOVE.B
+* MOVE.B
 OP_Code0001:
     OP_MOVE_B:
          MOVE.B #'M', (A0)+
@@ -489,7 +487,7 @@ OP_Code0001:
          MOVEQ #1, D3
          BRA         OP_Done_Decoding 
     
-*MOVE.L, MOVEA.L
+* MOVE.L, MOVEA.L
 OP_Code0010:
     *If equal after bit mask, then MOVEA.L, else, MOVE.L
     MOVE.W      D4,D1
@@ -524,7 +522,7 @@ OP_Code0010:
          MOVEQ #2, D3
          BRA         OP_Done_Decoding      
 
-*MOVE.W, MOVEA.W
+* MOVE.W, MOVEA.W
 OP_Code0011:
  *If equal after bit mask, then MOVEA.L, else, MOVE.L
     MOVE.W      D4,D1
@@ -559,7 +557,7 @@ OP_Code0011:
          MOVEQ #3, D3
          BRA         OP_Done_Decoding 
 
-*NOP, JSR, RTS, NEG.B, NEG.W, NEG.L, LEA.L, MOVEM.W*, MOVEM.L*
+* NOP, JSR, RTS, NEG.B, NEG.W, NEG.L, LEA.L, MOVEM.W*, MOVEM.L*
 OP_Code0100:
     * is it NOP?
     MOVE.W      D4,D1
@@ -744,7 +742,7 @@ OP_Code0100:
                 MOVEQ #3, D3
                 BRA         OP_Done_Decoding
         
-*SUBQ.B, SUBQ.W, SUBQ.L
+* SUBQ.B, SUBQ.W, SUBQ.L
 OP_Code0101:
     MOVE.W      D4,D1
     ANDI.W      #$01C0,D1 
@@ -793,7 +791,7 @@ OP_Code0101:
         MOVEQ #2, D3
         BRA         OP_Done_Decoding
 
-*BCS, BGE, BLT, BVC, BRA
+* BCS, BGE, BLT, BVC, BRA
 OP_Code0110:
     MOVE.W      D4,D1
     ANDI.W      #$0F00,D1
@@ -860,7 +858,7 @@ OP_Code0110:
 OP_Code0111:
     BRA         OP_NOT_FOUND_ERROR
 
-*DIVS.W, OR.B*, OR.W*, OR.L*
+* DIVS.W, OR.B*, OR.W*, OR.L*
 OP_Code1000:
     MOVE.W      D4,D1
     ANDI.W      #$01C0,D1  
@@ -1430,7 +1428,7 @@ OP_1110_MemoryShifts:
         MOVEQ #8, D2
         BRA         OP_Done_Decoding
 
-****NOT USED!!!
+***NOT USED!!!
 OP_Code1111:
     BRA         OP_NOT_FOUND_ERROR
 
@@ -1484,7 +1482,7 @@ OP_jmp_table
 *|_______||___|    |___|      |__| |__||______| |______| |___|  |_|
 
 
-***************************** Main Method for EA
+**************************** Main Method for EA
 * D2 = EA Case Code
 * D3 = Size of Operation
 EA_DECODE:
@@ -1588,7 +1586,7 @@ EA_DECODE:
     RTS
 
 
-***** Case 1 includes:
+**** Case 1 includes:
 *       MOVE, MOVEA
 EA_DECODE_CASE1:
     MOVEM.L PARAMS, -(A7)
@@ -1629,7 +1627,7 @@ EA_DECODE_CASE1:
     MOVEM.L (A7)+, PARAMS
     RTS
 
-***** Case 2 includes:
+**** Case 2 includes:
 EA_DECODE_CASE2:
     MOVEM.L PARAMS, -(A7)
     * D3 Stores OpMode
@@ -2016,76 +2014,180 @@ EA_DECODE_CASE11:
     
 EA_DECODE_CASE12:
     MOVEM.L PARAMS, -(A7)
+
+    * get the register mask list word.
+    MOVE.L #1, D6
+    JSR EA_GetData
+    MOVE.L D2, D1               * reg mask list in D1
     
     * get direction of transfer (dr field)
-    MOVE.L #$10, D6   * shift
-    MOVE.L #$1, D7   * keep
+    MOVE.L #10, D6     * shift
+    MOVE.L #1, D7      * keep
     JSR EA_ShiftAndMask
-    MOVE.L D2, D3
-    
-    *if dr == 0, --> register to memory (push)
-    *if dr == 1, --> memory to register (pop)
+    MOVE.L D2, D3               * dr field D3
+
+    * get the EA mode
+    MOVE.L #3, D6       * shift
+    MOVE.L #3, D7       * keep
+    JSR EA_ShiftAndMask
+    MOVE.L D2, D5               * EA Mode D5
+
+    * get the EA register
+    MOVE.L #0, D6   * shift
+    MOVE.L #3, D7   * keep
+    JSR EA_ShiftAndMask
+    MOVE.L D2, D6               * EA register D6
+
+    * determine if PreDec mode
+    CMP.B #4, D5
+    BEQ EA_DECODE_CASE12_PreDec
+    BRA EA_DECODE_CASE12_Default
+
+    EA_DECODE_CASE12_PreDec:
+        MOVE.L #1, D0
+        BRA EA_DECODE_CASE12_PreEnd
+    EA_DECODE_CASE12_Default:
+        MOVE.L #0, D0
+    EA_DECODE_CASE12_PreEnd:
+
+    * 0 = push, 1 = pop
+    * if the mode is push, then 
     CMP.B #1, D3
-    *BEQ EA_DECODE_CASE12_MemToReg
-    BRA EA_DECODE_CASE12_RegToMem
+    BEQ EA_DECODE_CASE12_Pop
+    BRA EA_DECODE_CASE12_Push
     
-    *Put D3 (dr) into D7 when calling EA_RegList
-    
-    *register to memory (push)
-    EA_DECODE_CASE12_RegToMem:
-        MOVE.L D3, D7
-        JSR EA_PrintRegList
+    * register to memory (push)
+    EA_DECODE_CASE12_Push:
+        MOVEM.L PARAMS, -(A7)
+            MOVE.L D1, D6
+            MOVE.L D0, D7
+            JSR EA_PrintRegList
+        MOVEM.L (A7)+, PARAMS
+
         JSR EA_PrintCommaSpace
+
+        MOVE.L D6, D7
+        MOVE.L D5, D6
         JSR EA_HandleOperand
-        BRA EA_DECODE_CASE12_END
-    
-*    *memory to register (pop)
-*    EA_DECODE_CASE12_MemToReg:
-*        MOVE.L D3, D7
-*        JSR EA_HandleOperand
-*        JSR EA_PrintCommaSpace
-*        JSR EA_PrintRegList
-*        BRA EA_DECODE_CASE12_END
-    
-    EA_DECODE_CASE12_END:
+
+        BRA EA_DECODE_CASE12_EndIf
+    * memory to register (pop)
+    EA_DECODE_CASE12_Pop:
+        MOVE.L D6, D7
+        MOVE.L D5, D6
+        JSR EA_HandleOperand
+
+        JSR EA_PrintCommaSpace
+
+        MOVE.L D0, D7
+        MOVE.L D1, D6
+        JSR EA_PrintRegList
+
+        BRA EA_DECODE_CASE12_EndIf
+    EA_DECODE_CASE12_EndIf:
+
+
     MOVEM.L (A7)+, PARAMS
     RTS
 
-* D7 = 0 if (push) predec mode, d0-d7,a0-a7, 16->0
-* D7 = 1 if (pop) postdec mode, a7-a0,d7-d0, 16->0
+* D6 = register mask list word
+* D7 = 1 if PreDec mode.
 EA_PrintRegList:
     MOVEM.L PARAMS, -(A7)
-    *if pop(D7) == 0
+
+    MOVE.L D6, D3       * reg list word in D3
+
+    * if 0, then default. if 1, then PreDec.
     CMP.B #0, D7
-    *BEQ PrintRegList_Pop
-    BRA PrintRegList_Push
+    BEQ PrintRegList_Default
+    BRA PrintRegList_PreDec
 
-    *PrintRegList_Pop:
+    PrintRegList_Default:
 
-    PrintRegList_Push:
-        *read the next byte
-        CLR.L D0
-        MOVE.L #1, D6
-        JSR EA_GetData
+        ; setup block for pop parsing
+        *MOVE.L D2, D3    * reg list byte in D3
+        MOVE.L #0, D5    * start index
+        MOVE.L #8, D6    * end index
+        MOVE.L #1, D7    * direction of loop movement
+
+        CMP.B #0, D3
+        BNE EA_PrintRegList_Default_Data
+
+        ; roll of the data register values
+        LSR.W #8, D3
+
+        CMP.B #0, D3
+        BNE EA_PrintRegList_Default_Address
+
+        EA_PrintRegList_Default_Data:
+            MOVE.L #'D', D0  * character to print
+            JSR EA_ParseRegMask
+
+            LSR.W #8, D3
+
+            CMP.B #0, D3
+            BNE EA_PrintRegList_Default_Sep
+            BRA EA_PrintRegList_Default_EndIf
+        EA_PrintRegList_Default_Sep:
+            MOVE.B #'/', (A0)+
+        EA_PrintRegList_Default_Address:
+            MOVE.L #'A', D0
+            JSR EA_ParseRegMask
+        EA_PrintRegList_Default_EndIf:
+
+    BRA PrintRegList_EndIf
+
+    PrintRegList_PreDec:
+        **read the register list byte
+        *CLR.L D0
+        *MOVE.L #1, D6
+        *JSR EA_GetData
+
+        ; reverse the reg list mask
+        JSR ReverseBits
         MOVE.L D2, D3
 
-        MOVE.L #0, D5
-        MOVE.L #8, D6
-        MOVE.L #1, D7
-        MOVE.L #'D', D0
-        JSR EA_ParseRegMask
+        ; setup block for push parsing
+        *MOVE.L D2, D3    * reg list byte in D3
+        MOVE.L #0, D5    * start index
+        MOVE.L #8, D6    * end index
+        MOVE.L #1, D7    * direction of loop movement
+
+        CMP.B #0, D3
+        BNE EA_PrintRegList_PreDec_Data
+
+        ; roll of the data register values
+        LSR.W #8, D3
+
+        CMP.B #0, D3
+        BNE EA_PrintRegList_PreDec_Address
+
+        EA_PrintRegList_PreDec_Data:
+            MOVE.L #'D', D0  * character to print
+            JSR EA_ParseRegMask
+
+            LSR.W #8, D3
+
+            CMP.B #0, D3
+            BNE EA_PrintRegList_PreDec_Separator
+            BRA EA_PrintRegList_PreDec_EndIf
+        EA_PrintRegList_PreDec_Separator:
+            MOVE.B #'/', (A0)+
+        EA_PrintRegList_PreDec_Address:
+            MOVE.L #'A', D0
+            JSR EA_ParseRegMask
+        EA_PrintRegList_PreDec_EndIf:
+
     PrintRegList_EndIf:
    
-
-
     MOVEM.L (A7)+, PARAMS
     RTS
 
-*D3 = current word
-*D5 = start index
-*D6 = end index
-*D7 = dr: 1 or -1
-*D0 = ch: 'A' or 'D'
+* D3 = current word
+* D5 = start index
+* D6 = end index
+* D7 = default(1) or Predec(0) *D7 = dr: 1 or -1
+* D0 = ch: 'A' or 'D'
 EA_ParseRegMask:
     MOVEM.L PARAMS, -(A7)
     *D4 = boolean list = false
@@ -2094,6 +2196,13 @@ EA_ParseRegMask:
     MOVE.L #0, D4
     MOVE.L #1, D1
     MOVE.L #0 , D2
+
+    * if dr == 0, then rol mode.
+    * else if dr == 1, then lsr mode.
+    CMP.B #1, D7
+    BEQ EA_ParseRegMask_SkipRol
+        ROL.W #1, D3
+    EA_ParseRegMask_SkipRol:
 
     *D4 = current bit
     *while start != end
@@ -2135,7 +2244,8 @@ EA_ParseRegMask:
                 MOVE.B #'-', (A0)+
                 MOVE.B D0, (A0)+
                 MOVEM.L PARAMS, -(A7) ---> scope
-                    SUB.L D7, D5
+                    *SUB.L D7, D5 * -----------------------------------
+                    SUB.L #1, D5
                     MOVE.L D5, D2
                     MOVE.L #1, D3
                     JSR IO_HEX2ASCII
@@ -2170,9 +2280,20 @@ EA_ParseRegMask:
         * last = cur
         * start ++
         MOVE.L D3, D2
-        ADD.L D7, D5
+        *ADD.L D7, D5 * -----------------------------------
+        ADD.L #1, D5
         MOVEM.L (A7)+, D3 * restore word value
-        LSR.W #1, D3
+
+        CMP.B #1, D7
+        BEQ  EA_PrintModular_Loop_Lsr * do lsr
+        BRA  EA_PrintModular_Loop_Rol * do rol
+
+        EA_PrintModular_Loop_Lsr:
+            LSR.W #1, D3
+            BRA EA_PrintModular_Loop_End
+        EA_PrintModular_Loop_Rol:
+            ROL.W #1, D3
+        EA_PrintModular_Loop_End:
 
         BRA EA_PrintModular_LoopStart
     EA_PrintModular_LoopDone:
@@ -2186,11 +2307,36 @@ EA_ParseRegMask:
         MOVE.B D0, (A0)+
         MOVEM.L PARAMS, -(A7) * ----> scope
             MOVE.L D6, D2
-            SUB.L D7, D2
+            *SUB.L D7, D2  * -----------------------------------
+            SUB.L #1, D2
             MOVE.L #1, D3
             JSR IO_HEX2ASCII
         MOVEM.L (A7)+, PARAMS * <---- end scope
     EA_PrintModular_ListSkip:
+
+    MOVEM.L (A7)+, PARAMS
+    RTS
+
+
+*D3 = word
+* returns in D2
+ReverseBits:
+    MOVEM.L PARAMS, -(A7)
+    * counter = 16
+    MOVE.L #16, D0
+
+    LoopStart:
+    CMP.B #0, D0
+    BEQ LoopDone
+        LSL.W #1, D2
+        LSR.W #1, D3
+        BCC AddZero
+        ADD.W #1, D2
+        AddZero:
+
+        SUB.B #1, D0
+        BRA LoopStart
+    LoopDone:
 
     MOVEM.L (A7)+, PARAMS
     RTS
@@ -2341,6 +2487,7 @@ EA_WordAddr:
     MOVEM.L (A7)+, PARAMS
     RTS
 
+* no arguments
 EA_LongWordAddr:
     MOVEM.L PARAMS, -(A7)
 
@@ -2487,7 +2634,7 @@ EA_SIZE         DS.B    1
     END    START        ; last line of source
 
 
-*~Font name~Courier New~
-*~Font size~10~
-*~Tab type~1~
-*~Tab size~4~
+~Font name~Courier New~
+~Font size~10~
+~Tab type~1~
+~Tab size~4~
