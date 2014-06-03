@@ -344,9 +344,12 @@ IO_CURR_ADDR    DS.L    1
 *|  |_|  ||    ___|  |      _||  |_|  || |_|   ||    ___|
 *|       ||   |      |     |_ |       ||       ||   |___ 
 *|_______||___|      |_______||_______||______| |_______|
-
-* Address where opcode is to decode is in D4
-* A0 is line buffer
+*********************************************************
+* @Params:  Address where opcode is to decode is in D4
+*           A0 is line buffer
+* @Returns: EA case in D2
+*           EA size in D3
+*********************************************************
 OP_DETERMINE_OP_CODE:
 
 OP_DECODER:
@@ -2638,3 +2641,8 @@ EA_SIZE         DS.B    1
 ~Font size~10~
 ~Tab type~1~
 ~Tab size~4~
+
+*~Font name~Courier New~
+*~Font size~10~
+*~Tab type~1~
+*~Tab size~4~
