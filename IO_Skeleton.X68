@@ -1492,99 +1492,99 @@ EA_DECODE:
     * To save d reg space, move: 
     *       EA_Case into (A3)
     *       EA_Size into (A4)
-    LEA						EA_CASE, A3
-    LEA						EA_SIZE, A4
-    MOVE.B					D2, (A3)
-    MOVE.B					D3, (A4)
+    LEA                     EA_CASE, A3
+    LEA                     EA_SIZE, A4
+    MOVE.B                  D2, (A3)
+    MOVE.B                  D3, (A4)
 
     * IF case == 1:
-    CMP.B					#1, (A3)
-    BEQ						EA_DECODE_BranchCase1
+    CMP.B                   #1, (A3)
+    BEQ                     EA_DECODE_BranchCase1
     * If case == 2:
-    CMP.B					#2, (A3)
-    BEQ						EA_DECODE_BranchCase2
+    CMP.B                   #2, (A3)
+    BEQ                     EA_DECODE_BranchCase2
     * if case ==3:
-    CMP.B					#3, (A3)
-    BEQ						EA_DECODE_BranchCase3
+    CMP.B                   #3, (A3)
+    BEQ                     EA_DECODE_BranchCase3
     * if case == 4:
-    CMP.B					#4, (A3)
-    BEQ						EA_DECODE_BranchCase4
+    CMP.B                   #4, (A3)
+    BEQ                     EA_DECODE_BranchCase4
     * if case == 5
-    CMP.B					#5, (A3)
-    BEQ						EA_DECODE_BranchCase5
+    CMP.B                   #5, (A3)
+    BEQ                     EA_DECODE_BranchCase5
     * if case == 6
-    CMP.B					#6, (A3)
-    BEQ						EA_DECODE_BranchCase6
+    CMP.B                   #6, (A3)
+    BEQ                     EA_DECODE_BranchCase6
     * if case == 7
-    CMP.B					#7, (A3)
-    BEQ						EA_DECODE_BranchCase7
+    CMP.B                   #7, (A3)
+    BEQ                     EA_DECODE_BranchCase7
     * if case == 8
-    CMP.B					#8, (A3)
-    BEQ						EA_DECODE_BranchCase8
+    CMP.B                   #8, (A3)
+    BEQ                     EA_DECODE_BranchCase8
     * if case == 9
-    CMP.B					#9, (A3)
-    BEQ						EA_DECODE_BranchCase9
+    CMP.B                   #9, (A3)
+    BEQ                     EA_DECODE_BranchCase9
     * if case == 10
-    CMP.B					#10, (A3)
-    BEQ						EA_DECODE_BranchCase10
+    CMP.B                   #10, (A3)
+    BEQ                     EA_DECODE_BranchCase10
     * if case == 11
-    CMP.B					#11, (A3)
-    BEQ						EA_DECODE_BranchCase11
+    CMP.B                   #11, (A3)
+    BEQ                     EA_DECODE_BranchCase11
     * if case == 12
-    CMP.B					#12, (A3)
-    BEQ						EA_DECODE_BranchCase12
+    CMP.B                   #12, (A3)
+    BEQ                     EA_DECODE_BranchCase12
 
     * IF CAse is anything else
-    BRA						EA_DECODE_UnsupportedCase
+    BRA                     EA_DECODE_UnsupportedCase
 
     EA_DECODE_BranchCase1:
-        JSR						EA_DECODE_CASE1
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE1
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_BranchCase2:
-        JSR						EA_DECODE_CASE2
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE2
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_BranchCase3:
-        JSR						EA_DECODE_CASE3
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE3
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_BranchCase4:
-        JSR						EA_DECODE_CASE4
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE4
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_BranchCase5:
-        JSR						EA_DECODE_CASE5
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE5
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_BranchCase6:
-        JSR						EA_DECODE_CASE6
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE6
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_BranchCase7:
-        JSR						EA_DECODE_CASE7
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE7
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_BranchCase8:
-        JSR						EA_DECODE_CASE8
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE8
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_BranchCase9:
-        JSR						EA_DECODE_CASE9
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE9
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_BranchCase10:
-        JSR						EA_DECODE_CASE10
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE10
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_BranchCase11:
-        JSR						EA_DECODE_CASE11
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE11
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_BranchCase12:
-        JSR						EA_DECODE_CASE12
-        BRA						EA_DECODE_EndIf
+        JSR                     EA_DECODE_CASE12
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_UnsupportedCase:
-        MOVE.B					#$4E, (A0)+ * 'N'
-        MOVE.B					#$4F, (A0)+ * 'O'
-        MOVE.B					#$20, (A0)+ * ' '
-        MOVE.B					#$45, (A0)+ * 'E'
-        MOVE.B					#$41, (A0)+ * 'A'
-        MOVE.B					#$20, (A0)+ * ' '
-        MOVE.B					(A3), D2
-        MOVE.L					#2, D3
-        JSR						IO_HEX2ASCII
+        MOVE.B                  #$4E, (A0)+ * 'N'
+        MOVE.B                  #$4F, (A0)+ * 'O'
+        MOVE.B                  #$20, (A0)+ * ' '
+        MOVE.B                  #$45, (A0)+ * 'E'
+        MOVE.B                  #$41, (A0)+ * 'A'
+        MOVE.B                  #$20, (A0)+ * ' '
+        MOVE.B                  (A3), D2
+        MOVE.L                  #2, D3
+        JSR                     IO_HEX2ASCII
 
-        BRA						EA_DECODE_EndIf
+        BRA                     EA_DECODE_EndIf
     EA_DECODE_EndIf:
     RTS
 
@@ -1592,224 +1592,224 @@ EA_DECODE:
 **** Case 1 includes:
 *       MOVE, MOVEA
 EA_DECODE_CASE1:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
     * get source mode ===============
-    MOVE.L					#$00000003, D6 * shift
-    MOVE.L					#$00000003, D7 * keep
-    JSR						EA_ShiftAndMask
-    MOVE.L					D2, D5
+    MOVE.L                  #$00000003, D6 * shift
+    MOVE.L                  #$00000003, D7 * keep
+    JSR                     EA_ShiftAndMask
+    MOVE.L                  D2, D5
 
     * get source register
-    MOVE.L					#$00000000, D6 * shift
-    MOVE.L					#$00000003, D7 * keep
-    JSR						EA_ShiftAndMask
+    MOVE.L                  #$00000000, D6 * shift
+    MOVE.L                  #$00000003, D7 * keep
+    JSR                     EA_ShiftAndMask
     
-    MOVE.L					D5, D6
-    MOVE.L					D2, D7
+    MOVE.L                  D5, D6
+    MOVE.L                  D2, D7
 
     * HandleOperand(src=d6, reg=d7)
-    JSR						EA_HandleOperand
+    JSR                     EA_HandleOperand
 
-    JSR						EA_PrintCommaSpace
+    JSR                     EA_PrintCommaSpace
 
     * Get dest mode =================
-    MOVE.L					#$00000006, D6 * shift
-    MOVE.L					#$00000003, D7 * keep
-    JSR						EA_ShiftAndMask
-    MOVE.L					D2, D5
+    MOVE.L                  #$00000006, D6 * shift
+    MOVE.L                  #$00000003, D7 * keep
+    JSR                     EA_ShiftAndMask
+    MOVE.L                  D2, D5
 
     * get dest register 
-    MOVE.L					#$00000009, D6 * shift
-    MOVE.L					#$00000003, D7 * keep
-    JSR						EA_ShiftAndMask
+    MOVE.L                  #$00000009, D6 * shift
+    MOVE.L                  #$00000003, D7 * keep
+    JSR                     EA_ShiftAndMask
 
-    MOVE.L					D5, D6
-    MOVE.L					D2, D7
-    JSR						EA_HandleOperand
+    MOVE.L                  D5, D6
+    MOVE.L                  D2, D7
+    JSR                     EA_HandleOperand
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 **** Case 2 includes:
 EA_DECODE_CASE2:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
     * D3 Stores OpMode
     * D5 Stores Register
     * D6 Stores EA Mode
     * D7 Store EA Register
 
     *Retrieve register bits
-    MOVEM.L					PARAMS, -(A7)  * scope -->
-    MOVE.L					#$00000009, D6   * shift
-    MOVE.L					#$00000003, D7   * keep
-    JSR						EA_ShiftAndMask
-    MOVEM.L					(A7)+, PARAMS  * end scope <--
-    MOVE.L					D2, D5
+    MOVEM.L                 PARAMS, -(A7)  * scope -->
+    MOVE.L                  #$00000009, D6   * shift
+    MOVE.L                  #$00000003, D7   * keep
+    JSR                     EA_ShiftAndMask
+    MOVEM.L                 (A7)+, PARAMS  * end scope <--
+    MOVE.L                  D2, D5
 
     *Retrieve EA Mode
-    MOVEM.L					PARAMS, -(A7)  * scope -->
-    MOVE.L					#$00000003, D6   * shift
-    MOVE.L					#$00000003, D7   * keep
-    JSR						EA_ShiftAndMask
-    MOVEM.L					(A7)+, PARAMS  * end scope <--
-    MOVE.L					D2, D6
+    MOVEM.L                 PARAMS, -(A7)  * scope -->
+    MOVE.L                  #$00000003, D6   * shift
+    MOVE.L                  #$00000003, D7   * keep
+    JSR                     EA_ShiftAndMask
+    MOVEM.L                 (A7)+, PARAMS  * end scope <--
+    MOVE.L                  D2, D6
 
     *Retrieve EA register
-    MOVEM.L					PARAMS, -(A7)  * scope -->
-    MOVE.B					#$00000000, D6   * shift
-    MOVE.B					#$00000003, D7   * keep
-    JSR						EA_ShiftAndMask
-    MOVEM.L					(A7)+, PARAMS  * end scope <--
-    MOVE.L					D2, D7
+    MOVEM.L                 PARAMS, -(A7)  * scope -->
+    MOVE.B                  #$00000000, D6   * shift
+    MOVE.B                  #$00000003, D7   * keep
+    JSR                     EA_ShiftAndMask
+    MOVEM.L                 (A7)+, PARAMS  * end scope <--
+    MOVE.L                  D2, D7
 
     *Retrieve OpMode
-    MOVEM.L					PARAMS, -(A7)  * scope -->
-    MOVE.L					#00000006, D6   * shift
-    MOVE.L					#00000003, D7   * keep
-    JSR						EA_ShiftAndMask
-    MOVEM.L					(A7)+, PARAMS  * end scope <--
-    MOVE.L					D2, D3
+    MOVEM.L                 PARAMS, -(A7)  * scope -->
+    MOVE.L                  #00000006, D6   * shift
+    MOVE.L                  #00000003, D7   * keep
+    JSR                     EA_ShiftAndMask
+    MOVEM.L                 (A7)+, PARAMS  * end scope <--
+    MOVE.L                  D2, D3
 
     * Opmode --> D3
     * if op mode >= 4, --> Dn + <EA>
 
-    CMPI.B					#4, D3
-    BGE						EA_DECODE_CASE2_IfDnEa
-    BRA						EA_DECODE_CASE2_IfEaDn
+    CMPI.B                  #4, D3
+    BGE                     EA_DECODE_CASE2_IfDnEa
+    BRA                     EA_DECODE_CASE2_IfEaDn
 
     EA_DECODE_CASE2_IfDnEa:
-        MOVEM.L					PARAMS, -(A7)  * scope -->
-        MOVE.B					D5, D7
-        JSR						EA_DirectData
-        MOVEM.L					(A7)+, PARAMS  * end scope <--
+        MOVEM.L                 PARAMS, -(A7)  * scope -->
+        MOVE.B                  D5, D7
+        JSR                     EA_DirectData
+        MOVEM.L                 (A7)+, PARAMS  * end scope <--
 
-        JSR						EA_PrintCommaSpace
-        JSR						EA_HandleOperand
-        BRA						EA_DECODE_CASE2_IfEnd
+        JSR                     EA_PrintCommaSpace
+        JSR                     EA_HandleOperand
+        BRA                     EA_DECODE_CASE2_IfEnd
 
     EA_DECODE_CASE2_IfEaDn:
-        JSR						EA_HandleOperand
-        JSR						EA_PrintCommaSpace
+        JSR                     EA_HandleOperand
+        JSR                     EA_PrintCommaSpace
 
-        MOVEM.L					PARAMS, -(A7)  * scope -->
-        MOVE.B					D5, D7
-        JSR						EA_DirectData
-        MOVEM.L					(A7)+, PARAMS  * end scope <--
-        BRA						EA_DECODE_CASE2_IfEnd
+        MOVEM.L                 PARAMS, -(A7)  * scope -->
+        MOVE.B                  D5, D7
+        JSR                     EA_DirectData
+        MOVEM.L                 (A7)+, PARAMS  * end scope <--
+        BRA                     EA_DECODE_CASE2_IfEnd
     EA_DECODE_CASE2_IfEnd:
     
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 EA_DECODE_CASE3:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
-    MOVE.L					D2, D5
+    MOVE.L                  D2, D5
 
-    JSR						EA_ImmData
-    JSR						EA_PrintCommaSpace
+    JSR                     EA_ImmData
+    JSR                     EA_PrintCommaSpace
 
     *get the ea mode
-    MOVE.L					#3, D6    * shift
-    MOVE.L					#3, D7    * keep
-    JSR						EA_ShiftAndMask
-    MOVE.L					D2, D3
+    MOVE.L                  #3, D6    * shift
+    MOVE.L                  #3, D7    * keep
+    JSR                     EA_ShiftAndMask
+    MOVE.L                  D2, D3
 
     * get the ea register
-    MOVE.L					#0, D6    * shift
-    MOVE.L					#3, D7    * keep
-    JSR						EA_ShiftAndMask
+    MOVE.L                  #0, D6    * shift
+    MOVE.L                  #3, D7    * keep
+    JSR                     EA_ShiftAndMask
 
-    MOVE.L					D3, D6
-    MOVE.L					D2, D7
-    JSR						EA_HandleOperand
+    MOVE.L                  D3, D6
+    MOVE.L                  D2, D7
+    JSR                     EA_HandleOperand
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 EA_DECODE_CASE4:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
     * data is 9 shift, 3 keep.
-    MOVE.L					#$9, D6
-    MOVE.L					#$3, D7
-    JSR						EA_ShiftAndMask
+    MOVE.L                  #$9, D6
+    MOVE.L                  #$3, D7
+    JSR                     EA_ShiftAndMask
 
-    MOVE.L					D2, D7
-    JSR						EA_InstrData
+    MOVE.L                  D2, D7
+    JSR                     EA_InstrData
 
-    JSR						EA_PrintCommaSpace
+    JSR                     EA_PrintCommaSpace
 
     * EA Mode is 3 shift, 3 keep.
-    MOVE.L					#3, D6
-    MOVE.L					#3, D7
-    JSR						EA_ShiftAndMask
-    MOVE.L					D2, D3       * temp store D3
+    MOVE.L                  #3, D6
+    MOVE.L                  #3, D7
+    JSR                     EA_ShiftAndMask
+    MOVE.L                  D2, D3       * temp store D3
 
     * EA Register is 0 shift, 3 keep.
-    MOVE.L					#0, D6
-    MOVE.L					#3, D7
-    JSR						EA_ShiftAndMask
+    MOVE.L                  #0, D6
+    MOVE.L                  #3, D7
+    JSR                     EA_ShiftAndMask
 
     * call handle operand
-    MOVE.L					D3, D6
-    MOVE.L					D2, D7
-    JSR						EA_HandleOperand
+    MOVE.L                  D3, D6
+    MOVE.L                  D2, D7
+    JSR                     EA_HandleOperand
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 EA_DECODE_CASE5:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
-    * EA					Mode is 3 shift, 3 keep.
-    MOVE.L					#3, D6
-    MOVE.L					#3, D7
-    JSR						EA_ShiftAndMask
-    MOVE.L					D2, D3       * temp store D3
+    * EA                    Mode is 3 shift, 3 keep.
+    MOVE.L                  #3, D6
+    MOVE.L                  #3, D7
+    JSR                     EA_ShiftAndMask
+    MOVE.L                  D2, D3       * temp store D3
 
     * EA Register is 0 shift, 3 keep.
-    MOVE.L					#0, D6
-    MOVE.L					#3, D7
-    JSR						EA_ShiftAndMask
+    MOVE.L                  #0, D6
+    MOVE.L                  #3, D7
+    JSR                     EA_ShiftAndMask
 
-    MOVE.L					D3, D6
-    MOVE.L					D2, D7
-    JSR						EA_HandleOperand
+    MOVE.L                  D3, D6
+    MOVE.L                  D2, D7
+    JSR                     EA_HandleOperand
 
-    JSR						EA_PrintCommaSpace
+    JSR                     EA_PrintCommaSpace
 
     * Address Register is 9 shift, 3 keep.
-    MOVE.L					#9, D6
-    MOVE.L					#3, D7
-    JSR						EA_ShiftAndMask
+    MOVE.L                  #9, D6
+    MOVE.L                  #3, D7
+    JSR                     EA_ShiftAndMask
 
-    MOVE.L					D2, D7
-    JSR						EA_DirectAddress
+    MOVE.L                  D2, D7
+    JSR                     EA_DirectAddress
     
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 EA_DECODE_CASE6:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
     
     * Mode is 3 shift, 3 keep
-    MOVE.L					#3, D6
-    MOVE.L					#3, D7
-    JSR						EA_ShiftAndMask
-    MOVE.L					D2, D3   *temp store D3
+    MOVE.L                  #3, D6
+    MOVE.L                  #3, D7
+    JSR                     EA_ShiftAndMask
+    MOVE.L                  D2, D3   *temp store D3
     
     *Register is 0 shift, 3 keep
-    MOVE.L					#0, D6
-    MOVE.L					#3, D7
-    JSR						EA_ShiftAndMask
+    MOVE.L                  #0, D6
+    MOVE.L                  #3, D7
+    JSR                     EA_ShiftAndMask
     
     *call handle operand
-    MOVE.L					D3, D6
-    MOVE.L					D2, D7
-    JSR						EA_HandleOperand
+    MOVE.L                  D3, D6
+    MOVE.L                  D2, D7
+    JSR                     EA_HandleOperand
     
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 EA_DECODE_CASE7:
@@ -1817,366 +1817,366 @@ EA_DECODE_CASE7:
     * D6 Stores EA Mode
     * D7 Store EA Register
 
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
     *Retrieve EA Mode
-    MOVEM.L					PARAMS, -(A7)  * scope -->
-    MOVE.L					#$00000003, D6   * shift
-    MOVE.L					#$00000003, D7   * keep
-    JSR						EA_ShiftAndMask
-    MOVEM.L					(A7)+, PARAMS  * end scope <--
-    MOVE.L					D2, D6
+    MOVEM.L                 PARAMS, -(A7)  * scope -->
+    MOVE.L                  #$00000003, D6   * shift
+    MOVE.L                  #$00000003, D7   * keep
+    JSR                     EA_ShiftAndMask
+    MOVEM.L                 (A7)+, PARAMS  * end scope <--
+    MOVE.L                  D2, D6
 
     *Retrieve EA register
-    MOVEM.L					PARAMS, -(A7)  * scope -->
-    MOVE.B					#$00000000, D6   * shift
-    MOVE.B					#$00000003, D7   * keep
-    JSR						EA_ShiftAndMask
-    MOVEM.L					(A7)+, PARAMS  * end scope <--
-    MOVE.L					D2, D7
+    MOVEM.L                 PARAMS, -(A7)  * scope -->
+    MOVE.B                  #$00000000, D6   * shift
+    MOVE.B                  #$00000003, D7   * keep
+    JSR                     EA_ShiftAndMask
+    MOVEM.L                 (A7)+, PARAMS  * end scope <--
+    MOVE.L                  D2, D7
 
-    JSR						EA_HandleOperand
-    JSR						EA_PrintCommaSpace
+    JSR                     EA_HandleOperand
+    JSR                     EA_PrintCommaSpace
 
     *Retrieve register bits
-    MOVEM.L					PARAMS, -(A7)  * scope -->
-    MOVE.L					#$00000009, D6   * shift
-    MOVE.L					#$00000003, D7   * keep
-    JSR						EA_ShiftAndMask
-    MOVEM.L					(A7)+, PARAMS  * end scope <--
-    MOVE.L					D2, D7
+    MOVEM.L                 PARAMS, -(A7)  * scope -->
+    MOVE.L                  #$00000009, D6   * shift
+    MOVE.L                  #$00000003, D7   * keep
+    JSR                     EA_ShiftAndMask
+    MOVEM.L                 (A7)+, PARAMS  * end scope <--
+    MOVE.L                  D2, D7
 
-    JSR						EA_DirectData
+    JSR                     EA_DirectData
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 EA_DECODE_CASE8:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
     * get the size to determine whether
     * two operands, or one
-    MOVE.L					#6, D6 * shift
-    MOVE.L					#2, D7 * keep
-    JSR						EA_ShiftAndMask
+    MOVE.L                  #6, D6 * shift
+    MOVE.L                  #2, D7 * keep
+    JSR                     EA_ShiftAndMask
 
-    CMP.B					#3, D2
-    BLT						EA_DECODE_CASE8_TwoOperands
-    BRA						EA_DECODE_CASE8_OneOperand
+    CMP.B                   #3, D2
+    BLT                     EA_DECODE_CASE8_TwoOperands
+    BRA                     EA_DECODE_CASE8_OneOperand
 
     EA_DECODE_CASE8_TwoOperands:
 
         * read i/r bit
-        MOVE.L					#$5, D6   * shift
-        MOVE.L					#$1, D7   * keep
-        JSR						EA_ShiftAndMask
-        MOVE.L					D2, D3
+        MOVE.L                  #$5, D6   * shift
+        MOVE.L                  #$1, D7   * keep
+        JSR                     EA_ShiftAndMask
+        MOVE.L                  D2, D3
 
         * read reg/count
-        MOVE.L					#9, D6 * shift
-        MOVE.L					#3, D7 * keep
-        JSR						EA_ShiftAndMask
-        MOVE.L					D2, D7
+        MOVE.L                  #9, D6 * shift
+        MOVE.L                  #3, D7 * keep
+        JSR                     EA_ShiftAndMask
+        MOVE.L                  D2, D7
 
         *if i/r == 0, --> immediate data
-        CMP.B					#1, D3
-        BEQ						EA_DECODE_CASE8_Two_Reg
-        BRA						EA_DECODE_CASE8_Two_Instr
+        CMP.B                   #1, D3
+        BEQ                     EA_DECODE_CASE8_Two_Reg
+        BRA                     EA_DECODE_CASE8_Two_Instr
 
         EA_DECODE_CASE8_Two_Reg:
-            JSR						EA_DirectData
-            BRA						EA_DECODE_CASE8_Two_RegInstrEnd
+            JSR                     EA_DirectData
+            BRA                     EA_DECODE_CASE8_Two_RegInstrEnd
         EA_DECODE_CASE8_Two_Instr:
-            JSR						EA_InstrData
-            BRA						EA_DECODE_CASE8_Two_RegInstrEnd
+            JSR                     EA_InstrData
+            BRA                     EA_DECODE_CASE8_Two_RegInstrEnd
         EA_DECODE_CASE8_Two_RegInstrEnd:
 
-        JSR						EA_PrintCommaSpace
+        JSR                     EA_PrintCommaSpace
 
         * Get register bits
-        MOVE.L					#0, D6 * shift
-        MOVE.L					#3, D7 * keep
-        JSR						EA_ShiftAndMask
+        MOVE.L                  #0, D6 * shift
+        MOVE.L                  #3, D7 * keep
+        JSR                     EA_ShiftAndMask
 
-        MOVE.L					D2, D7
-        JSR						EA_DirectData
+        MOVE.L                  D2, D7
+        JSR                     EA_DirectData
 
-        BRA						EA_DECODE_CASE8_End
+        BRA                     EA_DECODE_CASE8_End
 
     EA_DECODE_CASE8_OneOperand:
 
         * get EA mode 
-        MOVE.L					#$3, D6 * shift
-        MOVE.L					#$3, D7 * keep
-        JSR						EA_ShiftAndMask
-        MOVE.L					D2, D5
+        MOVE.L                  #$3, D6 * shift
+        MOVE.L                  #$3, D7 * keep
+        JSR                     EA_ShiftAndMask
+        MOVE.L                  D2, D5
 
         * get EA register
-        MOVE.L					#$0, D6 * shift
-        MOVE.L					#$3, D7 * keep
-        JSR						EA_ShiftAndMask
+        MOVE.L                  #$0, D6 * shift
+        MOVE.L                  #$3, D7 * keep
+        JSR                     EA_ShiftAndMask
 
-        MOVE.L					D5, D6
-        MOVE.L					D2, D7
-        JSR						EA_HandleOperand
+        MOVE.L                  D5, D6
+        MOVE.L                  D2, D7
+        JSR                     EA_HandleOperand
 
-        BRA						EA_DECODE_CASE8_End
+        BRA                     EA_DECODE_CASE8_End
 
     EA_DECODE_CASE8_End:
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
     
 EA_DECODE_CASE9:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
     
     *get bit 8 to determine mode
-    MOVE.L					#8, D6 *shift 8
-    MOVE.L					#1, D7 *keep 3
-    JSR						EA_ShiftAndMask
+    MOVE.L                  #8, D6 *shift 8
+    MOVE.L                  #1, D7 *keep 3
+    JSR                     EA_ShiftAndMask
     
     *if bit is 1, format is Dn, <ea>
     * if 0, #<data>, <ea>
-    CMP.L					#1, D2
-    BEQ						EA_DECODE_CASE9_IfRegister
-    BRA						EA_DECODE_CASE9_IfImmediate
+    CMP.L                   #1, D2
+    BEQ                     EA_DECODE_CASE9_IfRegister
+    BRA                     EA_DECODE_CASE9_IfImmediate
     
     EA_DECODE_CASE9_IfRegister:
     
         *get register
-        MOVE.L					#9, D6 *shift 9
-        MOVE.L					#3, D7 *keep 3
-        JSR						EA_ShiftAndMask
-        MOVE.L					D2, D7
-        JSR						EA_DirectData
-        BRA						EA_DECODE_CASE9_EA_PARAMETER
+        MOVE.L                  #9, D6 *shift 9
+        MOVE.L                  #3, D7 *keep 3
+        JSR                     EA_ShiftAndMask
+        MOVE.L                  D2, D7
+        JSR                     EA_DirectData
+        BRA                     EA_DECODE_CASE9_EA_PARAMETER
     
     
     EA_DECODE_CASE9_IfImmediate:
-        MOVE.B					#3, (A4)
-        JSR						EA_ImmData    
+        MOVE.B                  #3, (A4)
+        JSR                     EA_ImmData    
     
     EA_DECODE_CASE9_EA_PARAMETER:
-        JSR						EA_PrintCommaSpace
+        JSR                     EA_PrintCommaSpace
     
         * get EA mode 
-        MOVE.L					#$3, D6 * shift
-        MOVE.L					#$3, D7 * keep
-        JSR						EA_ShiftAndMask
-        MOVE.L					D2, D5
+        MOVE.L                  #$3, D6 * shift
+        MOVE.L                  #$3, D7 * keep
+        JSR                     EA_ShiftAndMask
+        MOVE.L                  D2, D5
 
         * get EA register
-        MOVE.L					#$0, D6 * shift
-        MOVE.L					#$3, D7 * keep
-        JSR						EA_ShiftAndMask
+        MOVE.L                  #$0, D6 * shift
+        MOVE.L                  #$3, D7 * keep
+        JSR                     EA_ShiftAndMask
 
-        MOVE.L					D5, D6
-        MOVE.L					D2, D7
-        JSR						EA_HandleOperand
+        MOVE.L                  D5, D6
+        MOVE.L                  D2, D7
+        JSR                     EA_HandleOperand
 
-        BRA						EA_DECODE_CASE9_End
+        BRA                     EA_DECODE_CASE9_End
     
     EA_DECODE_CASE9_End:
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 EA_DECODE_CASE10:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
     * get the 8-bit displacement value
-    MOVE.L					#0, D6    * shift
-    MOVE.L					#8, D7    * keep
-    JSR						EA_ShiftAndMask
+    MOVE.L                  #0, D6    * shift
+    MOVE.L                  #8, D7    * keep
+    JSR                     EA_ShiftAndMask
 
     * if it is 00, then 16-bit displacement
     *   as immediate data, else 8-bit
-    CMP.L					#$0, D2
-    BEQ						EA_DECODE_CASE10_If16Bit
-    BRA						EA_DECODE_CASE10_If8Bit
+    CMP.L                   #$0, D2
+    BEQ                     EA_DECODE_CASE10_If16Bit
+    BRA                     EA_DECODE_CASE10_If8Bit
 
     EA_DECODE_CASE10_If8Bit:
         * print the displacement
         *data is in D2 already.
-        MOVE.B					#'$', (A0)+
-        MOVE.L					#4, D3
-        JSR						IO_HEX2ASCII
-        BRA						EA_DECODE_CASE10_EndIf
+        MOVE.B                  #'$', (A0)+
+        MOVE.L                  #4, D3
+        JSR                     IO_HEX2ASCII
+        BRA                     EA_DECODE_CASE10_EndIf
     EA_DECODE_CASE10_If16Bit:
         * set the size to word
-        MOVE.B					#3, (A4)
-        JSR						EA_WordAddr
-        BRA						EA_DECODE_CASE10_EndIf
+        MOVE.B                  #3, (A4)
+        JSR                     EA_WordAddr
+        BRA                     EA_DECODE_CASE10_EndIf
     EA_DECODE_CASE10_EndIf:
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 EA_DECODE_CASE11:
     RTS
     
 EA_DECODE_CASE12:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
     * get the register mask list word.
-    MOVE.L					#1, D6
-    JSR						EA_GetData
-    MOVE.L					D2, D1               * reg mask list in D1
+    MOVE.L                  #1, D6
+    JSR                     EA_GetData
+    MOVE.L                  D2, D1               * reg mask list in D1
     
     * get direction of transfer (dr field)
-    MOVE.L					#10, D6     * shift
-    MOVE.L					#1, D7      * keep
-    JSR						EA_ShiftAndMask
-    MOVE.L					D2, D3               * dr field D3
+    MOVE.L                  #10, D6     * shift
+    MOVE.L                  #1, D7      * keep
+    JSR                     EA_ShiftAndMask
+    MOVE.L                  D2, D3               * dr field D3
 
     * get the EA mode
-    MOVE.L					#3, D6       * shift
-    MOVE.L					#3, D7       * keep
-    JSR						EA_ShiftAndMask
-    MOVE.L					D2, D5               * EA Mode D5
+    MOVE.L                  #3, D6       * shift
+    MOVE.L                  #3, D7       * keep
+    JSR                     EA_ShiftAndMask
+    MOVE.L                  D2, D5               * EA Mode D5
 
     * get the EA register
-    MOVE.L					#0, D6   * shift
-    MOVE.L					#3, D7   * keep
-    JSR						EA_ShiftAndMask
-    MOVE.L					D2, D6               * EA register D6
+    MOVE.L                  #0, D6   * shift
+    MOVE.L                  #3, D7   * keep
+    JSR                     EA_ShiftAndMask
+    MOVE.L                  D2, D6               * EA register D6
 
     * determine if PreDec mode
-    CMP.B					#4, D5
-    BEQ						EA_DECODE_CASE12_PreDec
-    BRA						EA_DECODE_CASE12_Default
+    CMP.B                   #4, D5
+    BEQ                     EA_DECODE_CASE12_PreDec
+    BRA                     EA_DECODE_CASE12_Default
 
     EA_DECODE_CASE12_PreDec:
-        MOVE.L					#1, D0
-        BRA						EA_DECODE_CASE12_PreEnd
+        MOVE.L                  #1, D0
+        BRA                     EA_DECODE_CASE12_PreEnd
     EA_DECODE_CASE12_Default:
-        MOVE.L					#0, D0
+        MOVE.L                  #0, D0
     EA_DECODE_CASE12_PreEnd:
 
     * 0 = push, 1 = pop
     * if the mode is push, then 
-    CMP.B					#1, D3
-    BEQ						EA_DECODE_CASE12_Pop
-    BRA						EA_DECODE_CASE12_Push
+    CMP.B                   #1, D3
+    BEQ                     EA_DECODE_CASE12_Pop
+    BRA                     EA_DECODE_CASE12_Push
     
     * register to memory (push)
     EA_DECODE_CASE12_Push:
-        MOVEM.L					PARAMS, -(A7)
-            MOVE.L					D1, D6
-            MOVE.L					D0, D7
-            JSR						EA_PrintRegList
-        MOVEM.L					(A7)+, PARAMS
+        MOVEM.L                 PARAMS, -(A7)
+            MOVE.L                  D1, D6
+            MOVE.L                  D0, D7
+            JSR                     EA_PrintRegList
+        MOVEM.L                 (A7)+, PARAMS
 
-        JSR						EA_PrintCommaSpace
+        JSR                     EA_PrintCommaSpace
 
-        MOVE.L					D6, D7
-        MOVE.L					D5, D6
-        JSR						EA_HandleOperand
+        MOVE.L                  D6, D7
+        MOVE.L                  D5, D6
+        JSR                     EA_HandleOperand
 
-        BRA						EA_DECODE_CASE12_EndIf
+        BRA                     EA_DECODE_CASE12_EndIf
     * memory to register (pop)
     EA_DECODE_CASE12_Pop:
-        MOVE.L					D6, D7
-        MOVE.L					D5, D6
-        JSR						EA_HandleOperand
+        MOVE.L                  D6, D7
+        MOVE.L                  D5, D6
+        JSR                     EA_HandleOperand
 
-        JSR						EA_PrintCommaSpace
+        JSR                     EA_PrintCommaSpace
 
-        MOVE.L					D0, D7
-        MOVE.L					D1, D6
-        JSR						EA_PrintRegList
+        MOVE.L                  D0, D7
+        MOVE.L                  D1, D6
+        JSR                     EA_PrintRegList
 
-        BRA						EA_DECODE_CASE12_EndIf
+        BRA                     EA_DECODE_CASE12_EndIf
     EA_DECODE_CASE12_EndIf:
 
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * D6 = register mask list word
 * D7 = 1 if PreDec mode.
 EA_PrintRegList:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
-    MOVE.L					D6, D3       * reg list word in D3
+    MOVE.L                  D6, D3       * reg list word in D3
 
     * if 0, then default. if 1, then PreDec.
-    CMP.B					#0, D7
-    BEQ						PrintRegList_Default
-    BRA						PrintRegList_PreDec
+    CMP.B                   #0, D7
+    BEQ                     PrintRegList_Default
+    BRA                     PrintRegList_PreDec
 
     PrintRegList_Default:
 
         ; setup block for pop parsing
 
-        MOVE.L					#0, D5    * start index
-        MOVE.L					#8, D6    * end index
-        MOVE.L					#1, D7    * direction of loop movement
+        MOVE.L                  #0, D5    * start index
+        MOVE.L                  #8, D6    * end index
+        MOVE.L                  #1, D7    * direction of loop movement
 
-        CMP.B					#0, D3
-        BNE						EA_PrintRegList_Default_Data
+        CMP.B                   #0, D3
+        BNE                     EA_PrintRegList_Default_Data
 
         ; roll of the data register values
-        LSR.W					#8, D3
+        LSR.W                   #8, D3
 
-        CMP.B					#0, D3
-        BNE						EA_PrintRegList_Default_Address
+        CMP.B                   #0, D3
+        BNE                     EA_PrintRegList_Default_Address
 
         EA_PrintRegList_Default_Data:
-            MOVE.L					#'D', D0  * character to print
-            JSR						EA_ParseRegMask
+            MOVE.L                  #'D', D0  * character to print
+            JSR                     EA_ParseRegMask
 
-            LSR.W					#8, D3
+            LSR.W                   #8, D3
 
-            CMP.B					#0, D3
-            BNE						EA_PrintRegList_Default_Sep
-            BRA						EA_PrintRegList_Default_EndIf
+            CMP.B                   #0, D3
+            BNE                     EA_PrintRegList_Default_Sep
+            BRA                     EA_PrintRegList_Default_EndIf
         EA_PrintRegList_Default_Sep:
-            MOVE.B					#'/', (A0)+
+            MOVE.B                  #'/', (A0)+
         EA_PrintRegList_Default_Address:
-            MOVE.L					#'A', D0
-            JSR						EA_ParseRegMask
+            MOVE.L                  #'A', D0
+            JSR                     EA_ParseRegMask
         EA_PrintRegList_Default_EndIf:
 
-    BRA						PrintRegList_EndIf
+    BRA                     PrintRegList_EndIf
 
     PrintRegList_PreDec:
 
         ; reverse the reg list mask
-        JSR						ReverseBits
-        MOVE.L					D2, D3
+        JSR                     ReverseBits
+        MOVE.L                  D2, D3
 
         ; setup block for push parsing
-        MOVE.L					#0, D5    * start index
-        MOVE.L					#8, D6    * end index
-        MOVE.L					#1, D7    * direction of loop movement
+        MOVE.L                  #0, D5    * start index
+        MOVE.L                  #8, D6    * end index
+        MOVE.L                  #1, D7    * direction of loop movement
 
-        CMP.B					#0, D3
-        BNE						EA_PrintRegList_PreDec_Data
+        CMP.B                   #0, D3
+        BNE                     EA_PrintRegList_PreDec_Data
 
         ; roll of the data register values
-        LSR.W					#8, D3
+        LSR.W                   #8, D3
 
-        CMP.B					#0, D3
-        BNE						EA_PrintRegList_PreDec_Address
+        CMP.B                   #0, D3
+        BNE                     EA_PrintRegList_PreDec_Address
 
         EA_PrintRegList_PreDec_Data:
-            MOVE.L					#'D', D0  * character to print
-            JSR						EA_ParseRegMask
+            MOVE.L                  #'D', D0  * character to print
+            JSR                     EA_ParseRegMask
 
-            LSR.W					#8, D3
+            LSR.W                   #8, D3
 
-            CMP.B					#0, D3
-            BNE						EA_PrintRegList_PreDec_Separator
-            BRA						EA_PrintRegList_PreDec_EndIf
+            CMP.B                   #0, D3
+            BNE                     EA_PrintRegList_PreDec_Separator
+            BRA                     EA_PrintRegList_PreDec_EndIf
         EA_PrintRegList_PreDec_Separator:
-            MOVE.B					#'/', (A0)+
+            MOVE.B                  #'/', (A0)+
         EA_PrintRegList_PreDec_Address:
-            MOVE.L					#'A', D0
-            JSR						EA_ParseRegMask
+            MOVE.L                  #'A', D0
+            JSR                     EA_ParseRegMask
         EA_PrintRegList_PreDec_EndIf:
 
     PrintRegList_EndIf:
    
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * D3 = current word
@@ -2185,375 +2185,375 @@ EA_PrintRegList:
 * D7 = default(1) or Predec(0) *D7 = dr: 1 or -1
 * D0 = ch: 'A' or 'D'
 EA_ParseRegMask:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
     *D4 = boolean list = false
     *D1 = boolean first = true
     *D2 = int last = 0
-    MOVE.L					#0, D4
-    MOVE.L					#1, D1
-    MOVE.L					#0 , D2
+    MOVE.L                  #0, D4
+    MOVE.L                  #1, D1
+    MOVE.L                  #0 , D2
 
     * if dr == 0, then rol mode.
     * else if dr == 1, then lsr mode.
-    CMP.B					#1, D7
-    BEQ						EA_ParseRegMask_SkipRol
-        ROL.W					#1, D3
+    CMP.B                   #1, D7
+    BEQ                     EA_ParseRegMask_SkipRol
+        ROL.W                   #1, D3
     EA_ParseRegMask_SkipRol:
 
     *D4 = current bit
     *while start != end
     EA_PrintModular_LoopStart:
-    CMP.L					D5, D6
-    BEQ						EA_PrintModular_LoopDone
+    CMP.L                   D5, D6
+    BEQ                     EA_PrintModular_LoopDone
         * protect the word with movem
-        MOVEM.L					D3, -(A7)
+        MOVEM.L                 D3, -(A7)
         * cur = b[i]
-        AND.L					#%1, D3  
+        AND.L                   #%1, D3  
 
         *compare cur
-        CMP.L					#0, D3
-        BEQ						EA_Cur0
-        BRA						EA_Cur1
+        CMP.L                   #0, D3
+        BEQ                     EA_Cur0
+        BRA                     EA_Cur1
 
         EA_Cur0:
             *compare last
-            CMP.L					#0, D2
-            BEQ						EA_Cur0Last0
-            BRA						EA_Cur0Last1
+            CMP.L                   #0, D2
+            BEQ                     EA_Cur0Last0
+            BRA                     EA_Cur0Last1
         EA_Cur1:
             *compare last
-            CMP.L					#0, D2
-            BEQ						EA_Cur1Last0
-            BRA						EA_Cur1Last1
+            CMP.L                   #0, D2
+            BEQ                     EA_Cur1Last0
+            BRA                     EA_Cur1Last1
 
         EA_Cur0Last0:
-            BRA						EA_IfDone
+            BRA                     EA_IfDone
         EA_Cur0Last1:  ; 01
             * if list == 1:
             *   print '-'
             *   print ch
             *   print i-1
             * list = 0
-            CMP.B					#1, D4
-            BNE						EA_Cur0Last1_SkipIf
-                MOVE.B					#'-', (A0)+
-                MOVE.B					D0, (A0)+
-                MOVEM.L					PARAMS, -(A7) ---> scope
-                    *SUB.L					D7, D5 * -----------------------------------
-                    SUB.L					#1, D5
-                    MOVE.L					D5, D2
-                    MOVE.L					#1, D3
-                    JSR						IO_HEX2ASCII
-                MOVEM.L					(A7)+, PARAMS <--- end scope
+            CMP.B                   #1, D4
+            BNE                     EA_Cur0Last1_SkipIf
+                MOVE.B                  #'-', (A0)+
+                MOVE.B                  D0, (A0)+
+                MOVEM.L                 PARAMS, -(A7) ---> scope
+                    *SUB.L                  D7, D5 * -----------------------------------
+                    SUB.L                   #1, D5
+                    MOVE.L                  D5, D2
+                    MOVE.L                  #1, D3
+                    JSR                     IO_HEX2ASCII
+                MOVEM.L                 (A7)+, PARAMS <--- end scope
             EA_Cur0Last1_SkipIf:
-            MOVE.L					#0, D4
-            BRA						EA_IfDone
+            MOVE.L                  #0, D4
+            BRA                     EA_IfDone
         EA_Cur1Last0:
             * if first == 0:
             *   print '/'
             * print ch
             * print start
             * first = 0
-            CMP.B					#0, D1
-            BNE						EA_Cur1Last0_SkipIf
-                MOVE.B					#'/', (A0)+
+            CMP.B                   #0, D1
+            BNE                     EA_Cur1Last0_SkipIf
+                MOVE.B                  #'/', (A0)+
             EA_Cur1Last0_SkipIf:
-            MOVE.B					D0, (A0)+
-            MOVEM.L					PARAMS, -(A7) ---> scope
-                MOVE.L					D5, D2
-                MOVE.L					#1, D3
-                JSR						IO_HEX2ASCII
-            MOVEM.L					(A7)+, PARAMS <--- end scope
-            MOVE.L					#0, D1
-            BRA						EA_IfDone
+            MOVE.B                  D0, (A0)+
+            MOVEM.L                 PARAMS, -(A7) ---> scope
+                MOVE.L                  D5, D2
+                MOVE.L                  #1, D3
+                JSR                     IO_HEX2ASCII
+            MOVEM.L                 (A7)+, PARAMS <--- end scope
+            MOVE.L                  #0, D1
+            BRA                     EA_IfDone
         EA_Cur1Last1:
             * list = 1
-            MOVE.B					#1, D4
-            BRA						EA_IfDone
+            MOVE.B                  #1, D4
+            BRA                     EA_IfDone
         EA_IfDone:
 
         * last = cur
         * start ++
-        MOVE.L					D3, D2
-        ADD.L					#1, D5
-        MOVEM.L					(A7)+, D3 * restore word value
+        MOVE.L                  D3, D2
+        ADD.L                   #1, D5
+        MOVEM.L                 (A7)+, D3 * restore word value
 
-        CMP.B					#1, D7
-        BEQ						EA_PrintModular_Loop_Lsr * do lsr
-        BRA						EA_PrintModular_Loop_Rol * do rol
+        CMP.B                   #1, D7
+        BEQ                     EA_PrintModular_Loop_Lsr * do lsr
+        BRA                     EA_PrintModular_Loop_Rol * do rol
 
         EA_PrintModular_Loop_Lsr:
-            LSR.W					#1, D3
-            BRA						EA_PrintModular_Loop_End
+            LSR.W                   #1, D3
+            BRA                     EA_PrintModular_Loop_End
         EA_PrintModular_Loop_Rol:
-            ROL.W					#1, D3
+            ROL.W                   #1, D3
         EA_PrintModular_Loop_End:
 
-        BRA						EA_PrintModular_LoopStart
+        BRA                     EA_PrintModular_LoopStart
     EA_PrintModular_LoopDone:
     * if list == 1:
     *   print '-'
     *   print ch
     *   print end - 1
-    CMP.B					#1, D4
-    BNE						EA_PrintModular_ListSkip
-        MOVE.B					#'-', (A0)+
-        MOVE.B					D0, (A0)+
-        MOVEM.L					PARAMS, -(A7) * ----> scope
-            MOVE.L					D6, D2
-            SUB.L					#1, D2
-            MOVE.L					#1, D3
-            JSR						IO_HEX2ASCII
-        MOVEM.L					(A7)+, PARAMS * <---- end scope
+    CMP.B                   #1, D4
+    BNE                     EA_PrintModular_ListSkip
+        MOVE.B                  #'-', (A0)+
+        MOVE.B                  D0, (A0)+
+        MOVEM.L                 PARAMS, -(A7) * ----> scope
+            MOVE.L                  D6, D2
+            SUB.L                   #1, D2
+            MOVE.L                  #1, D3
+            JSR                     IO_HEX2ASCII
+        MOVEM.L                 (A7)+, PARAMS * <---- end scope
     EA_PrintModular_ListSkip:
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 
 *D3 = word
 * returns in D2
 ReverseBits:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
     * counter = 16
-    MOVE.L					#16, D0
+    MOVE.L                  #16, D0
 
     LoopStart:
-    CMP.B					#0, D0
-    BEQ						LoopDone
-        LSL.W					#1, D2
-        LSR.W					#1, D3
-        BCC						AddZero
-        ADD.W					#1, D2
+    CMP.B                   #0, D0
+    BEQ                     LoopDone
+        LSL.W                   #1, D2
+        LSR.W                   #1, D3
+        BCC                     AddZero
+        ADD.W                   #1, D2
         AddZero:
 
-        SUB.B					#1, D0
-        BRA						LoopStart
+        SUB.B                   #1, D0
+        BRA                     LoopStart
     LoopDone:
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * Mode = D6
 * Register = D7
 EA_HandleOperand:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
     *if mode == 0 --> directData
-    CMP.B					#0, D6
-    BEQ						EA_HandleOperand_IfDirectData
+    CMP.B                   #0, D6
+    BEQ                     EA_HandleOperand_IfDirectData
 
     *elif mode == 1 --> direct address
-    CMP.B					#1, D6
-    BEQ						EA_HandleOperand_IfDirectAddress
+    CMP.B                   #1, D6
+    BEQ                     EA_HandleOperand_IfDirectAddress
 
     *elif mode == 2 --> indirect address
-    CMP.B					#2, D6
-    BEQ						EA_HandleOperand_IfIndirectAddr
+    CMP.B                   #2, D6
+    BEQ                     EA_HandleOperand_IfIndirectAddr
 
     *elif mode == 3 --> post dec address
-    CMP.B					#3, D6
-    BEQ						EA_HandleOperand_IfPostDec
+    CMP.B                   #3, D6
+    BEQ                     EA_HandleOperand_IfPostDec
 
     *elif mode == 4 --> pre dec address
-    CMP.B					#4, D6
-    BEQ						EA_HandleOperand_IfPreDec
+    CMP.B                   #4, D6
+    BEQ                     EA_HandleOperand_IfPreDec
 
     *elif mode == 7 --> immediate data
-    CMP.B					#7, D6
-    BEQ						EA_HandleOperand_ifImmMode
+    CMP.B                   #7, D6
+    BEQ                     EA_HandleOperand_ifImmMode
 
     * Not any of the supported modes, error.
-    BRA						EA_HandleOperand_IfElse     
+    BRA                     EA_HandleOperand_IfElse     
 
     EA_HandleOperand_IfDirectData:
-        JSR						EA_DirectData
-        BRA						EA_HandleOperand_IfEnd
+        JSR                     EA_DirectData
+        BRA                     EA_HandleOperand_IfEnd
     EA_HandleOperand_IfDirectAddress:
-        JSR						EA_DirectAddress
-        BRA						EA_HandleOperand_IfEnd
+        JSR                     EA_DirectAddress
+        BRA                     EA_HandleOperand_IfEnd
     EA_HandleOperand_IfIndirectAddr:
-        JSR						EA_IndirectAddress
-        BRA						EA_HandleOperand_IfEnd
+        JSR                     EA_IndirectAddress
+        BRA                     EA_HandleOperand_IfEnd
     EA_HandleOperand_IfPostDec:
-        JSR						EA_PostDecAddress
-        BRA						EA_HandleOperand_IfEnd
+        JSR                     EA_PostDecAddress
+        BRA                     EA_HandleOperand_IfEnd
     EA_HandleOperand_IfPreDec:
-        JSR						EA_PreDecAddress
-        BRA						EA_HandleOperand_IfEnd
+        JSR                     EA_PreDecAddress
+        BRA                     EA_HandleOperand_IfEnd
     EA_HandleOperand_IfElse:
     * TODO ERROR HANDLING HERE -----------
-        BRA						EA_HandleOperand_IfEnd
+        BRA                     EA_HandleOperand_IfEnd
     EA_HandleOperand_ifImmMode:
         * check the register
         * if reg == 0 --> (xxx).W
-        CMP.B					#0, D7
-        BEQ						EA_HandleOperand_IfWordAddr
+        CMP.B                   #0, D7
+        BEQ                     EA_HandleOperand_IfWordAddr
         * if reg == 1 --> (xxx).L
-        CMP.B					#1, D7
-        BEQ						EA_HandleOperand_IfLongWordAddr
+        CMP.B                   #1, D7
+        BEQ                     EA_HandleOperand_IfLongWordAddr
         * if reg == 4 --> #data
-        CMP.B					#4, D7
-        BEQ						EA_HandleOperand_IfImmData
-        BRA						EA_HandleOperand_IfElse
+        CMP.B                   #4, D7
+        BEQ                     EA_HandleOperand_IfImmData
+        BRA                     EA_HandleOperand_IfElse
     EA_HandleOperand_IfWordAddr:
-        JSR						EA_WordAddr
-        BRA						EA_HandleOperand_IfElse
+        JSR                     EA_WordAddr
+        BRA                     EA_HandleOperand_IfElse
     EA_HandleOperand_IfLongWordAddr:
-        JSR						EA_LongWordAddr
-        BRA						EA_HandleOperand_IfElse
+        JSR                     EA_LongWordAddr
+        BRA                     EA_HandleOperand_IfElse
     EA_HandleOperand_IfImmData:
-        JSR						EA_ImmData 
-        BRA						EA_HandleOperand_IfElse
+        JSR                     EA_ImmData 
+        BRA                     EA_HandleOperand_IfElse
     EA_HandleOperand_IfEnd:
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * register # = D7
 EA_DirectData:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
-    MOVE.B					#$44, (A0)+      * Data (D)
+    MOVE.B                  #$44, (A0)+      * Data (D)
     *Print the register #
-    MOVE.L					D7, D2
-    MOVE.L					#$00000001, D3
-    JSR						IO_HEX2ASCII
+    MOVE.L                  D7, D2
+    MOVE.L                  #$00000001, D3
+    JSR                     IO_HEX2ASCII
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * register # = D7
 EA_DirectAddress:
-    MOVEM.L					PARAMS, -(A7)
-    MOVE.B					#$41, (A0)+      * Address (A)
+    MOVEM.L                 PARAMS, -(A7)
+    MOVE.B                  #$41, (A0)+      * Address (A)
     *Print the register #
-    MOVE.L					D7, D2
-    MOVE.L					#$00000001, D3
-    JSR						IO_HEX2ASCII
+    MOVE.L                  D7, D2
+    MOVE.L                  #$00000001, D3
+    JSR                     IO_HEX2ASCII
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * register # = D7
 EA_IndirectAddress:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
-    MOVE.B					#$28, (A0)+      * '('
-    JSR						EA_DirectAddress
-    MOVE.B					#$29, (A0)+      * ')'
+    MOVE.B                  #$28, (A0)+      * '('
+    JSR                     EA_DirectAddress
+    MOVE.B                  #$29, (A0)+      * ')'
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * register # = D7
 EA_PostDecAddress:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
-    JSR						EA_IndirectAddress
-    MOVE.B					#$2B, (A0)+      * '+'
+    JSR                     EA_IndirectAddress
+    MOVE.B                  #$2B, (A0)+      * '+'
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * register # = D7
 EA_PreDecAddress:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
-    MOVE.B					#$2D, (A0)+      * '-'
-    JSR						EA_IndirectAddress
+    MOVE.B                  #$2D, (A0)+      * '-'
+    JSR                     EA_IndirectAddress
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * no arguments
 EA_WordAddr:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
-    MOVE.L					#1, D6
-    JSR						EA_GetData                  * returned in D2
+    MOVE.L                  #1, D6
+    JSR                     EA_GetData                  * returned in D2
 
-    MOVE.B					#$24, (A0)+      * '$'
-    MOVE.L					#$4, D3
+    MOVE.B                  #$24, (A0)+      * '$'
+    MOVE.L                  #$4, D3
     * Data is in D2 already
-    JSR						IO_HEX2ASCII        * '<addr>'
+    JSR                     IO_HEX2ASCII        * '<addr>'
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * no arguments
 EA_LongWordAddr:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
-    MOVE.L					#2, D6
-    JSR						EA_GetData                  * returned in D2
+    MOVE.L                  #2, D6
+    JSR                     EA_GetData                  * returned in D2
 
-    MOVE.B					#$24, (A0)+      * '$'
-    MOVE.L					#$8, D3
+    MOVE.B                  #$24, (A0)+      * '$'
+    MOVE.L                  #$8, D3
     * Data is in D2 already
-    JSR						IO_HEX2ASCII        * '<addr>'
+    JSR                     IO_HEX2ASCII        * '<addr>'
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * size of operation is (A4)
 EA_ImmData:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
     * if size == 1 --> byte
-    CMP.B					#$1, (A4)
-    BEQ						EA_ImmData_IfByte
+    CMP.B                   #$1, (A4)
+    BEQ                     EA_ImmData_IfByte
     * elif size == 3 --> word
-    CMP.B					#$3, (A4)
-    BEQ						EA_ImmData_IfWord
+    CMP.B                   #$3, (A4)
+    BEQ                     EA_ImmData_IfWord
     * elif size ==2 --> long
-    CMP.B					#$2, (A4)
-    BEQ						EA_ImmData_IfLongWord
+    CMP.B                   #$2, (A4)
+    BEQ                     EA_ImmData_IfLongWord
 
-    BRA						EA_ImmData_IfEnd
+    BRA                     EA_ImmData_IfEnd
 
     EA_ImmData_IfByte:
-        MOVE.B					#$1, D6
-        JSR						EA_GetData
-        MOVE.B					#$2, D3
-        BRA						EA_ImmData_IfEnd
+        MOVE.B                  #$1, D6
+        JSR                     EA_GetData
+        MOVE.B                  #$2, D3
+        BRA                     EA_ImmData_IfEnd
     EA_ImmData_IfWord:
-        MOVE.B					#$1, D6
-        JSR						EA_GetData
-        MOVE.B					#$4, D3
-        BRA						EA_ImmData_IfEnd
+        MOVE.B                  #$1, D6
+        JSR                     EA_GetData
+        MOVE.B                  #$4, D3
+        BRA                     EA_ImmData_IfEnd
     EA_ImmData_IfLongWord:
-        MOVE.B					#$2, D6
-        JSR						EA_GetData
-        MOVE.B					#$8, D3
-        BRA						EA_ImmData_IfEnd
+        MOVE.B                  #$2, D6
+        JSR                     EA_GetData
+        MOVE.B                  #$8, D3
+        BRA                     EA_ImmData_IfEnd
     EA_ImmData_IfEnd:
 
-    MOVE.B					#$23, (A0)+      * '#'
-    MOVE.B					#$24, (A0)+      * '$'
-    JSR						IO_HEX2ASCII
+    MOVE.B                  #$23, (A0)+      * '#'
+    MOVE.B                  #$24, (A0)+      * '$'
+    JSR                     IO_HEX2ASCII
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 * d7 = data
 EA_InstrData:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
 
     * if data is 0, it is really 8
-    CMP.B					#0, D7
-    BNE						EA_InstrData_NoTransform
-    MOVE.B					#8, D7
+    CMP.B                   #0, D7
+    BNE                     EA_InstrData_NoTransform
+    MOVE.B                  #8, D7
 
     EA_InstrData_NoTransform:
-    MOVE.B					#'#', (A0)+
-    MOVE.B					#'$', (A0)+
+    MOVE.B                  #'#', (A0)+
+    MOVE.B                  #'$', (A0)+
 
-    MOVE.B					D7, D2
-    MOVE.B					#1, D3
-    JSR						IO_HEX2ASCII
+    MOVE.B                  D7, D2
+    MOVE.B                  #1, D3
+    JSR                     IO_HEX2ASCII
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 
@@ -2561,21 +2561,21 @@ EA_InstrData:
 * D6 = # of words to read, must be 1 or 2
 * returns in D2
 EA_GetData:
-    MOVEM.L					PARAMS, -(A7)
+    MOVEM.L                 PARAMS, -(A7)
     *ADD.L #$2, A6
-    CLR.L					D2
+    CLR.L                   D2
     EA_GetData_Loop:
-    CMPI.B					#0, D6
-    BLE						EA_GetData_LoopDone
-        MOVE.L					#16, D0
-        LSL.L					D0, D2
-        ADD.W					(A6)+, D2
+    CMPI.B                  #0, D6
+    BLE                     EA_GetData_LoopDone
+        MOVE.L                  #16, D0
+        LSL.L                   D0, D2
+        ADD.W                   (A6)+, D2
         
-        SUBQ.B					#1, D6
-        BRA						EA_GetData_Loop
+        SUBQ.B                  #1, D6
+        BRA                     EA_GetData_Loop
     EA_GetData_LoopDone:
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 
@@ -2584,31 +2584,31 @@ EA_GetData:
 * D7 = # of bits wanted (LW)
 * Return in D2 (LW)
 EA_ShiftAndMask:
-    MOVEM.L					PARAMS, -(A7)
-    CLR.L					D2
-    LSR.L					D6, D4
+    MOVEM.L                 PARAMS, -(A7)
+    CLR.L                   D2
+    LSR.L                   D6, D4
     * build masking data
-    CLR.L					D1                * D1 = #$0000 0000
+    CLR.L                   D1                * D1 = #$0000 0000
     * for D7 > 0
     EA_ShiftAndMask_ForLoop:
-        CMP.B					#0, D7
-        BLE						EA_ShiftAndMask_ForLoopDone
+        CMP.B                   #0, D7
+        BLE                     EA_ShiftAndMask_ForLoopDone
 
-        LSL.L					#1, D1
-        ADD.L					#%00000000000000000000000000000001, D1
-        SUBQ.L					#1, D7      * Decrement loop
-        BRA						EA_ShiftAndMask_ForLoop
+        LSL.L                   #1, D1
+        ADD.L                   #%00000000000000000000000000000001, D1
+        SUBQ.L                  #1, D7      * Decrement loop
+        BRA                     EA_ShiftAndMask_ForLoop
     EA_ShiftAndMask_ForLoopDone:
-    AND.L					D1, D4
-    MOVE.L					D4, D2
+    AND.L                   D1, D4
+    MOVE.L                  D4, D2
 
-    MOVEM.L					(A7)+, PARAMS
+    MOVEM.L                 (A7)+, PARAMS
     RTS
 
 EA_PrintCommaSpace:
     *Print comma & space.
-    MOVE.B					#$2C, (A0)+
-    MOVE.B					#$20, (A0)+
+    MOVE.B                  #$2C, (A0)+
+    MOVE.B                  #$20, (A0)+
     RTS
 * ============================ END EA_ShiftAndMask
 
