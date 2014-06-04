@@ -395,14 +395,33 @@ IO_CLEAR_SCREEN:
         BRA       DISPLAY_LINE_BUFFER
 
 * IO CONSTANTS
-IO_OPEN  DC.B    ' ____ ____ ____ ', CR, LF 
-         DC.B    '||6 |||8 |||k ||', CR, LF
-         DC.B    '||__|||__|||__||', CR, LF
-         DC.B    '|/__\|/__\|/__\|', CR, LF
-         DC.B    ' ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ____ ', CR,LF
-         DC.B    '||D |||I |||S |||A |||S |||S |||E |||M |||B |||L |||E |||R ||', CR,LF
-         DC.B    '||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__|||__||', CR,LF
-         DC.B    '|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|', CR,LF,0
+
+IO_OPEN   DC.B        ' ___==_______________________________ ',CR,LF
+          DC.B        '|_|<OFF|ON>_______________________|_|',CR,LF
+          DC.B        '| .-------------------------------. |',CR,LF
+          DC.B        '| |  .-------------------------.  | |',CR,LF
+          DC.B        '| |  |      _/\|\_\_           |  | |',CR,LF
+          DC.B        '| |()|    _| .-     \____      |  | |',CR,LF
+          DC.B        '| |""|____\ /    )      o`o____|  | |',CR,LF
+          DC.B        '| |  |    </ ) _/_ )-.____/    |  | |',CR,LF
+          DC.B        '| |  |    /  /\(  (/           |  | |',CR,LF
+          DC.B        '| |  |   | (__``` ``           |  | |',CR,LF
+          DC.B        '| |  |    1--.)                |  | |',CR,LF
+          DC.B        '| |  .-------------------------.  | |',CR,LF
+          DC.B        '| |__Motorola 68k_________________/ |',CR,LF
+          DC.B        '|          ________                 |',CR,LF
+          DC.B        '|    .    (Disassembler)            |',CR,LF
+          DC.B        '|  _| |_   """"""""            .-.  |',CR,LF
+          DC.B        '|<[_ o _]>                .-. (   ) |',CR,LF
+          DC.B        '|   |_|                  (   ) `-`  |',CR,LF
+          DC.B        '|    `                    `-`   A   |',CR,LF
+          DC.B        '|                          B        |',CR,LF
+          DC.B        '|          ___   ___                |',CR,LF
+          DC.B        '|         (___) (___)           \\\\|',CR,LF
+          DC.B        '|        select start          \\\\\|',CR,LF
+          DC.B        '|                            \\\\\ / ',CR,LF
+          DC.B        '|    (The RAZRS)            \\\\`.   ',CR,LF
+          DC.B        '`-------------------------------`    ',CR,LF,0
 
 IO_STARTMSSG    DC.B    'Enter a starting address: ',0
 IO_ENDMSSG      DC.B    'Enter a ending address: ',0
