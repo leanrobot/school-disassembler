@@ -75,7 +75,7 @@ IO_INPUT_SUCCESSFUL:
     
 *================= MAIN LOOP ===================================================
 MAIN_LOOP:
-    MOVE.B    #25, D6               *Counter for display looping, starts at 30
+    MOVE.B    #27, D6               *Counter for display looping, starts at 30
 IO_READING:
     MOVE.L      (IO_ENDADDR),D0
     CMP.L       A6,D0
@@ -391,7 +391,7 @@ IO_CLEAR_SCREEN:
         MOVE.B    #4, D0                          *User presses any key
         TRAP      #15
     
-        MOVE.B    #25, D6                          *Restart loop counter
+        MOVE.B    #27, D6                          *Restart loop counter
         BRA       DISPLAY_LINE_BUFFER
 
 * IO CONSTANTS
@@ -1674,15 +1674,6 @@ EA_DECODE:
         JSR EA_DECODE_CASE12
         BRA EA_DECODE_EndIf
     EA_DECODE_UnsupportedCase:
-        MOVE.B #$4E, (A0)+ * 'N'
-        MOVE.B #$4F, (A0)+ * 'O'
-        MOVE.B #$20, (A0)+ * ' '
-        MOVE.B #$45, (A0)+ * 'E'
-        MOVE.B #$41, (A0)+ * 'A'
-        MOVE.B #$20, (A0)+ * ' '
-        MOVE.B (A3), D2
-        MOVE.L #2, D3
-        JSR IO_HEX2ASCII
 
         BRA EA_DECODE_EndIf
     EA_DECODE_EndIf:
